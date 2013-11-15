@@ -83,7 +83,7 @@ MIDDLEWARE_CLASSES = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'oap0ahyb%_iitq1un(4j!#v81_%6jl$wefeh@$^=metg6w8pr^'
 
-ROOT_URLCONF = 'example_project.urls'
+ROOT_URLCONF = 'timepiece_project.urls'
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
@@ -110,7 +110,7 @@ TEMPLATE_LOADERS = (
 )
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'example_project.wsgi.application'
+WSGI_APPLICATION = 'timepiece_project.wsgi.application'
 
 
 INSTALLED_APPS = (
