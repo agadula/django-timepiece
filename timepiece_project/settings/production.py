@@ -26,3 +26,5 @@ INTERNAL_IPS = ('127.0.0.1',)
 # Whether links in emails should use https
 # Default is True
 #TIMEPIECE_EMAILS_USE_HTTPS = True
+
+COMPRESS_ROOT = '/var/www/django/timepiece/timepiece/static'
