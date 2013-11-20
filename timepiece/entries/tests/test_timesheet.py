@@ -2167,3 +2167,108 @@ class MonthlyRejectTestCase(ViewTestMixin, TestCase):
 
         entries = Entry.no_join.filter(status=Entry.UNVERIFIED)
         self.assertEquals(entries.count(), 0)
+
+
+class CreateEditSimpleEntry(ViewTestMixin, TestCase):
+
+    def setUp(self):
+        super(CreateEditSimpleEntry, self).setUp()
+
+        self.user = factories.User()
+        self.user2 = factories.User()
+        self.superuser = factories.Superuser()
+        permissions = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(Entry),
+            codename__in=('can_clock_in', 'can_clock_out',
+            'can_pause', 'change_entry')
+        )
+        self.user.user_permissions = permissions
+        self.user2.user_permissions = permissions
+        self.user.save()
+        self.user2.save()
+
+        self.activity = factories.Activity(code='WRK',
+                name='Work')
+        self.devl_activity = factories.Activity(code='devl',
+                name='development', billable=True)
+        self.sick_activity = factories.Activity(code="sick",
+                name="sick/personal", billable=False)
+        self.activity_group_all = factories.ActivityGroup(
+                name='All')
+        self.activity_group_work = factories.ActivityGroup(
+                name='Client work')
+
+        activities = Activity.objects.all()
+        for activity in activities:
+            activity.activity_group.add(self.activity_group_all)
+            if activity != self.sick_activity:
+                activity.activity_group.add(self.activity_group_work)
+        self.business = factories.Business()
+        status = factories.StatusAttribute(label='Current',
+                enable_timetracking=True)
+        type_ = factories.TypeAttribute(label='Web Sites',
+            enable_timetracking=True)
+        self.project = factories.Project(type=type_,
+                status=status, business=self.business, point_person=self.user,
+                activity_group=self.activity_group_work)
+        self.project2 = factories.Project(type=type_,
+                status=status, business=self.business, point_person=self.user2,
+                activity_group=self.activity_group_all)
+        factories.ProjectRelationship(user=self.user,
+                project=self.project)
+        
+        self.location = factories.Location()
+
+        self.login_user(self.user)
+        self.now = timezone.now()
+        valid_start = self.now - relativedelta(days=1)
+        valid_end = valid_start + relativedelta(hours=1)
+        self.ten_min_ago = self.now - relativedelta(minutes=10)
+        self.two_hour_ago = self.now - relativedelta(hours=2)
+        self.one_hour_ago = self.now - relativedelta(hours=1)
+        #establish data, entries, urls for all tests
+        self.default_data = {
+            'project': self.project.pk,
+            #'activity': self.devl_activity.pk,
+            'date': timezone.now().strftime('%m/%d/%Y'),
+            'hours': 0,
+            'minutes': 0,
+        }
+#         self.closed_entry_data = {
+#             'user': self.user,
+#             'project': self.project,
+#             'activity': self.devl_activity,
+#             'start_time': self.two_hour_ago,
+#             'end_time': self.one_hour_ago,
+#         }
+#         self.current_entry_data = {
+#             'user': self.user,
+#             'project': self.project,
+#             'activity': self.devl_activity,
+#             'start_time': self.ten_min_ago,
+#         }
+#         self.closed_entry = factories.Entry(**self.closed_entry_data)
+#         self.current_entry = factories.Entry(**self.current_entry_data)
+#         self.closed_entry_data.update({
+#             'st_str': self.two_hour_ago.strftime('%H:%M:%S'),
+#             'end_str': self.one_hour_ago.strftime('%H:%M:%S'),
+#         })
+#         self.current_entry_data.update({
+#             'st_str': self.ten_min_ago.strftime('%H:%M:%S'),
+#         })
+        self.create_url = reverse('create_simple_entry')
+#         self.edit_closed_url = reverse('edit_entry',
+#             args=[self.closed_entry.pk])
+#         self.edit_current_url = reverse('edit_entry',
+#             args=[self.current_entry.pk])
+
+    def testCreateSimpleEntry(self):
+        """
+        Test the ability to create a valid new simple entry
+        """
+        response = self.client.post(self.create_url, self.default_data,
+            follow=True)
+        self.assertRedirects(response, reverse('dashboard'),
+            status_code=302, target_status_code=200)
+        self.assertContains(response,
+            'The simple entry has been created successfully', count=1)

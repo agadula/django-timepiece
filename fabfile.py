@@ -40,7 +40,7 @@ def deploy():
     with cd(code_dir):
         run("git pull")
         run("touch app.wsgi")
-    update_apache_conf()
+    apache_update_conf()
     
 def full_deploy():
     prepare_deploy()

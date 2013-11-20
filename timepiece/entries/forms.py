@@ -5,7 +5,7 @@ from django import forms
 
 from timepiece import utils
 from timepiece.crm.models import Project
-from timepiece.entries.models import Entry, Location, ProjectHours
+from timepiece.entries.models import Entry, Location, ProjectHours, SimpleEntry
 from timepiece.forms import INPUT_FORMATS, TimepieceSplitDateTimeWidget,\
         TimepieceDateInput
 
@@ -167,3 +167,19 @@ class ProjectHoursSearchForm(forms.Form):
     def clean_week_start(self):
         week_start = self.cleaned_data.get('week_start', None)
         return utils.get_week_start(week_start, False) if week_start else None
+
+
+class AddUpdateSimpleEntryForm(forms.ModelForm):
+
+    class Meta:
+        model = SimpleEntry
+        exclude = ('user', 'status')
+        fields = 'project date hours minutes comments'.split()
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(AddUpdateSimpleEntryForm, self).__init__(*args, **kwargs)
+        self.instance.user = self.user
+
+        self.fields['project'].queryset = Project.trackable.filter(
+                users=self.user)

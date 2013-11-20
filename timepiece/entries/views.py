@@ -25,8 +25,9 @@ from timepiece.utils.csv import DecimalEncoder
 
 from timepiece.crm.models import Project, UserProfile
 from timepiece.entries.forms import ClockInForm, ClockOutForm, \
-        AddUpdateEntryForm, ProjectHoursForm, ProjectHoursSearchForm
-from timepiece.entries.models import Entry, ProjectHours
+        AddUpdateEntryForm, ProjectHoursForm, ProjectHoursSearchForm, \
+        AddUpdateSimpleEntryForm
+from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 
 
 class Dashboard(TemplateView):
@@ -598,3 +599,50 @@ class ScheduleDetailView(ScheduleMixin, View):
             return HttpResponse('ok', mimetype='text/plain')
 
         return HttpResponse('', status=500)
+
+
+@permission_required('entries.change_entry')
+def create_edit_simple_entry(request, entry_id=None):
+    if entry_id: # edit mode
+        pass
+#         try:
+#             entry = Entry.no_join.get(pk=entry_id)
+#         except Entry.DoesNotExist:
+#             entry = None
+#         if not entry or not (entry.is_editable or
+#                 request.user.has_perm('entries.view_payroll_summary')):
+#             raise Http404
+    else:
+        entry = None
+
+    entry_user = entry.user if entry else request.user
+    if request.method == 'POST':
+        form = AddUpdateSimpleEntryForm(data=request.POST, instance=entry,
+                user=entry_user)
+        if form.is_valid():
+            entry = form.save()
+            if entry_id:
+                message = 'The simple entry has been updated successfully.'
+            else:
+                message = 'The simple entry has been created successfully.'
+            messages.info(request, message)
+            url = request.REQUEST.get('next', reverse('dashboard'))
+            return HttpResponseRedirect(url)
+        else:
+            message = 'Please fix the errors below.'
+            messages.error(request, message)
+        
+#         message = 'The simple entry has been created successfully.'   
+#         messages.info(request, message)
+#         url = request.REQUEST.get('next', reverse('dashboard'))
+#         return HttpResponseRedirect(url)
+
+    else:
+        initial = dict([(k, request.GET[k]) for k in request.GET.keys()])
+        form = AddUpdateSimpleEntryForm(instance=entry, user=entry_user,
+                initial=initial)
+
+    return render(request, 'timepiece/simple_entry/create_edit.html', {
+        'form': form,
+        'entry': entry,
+    })

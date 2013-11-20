@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.core import validators
@@ -520,3 +521,63 @@ class ProjectHours(models.Model):
         verbose_name = 'project hours entry'
         verbose_name_plural = 'project hours entries'
         unique_together = ('week_start', 'project', 'user')
+
+class SimpleEntry(models.Model):
+    """
+    This class is where all of the time logs are taken care of
+    """
+    UNVERIFIED = 'unverified'
+    VERIFIED = 'verified'
+    STATUSES = {
+        UNVERIFIED: 'Unverified',
+        VERIFIED: 'Verified',
+    }
+
+    user = models.ForeignKey(User, related_name='simple_entries')
+    project = models.ForeignKey('crm.Project', related_name='simple_entries')
+    #activity = models.ForeignKey(Activity, related_name='entries')
+    status = models.CharField(max_length=24, choices=STATUSES.items(),
+            default=UNVERIFIED)
+
+    comments = models.TextField(blank=True)
+    date = models.DateField(default=date.today)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    hours = models.DecimalField(max_digits=2, decimal_places=0, default=0) #validators=[MinValueValidator(Decimal('0.01'))
+    minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0)
+
+    class Meta:
+        db_table = 'timepiece_simple_entry'  # Using legacy table name
+        ordering = ('-date',)
+        verbose_name_plural = 'simple_entries'
+        permissions = (
+            ('can_clock_in', 'Can use Pendulum to clock in'),
+            ('can_pause', 'Can pause and unpause log entries'),
+            ('can_clock_out', 'Can use Pendulum to clock out'),
+            ('view_entry_summary', 'Can view entry summary page'),
+            ('view_payroll_summary', 'Can view payroll summary page'),
+            ('approve_timesheet', 'Can approve a verified timesheet'),
+        )
+
+    def __unicode__(self):
+        return '%s on %s' % (self.user, self.project)
+
+    @property
+    def is_editable(self):
+        return self.status == Entry.UNVERIFIED
+
+    @property
+    def delete_key(self):
+        """
+        Make it a little more interesting for deleting logs
+        """
+        salt = '%i-%i-apple-%s-sauce' \
+            % (self.id, self.is_paused, self.is_closed)
+        try:
+            import hashlib
+        except ImportError:
+            import sha
+            key = sha.new(salt).hexdigest()
+        else:
+            key = hashlib.sha1(salt).hexdigest()
+        return key

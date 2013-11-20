@@ -46,4 +46,9 @@ urlpatterns = patterns('',
     url(r'^schedule/ajax/(?P<assignment_id>\d+)/$',
         views.ScheduleDetailView.as_view(),
         name='ajax_schedule_detail'),
+        
+    # Simple Entries
+    url(r'^simple_entry/add/$',
+        views.create_edit_simple_entry,
+        name='create_simple_entry')
 )
