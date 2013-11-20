@@ -50,7 +50,7 @@ if not settings.configured:
             'django.contrib.messages.middleware.MessageMiddleware',
             'pagination.middleware.PaginationMiddleware',
         ),
-        ROOT_URLCONF='example_project.urls',
+        ROOT_URLCONF='timepiece_project.urls',
         SITE_ID=1,
         STATIC_URL='%s/timepiece/static/' % directory,
         TEMPLATE_CONTEXT_PROCESSORS=(
@@ -66,7 +66,8 @@ if not settings.configured:
             'timepiece.context_processors.extra_settings',
         ),
         TEMPLATE_DIRS=(
-            '%s/example_project/templates' % directory,
+            '%s/timepiece/templates' % directory,
+            '%s/timepiece_project/templates' % directory,
         ),
 
         # In tests, compressor has a habit of choking on failing tests & masking the real error.
