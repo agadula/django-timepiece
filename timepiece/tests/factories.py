@@ -198,3 +198,14 @@ class ProjectHours(factory.DjangoModelFactory):
     project = factory.SubFactory('timepiece.tests.factories.Project')
     user = factory.SubFactory('timepiece.tests.factories.User')
     hours = FuzzyInteger(0, 20)
+
+
+class SimpleEntry(factory.DjangoModelFactory):
+    FACTORY_FOR = entries.SimpleEntry
+
+    status = entries.SimpleEntry.UNVERIFIED
+    user = factory.SubFactory('timepiece.tests.factories.User')
+    #activity = factory.SubFactory('timepiece.tests.factories.Activity')
+    project = factory.SubFactory('timepiece.tests.factories.Project')
+    hours = FuzzyInteger(0, 23)
+    minutes = FuzzyInteger(0, 59)

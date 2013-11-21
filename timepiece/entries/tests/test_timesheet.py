@@ -2226,28 +2226,31 @@ class CreateEditSimpleEntry(ViewTestMixin, TestCase):
         self.ten_min_ago = self.now - relativedelta(minutes=10)
         self.two_hour_ago = self.now - relativedelta(hours=2)
         self.one_hour_ago = self.now - relativedelta(hours=1)
+        
+        self.yesterday = self.now - relativedelta(days=1)
+        self.two_days_ago = self.now - relativedelta(days=2)
+        
         #establish data, entries, urls for all tests
         self.default_data = {
             'project': self.project.pk,
             #'activity': self.devl_activity.pk,
-            'date': timezone.now().strftime('%m/%d/%Y'),
-            'hours': 0,
-            'minutes': 0,
+            'date': self.now.strftime('%m/%d/%Y'),
+            'hours': 3,
+            'minutes': 30,
         }
-#         self.closed_entry_data = {
-#             'user': self.user,
-#             'project': self.project,
-#             'activity': self.devl_activity,
-#             'start_time': self.two_hour_ago,
-#             'end_time': self.one_hour_ago,
-#         }
+        self.closed_entry_data = {
+            'user': self.user,
+            'project': self.project,
+            #'activity': self.devl_activity,
+            'date': self.yesterday,
+        }
 #         self.current_entry_data = {
 #             'user': self.user,
 #             'project': self.project,
 #             'activity': self.devl_activity,
 #             'start_time': self.ten_min_ago,
 #         }
-#         self.closed_entry = factories.Entry(**self.closed_entry_data)
+        self.closed_entry = factories.SimpleEntry(**self.closed_entry_data)
 #         self.current_entry = factories.Entry(**self.current_entry_data)
 #         self.closed_entry_data.update({
 #             'st_str': self.two_hour_ago.strftime('%H:%M:%S'),
@@ -2257,8 +2260,8 @@ class CreateEditSimpleEntry(ViewTestMixin, TestCase):
 #             'st_str': self.ten_min_ago.strftime('%H:%M:%S'),
 #         })
         self.create_url = reverse('create_simple_entry')
-#         self.edit_closed_url = reverse('edit_entry',
-#             args=[self.closed_entry.pk])
+        self.edit_closed_url = reverse('edit_simple_entry',
+            args=[self.closed_entry.pk])
 #         self.edit_current_url = reverse('edit_entry',
 #             args=[self.current_entry.pk])
 
@@ -2272,3 +2275,14 @@ class CreateEditSimpleEntry(ViewTestMixin, TestCase):
             status_code=302, target_status_code=200)
         self.assertContains(response,
             'The simple entry has been created successfully', count=1)
+
+    def testEditClosed(self):
+        """
+        Test the ability to edit a closed simple entry, using valid values
+        """
+        response = self.client.post(self.edit_closed_url, self.default_data,
+            follow=True)
+        self.assertRedirects(response, reverse('dashboard'),
+            status_code=302, target_status_code=200)
+        self.assertContains(response,
+            'The simple entry has been updated successfully', count=1)

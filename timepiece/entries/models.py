@@ -546,18 +546,12 @@ class SimpleEntry(models.Model):
     hours = models.DecimalField(max_digits=2, decimal_places=0, default=0) #validators=[MinValueValidator(Decimal('0.01'))
     minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0)
 
+    no_join = models.Manager()
+
     class Meta:
         db_table = 'timepiece_simple_entry'  # Using legacy table name
         ordering = ('-date',)
         verbose_name_plural = 'simple_entries'
-        permissions = (
-            ('can_clock_in', 'Can use Pendulum to clock in'),
-            ('can_pause', 'Can pause and unpause log entries'),
-            ('can_clock_out', 'Can use Pendulum to clock out'),
-            ('view_entry_summary', 'Can view entry summary page'),
-            ('view_payroll_summary', 'Can view payroll summary page'),
-            ('approve_timesheet', 'Can approve a verified timesheet'),
-        )
 
     def __unicode__(self):
         return '%s on %s' % (self.user, self.project)

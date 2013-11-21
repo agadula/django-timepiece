@@ -603,15 +603,14 @@ class ScheduleDetailView(ScheduleMixin, View):
 
 @permission_required('entries.change_entry')
 def create_edit_simple_entry(request, entry_id=None):
-    if entry_id: # edit mode
-        pass
-#         try:
-#             entry = Entry.no_join.get(pk=entry_id)
-#         except Entry.DoesNotExist:
-#             entry = None
-#         if not entry or not (entry.is_editable or
-#                 request.user.has_perm('entries.view_payroll_summary')):
-#             raise Http404
+    if entry_id:
+        try:
+            entry = SimpleEntry.no_join.get(pk=entry_id)
+        except SimpleEntry.DoesNotExist:
+            entry = None
+        if not entry or not (entry.is_editable or
+                request.user.has_perm('entries.view_payroll_summary')):
+            raise Http404
     else:
         entry = None
 
@@ -631,11 +630,6 @@ def create_edit_simple_entry(request, entry_id=None):
         else:
             message = 'Please fix the errors below.'
             messages.error(request, message)
-        
-#         message = 'The simple entry has been created successfully.'   
-#         messages.info(request, message)
-#         url = request.REQUEST.get('next', reverse('dashboard'))
-#         return HttpResponseRedirect(url)
 
     else:
         initial = dict([(k, request.GET[k]) for k in request.GET.keys()])
