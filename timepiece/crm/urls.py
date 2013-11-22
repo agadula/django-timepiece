@@ -26,7 +26,7 @@ urlpatterns = patterns('',
         views.DeleteUser.as_view(),
         name='delete_user'),
     url(r'^user/(?P<user_id>\d+)/timesheet/' +
-                '(?:(?P<active_tab>overview|all-entries|daily-summary)/)?$',
+                '(?:(?P<active_tab>all-simple-entries|overview|all-entries|daily-summary)/)?$',
         views.view_user_timesheet,
         name='view_user_timesheet'),
     url(r'^user/(?P<user_id>\d+)/timesheet/reject/$',

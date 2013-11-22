@@ -14,8 +14,8 @@
 {% block extrajs %}
     <script>
         var basePath = "{% url 'view_user_timesheet' timesheet_user.pk %}",
-            tabIds = ['overview', 'all-entries', 'daily-summary'],
-            defaultTab = 'overview';
+            tabIds = ['all-simple-entries', 'overview', 'all-entries', 'daily-summary'],
+            defaultTab = 'all-simple-entries';
     </script>
     <script charset="utf-8" src="{{ STATIC_URL }}timepiece/js/permanent_tabs.js"></script>
 {% endblock extrajs %}
@@ -64,6 +64,10 @@
     <div class="row-fluid">
         <div class="span12">
             <ul class="nav nav-tabs">
+                <li{% if active_tab == 'all-simple-entries' %} class="active"{% endif %}>
+                    {% url "view_user_timesheet" user.pk "'all-simple-entries'" as link %}
+                    <a class="tab-link" to="all-simple-entries" href="{{ link|add_parameters:request.GET }}">All Simple Entries</a>
+                </li>
                 <li{% if active_tab == 'overview' %} class="active"{% endif %}>
                     {% url "view_user_timesheet" user.pk "overview" as link %}
                     <a class="tab-link" to="overview" href="{{ link|add_parameters:request.GET }}">Overview</a>
@@ -78,6 +82,62 @@
                 </li>
             </ul>
             <div class="tab-content">
+
+                <div class="tab-pane{% if active_tab == 'all-simple-entries' %} active{% endif %}" id="all-simple-entries">
+                    {% if month_simple_entries %}
+                        {% url 'view_user_timesheet' timesheet_user.pk 'all-simple-entries' as next_url %}
+                        <table class="table table-bordered table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th class="project">Project</th>
+                                    <th class="time">Hours</th>
+                                    <th class="time">Minutes</th>
+                                    <th class="comments">Comments</th>
+                                    <th>Status</th>
+                                    <th class="aux"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in month_simple_entries %}
+                                    {% ifchanged entry.date|date:"W" %}
+                                        <tr class="emphasized-row">
+                                            <th colspan="11">Week of {{ entry.date|week_start|date:'M j, Y' }} </th>
+                                        </tr>
+                                    {% endifchanged %}
+                                    <tr>
+                                        {% ifchanged entry.date|date %}
+                                            <td>{{ entry.date|date:"d/m/Y (D)" }}</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endifchanged %}
+                                        <td class="project">{{ entry.project }}</td>
+                                        <td class="time break">{{ entry.hours }}</td>
+                                        <td class="time break">{{ entry.minutes }}</td>
+                                        <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
+                                        <td>{{ entry.status|title }}</td>
+                                        <td class="aux">
+                                            {% if entry.status == "unverified" or entry.status != 'invoiced' and perms.entries.view_payroll_summary %}
+                                                <a href="{% url 'edit_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}">Edit</a>
+                                            {% endif %}
+                                            {% if perms.entries.view_payroll_summary and entry.status != "unverified" and entry.status != "invoiced" %}
+                                                | <a href="{% url 'reject_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}">Reject</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr class="emphasized-row">
+                                    <th colspan=5 style="text-align: right;">Total over all entries:</th>
+                                    <th class="hours">{{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</th>
+                                    <th colspan=2></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No simple entries exist for this time sheet.</p>
+                    {% endif %}
+                </div>
+
                 <div class="tab-pane{% if active_tab == 'overview' %} active{% endif %}" id="overview">
                     <div class="row-fluid">
                         {% if project_entries %}

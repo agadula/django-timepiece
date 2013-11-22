@@ -30,7 +30,7 @@ from timepiece.crm.forms import (CreateEditBusinessForm, CreateEditProjectForm,
 from timepiece.crm.models import Business, Project, ProjectRelationship,\
         UserProfile
 from timepiece.crm.utils import grouped_totals
-from timepiece.entries.models import Entry
+from timepiece.entries.models import Entry, SimpleEntry
 
 
 @cbv_decorator(login_required)
@@ -212,6 +212,9 @@ def view_user_timesheet(request, user_id, active_tab):
             'id', 'location__name', 'project__name', 'activity__name',
             'status')
     month_entries = month_qs.date_trunc('month', extra_values)
+    
+    month_simple_entries = SimpleEntry.objects.filter(user=user)
+
     # For grouped entries, back date up to the start of the week.
     first_week = utils.get_week_start(from_date)
     month_week = first_week + relativedelta(weeks=1)
@@ -253,6 +256,7 @@ def view_user_timesheet(request, user_id, active_tab):
         'show_approve': show_approve,
         'timesheet_user': user,
         'entries': month_entries,
+        'month_simple_entries': month_simple_entries,
         'grouped_totals': totals,
         'project_entries': project_entries,
         'summary': summary,
