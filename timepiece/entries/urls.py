@@ -54,4 +54,8 @@ urlpatterns = patterns('',
     url(r'^simple_entry/(?P<entry_id>\d+)/edit/$',
         views.create_edit_simple_entry,
         name='edit_simple_entry'),
+
+    url(r'^simple_entry/(?P<entry_id>\d+)/delete/$',
+        views.delete_simple_entry,
+        name='delete_simple_entry'),
 )

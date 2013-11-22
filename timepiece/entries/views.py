@@ -644,3 +644,38 @@ def create_edit_simple_entry(request, entry_id=None):
         'form': form,
         'entry': entry,
     })
+
+
+@permission_required('entries.delete_entry')
+def delete_simple_entry(request, entry_id):
+    """
+    Give the user the ability to delete a log entry, with a confirmation
+    beforehand.  If this method is invoked via a GET request, a form asking
+    for a confirmation of intent will be presented to the user. If this method
+    is invoked via a POST request, the entry will be deleted.
+    """
+    try:
+        entry = SimpleEntry.no_join.get(pk=entry_id, user=request.user)
+    except SimpleEntry.DoesNotExist:
+        message = 'No such simple entry found.'
+        messages.info(request, message)
+        url = request.REQUEST.get('next', reverse('dashboard'))
+        return HttpResponseRedirect(url)
+
+    if request.method == 'POST':
+        key = request.POST.get('key', None)
+        if key and key == entry.delete_key:
+            entry.delete()
+#             message = 'Deleted {0} for {1}.'.format(entry.activity.name,
+#                     entry.project)
+            message = 'Deleted the simple entry for {0}'.format(entry.project)
+            messages.info(request, message)
+            url = request.REQUEST.get('next', reverse('dashboard'))
+            return HttpResponseRedirect(url)
+        else:
+            message = 'You are not authorized to delete this simple entry!'
+            messages.error(request, message)
+
+    return render(request, 'timepiece/simple_entry/delete.html', {
+        'entry': entry,
+    })

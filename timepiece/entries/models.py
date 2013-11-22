@@ -602,7 +602,7 @@ class SimpleEntry(models.Model):
         Make it a little more interesting for deleting logs
         """
         salt = '%i-%i-apple-%s-sauce' \
-            % (self.id, self.is_paused, self.is_closed)
+            % (self.id, True, False) #self.is_paused, self.is_closed
         try:
             import hashlib
         except ImportError:

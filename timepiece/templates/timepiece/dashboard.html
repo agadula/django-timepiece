@@ -178,7 +178,7 @@
                                         <td>
                                             {% if entry.status == "unverified" %}
                                                 <a href="{% url 'edit_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-pencil"></i></a>
-                                                <a href="{% url 'delete_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
+                                                <a href="{% url 'delete_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
                                             {% else %}
                                                 <span class="label label-success"><i class="icon-ok icon-white"></i></span>
                                             {% endif %}
