@@ -120,6 +120,41 @@ class EntryManager(models.Manager):
         return self.get_query_set().timespan(from_date, to_date, span)
 
 
+class SimpleEntryQuerySet(models.query.QuerySet):
+    """QuerySet extension to provide filtering by billable status"""
+
+    def date_trunc(self, key='month', extra_values=None):
+        select = {"day": {"date": """DATE_TRUNC('day', end_time)"""},
+                  "week": {"date": """DATE_TRUNC('week', end_time)"""},
+                  "month": {"date": """DATE_TRUNC('month', end_time)"""},
+                  "year": {"date": """DATE_TRUNC('year', end_time)"""},
+        }
+        basic_values = (
+            'user', 'date', 'user__first_name', 'user__last_name', 'billable',
+        )
+        extra_values = extra_values or ()
+        qs = self.extra(select=select[key])
+        qs = qs.values(*basic_values + extra_values)
+        qs = qs.annotate(hours=Sum('hours')).order_by('user__last_name',
+                                                      'date')
+        return qs
+
+
+class SimpleEntryManager(models.Manager):
+
+    def get_query_set(self):
+        qs = SimpleEntryQuerySet(self.model)
+        qs = qs.select_related('activity', 'project__type')
+
+        # ensure our select_related are added.  Without this line later calls
+        # to select_related will void ours (not sure why - probably a bug
+        # in Django)
+        # in other words: do not remove!
+        str(qs.query)
+
+        return qs
+
+
 class EntryWorkedManager(models.Manager):
 
     def get_query_set(self):
@@ -546,6 +581,7 @@ class SimpleEntry(models.Model):
     hours = models.DecimalField(max_digits=2, decimal_places=0, default=0) #validators=[MinValueValidator(Decimal('0.01'))
     minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0)
 
+    objects = SimpleEntryManager()
     no_join = models.Manager()
 
     class Meta:

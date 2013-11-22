@@ -70,6 +70,9 @@ class Dashboard(TemplateView):
         week_entries = Entry.objects.filter(user=self.user) \
                 .timespan(week_start, span='week', current=True) \
                 .select_related('project')
+        
+        week_simple_entries = SimpleEntry.objects.filter(user=self.user)
+
         assignments = ProjectHours.objects.filter(user=self.user,
                 week_start=week_start.date())
         project_progress = self.process_progress(week_entries, assignments)
@@ -93,6 +96,7 @@ class Dashboard(TemplateView):
             'total_worked': total_worked,
             'project_progress': project_progress,
             'week_entries': week_entries,
+            'week_simple_entries': week_simple_entries,
             'others_active_entries': others_active_entries,
         }
 
