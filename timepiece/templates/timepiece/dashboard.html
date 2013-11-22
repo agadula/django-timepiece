@@ -30,10 +30,11 @@
         <h2>Week from {{ week_start|date:'M j' }} to {{ week_end|date:'M j' }}</h2>
 
         <div class="row-fluid">
+<!--
             <div class="span12" id="active-entry">
 
                 <div id="active-buttons">
-<!--
+
                     <div class="pull-left">
                         <a class="btn btn-primary" href="{% url 'clock_in' %}">
                             {% if active_entry %}Switch Entry{% else %}Clock In{% endif %}
@@ -47,25 +48,20 @@
                             <a class="btn btn-primary" href="{% url 'edit_entry' active_entry.pk %}">Edit</a>
                         {% endif %}
                     </div>
--->
-                    <div class="hidden-phone pull-left">
-                        <a class="btn btn-primary" href="{% url 'create_simple_entry' %}" title="Add Simple Entry">
-                            <i class="icon-white icon-plus"></i>
-                        </a>
-                    </div>
 
-<!--
+
                     <div class="hidden-phone pull-right">
                         <a class="btn btn-primary" href="{% url 'create_entry' %}" title="Add Entry">
                             <i class="icon-white icon-plus"></i>
                         </a>
                     </div>
--->
+
                 </div>
+
 
                 <div class="clearfix"></div>
 
-<!--
+
                 <div id="active-text">
                     {% if active_entry %}
                         You have been clocked into
@@ -83,28 +79,31 @@
                         You are not currently clocked into a project.
                     {% endif %}
                 </div>
--->
+
             </div>
         </div>
+-->
 
-        <ul class="nav nav-tabs">
 <!--
+        <ul class="nav nav-tabs">
+
             <li{% if active_tab == 'progress' %} class="active"{% endif %}>
                 {% url "dashboard" "progress" as link %}
                 <a class="tab-link" to="progress" href="{{ link|add_parameters:request.GET }}">Progress</a>
             </li>
--->
+
             <li{% if active_tab == 'all-entries' %} class="active"{% endif %}>
                 {% url "dashboard" "all-entries" as link %}
                 <a class="tab-link" to="all-entries" href="{{ link|add_parameters:request.GET }}">Entries for this Week</a>
             </li>
-<!--
+
             <li{% if active_tab == 'online-users' %} class="active"{% endif %}>
                 {% url "dashboard" "online-users" as link %}
                 <a class="tab-link" to="online-users" href="{{ link|add_parameters:request.GET }}">Online Users</a>
             </li>
--->
+
         </ul>
+-->
 
         <div class="tab-content">
 <!--
