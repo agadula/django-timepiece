@@ -212,8 +212,10 @@ def view_user_timesheet(request, user_id, active_tab):
             'id', 'location__name', 'project__name', 'activity__name',
             'status')
     month_entries = month_qs.date_trunc('month', extra_values)
-    
-    month_simple_entries = SimpleEntry.objects.filter(user=user)
+
+    simple_entries_qs = SimpleEntry.objects.filter(user=user)
+    month_se_qs = simple_entries_qs.timespan(from_date, span='month')
+    month_simple_entries = month_se_qs
 
     # For grouped entries, back date up to the start of the week.
     first_week = utils.get_week_start(from_date)

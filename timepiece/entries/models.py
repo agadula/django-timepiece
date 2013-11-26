@@ -120,41 +120,6 @@ class EntryManager(models.Manager):
         return self.get_query_set().timespan(from_date, to_date, span)
 
 
-class SimpleEntryQuerySet(models.query.QuerySet):
-    """QuerySet extension to provide filtering by billable status"""
-
-    def date_trunc(self, key='month', extra_values=None):
-        select = {"day": {"date": """DATE_TRUNC('day', end_time)"""},
-                  "week": {"date": """DATE_TRUNC('week', end_time)"""},
-                  "month": {"date": """DATE_TRUNC('month', end_time)"""},
-                  "year": {"date": """DATE_TRUNC('year', end_time)"""},
-        }
-        basic_values = (
-            'user', 'date', 'user__first_name', 'user__last_name', 'billable',
-        )
-        extra_values = extra_values or ()
-        qs = self.extra(select=select[key])
-        qs = qs.values(*basic_values + extra_values)
-        qs = qs.annotate(hours=Sum('hours')).order_by('user__last_name',
-                                                      'date')
-        return qs
-
-
-class SimpleEntryManager(models.Manager):
-
-    def get_query_set(self):
-        qs = SimpleEntryQuerySet(self.model)
-        qs = qs.select_related('activity', 'project__type')
-
-        # ensure our select_related are added.  Without this line later calls
-        # to select_related will void ours (not sure why - probably a bug
-        # in Django)
-        # in other words: do not remove!
-        str(qs.query)
-
-        return qs
-
-
 class EntryWorkedManager(models.Manager):
 
     def get_query_set(self):
@@ -557,6 +522,46 @@ class ProjectHours(models.Model):
         verbose_name_plural = 'project hours entries'
         unique_together = ('week_start', 'project', 'user')
 
+
+class SimpleEntryQuerySet(models.query.QuerySet):
+
+    def timespan(self, from_date, to_date=None, span=None, current=False):
+        """
+        Takes a beginning date a filters entries. An optional to_date can be
+        specified, or a span, which is one of ('month', 'week', 'day').
+        N.B. - If given a to_date, it does not include that date, only before.
+        """
+        if span and not to_date:
+            diff = None
+            if span == 'month':
+                diff = relativedelta(months=1)
+            elif span == 'week':
+                diff = relativedelta(days=7)
+            elif span == 'day':
+                diff = relativedelta(days=1)
+            if diff is not None:
+                to_date = from_date + diff
+        datesQ = Q(date__gte=from_date)
+        datesQ &= Q(date__lt=to_date) if to_date else Q()
+        datesQ |= Q(date__isnull=True) if current else Q()
+        return self.filter(datesQ)
+
+
+class SimpleEntryManager(models.Manager):
+
+    def get_query_set(self):
+        qs = SimpleEntryQuerySet(self.model)
+        qs = qs.select_related('activity', 'project__type')
+
+        # ensure our select_related are added.  Without this line later calls
+        # to select_related will void ours (not sure why - probably a bug
+        # in Django)
+        # in other words: do not remove!
+        str(qs.query)
+
+        return qs
+
+
 class SimpleEntry(models.Model):
     """
     This class is where all of the time logs are taken care of
@@ -579,14 +584,20 @@ class SimpleEntry(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     hours = models.DecimalField(max_digits=2, decimal_places=0, default=0) #validators=[MinValueValidator(Decimal('0.01'))
-    minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0)
+    MINUTES = (
+        (0, 0),
+        (15, 15),
+        (30,30),
+        (45, 45)
+    )
+    minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0, choices=MINUTES)
 
     objects = SimpleEntryManager()
     no_join = models.Manager()
 
     class Meta:
         db_table = 'timepiece_simple_entry'  # Using legacy table name
-        ordering = ('-date',)
+        ordering = ('date',)
         verbose_name_plural = 'simple_entries'
 
     def __unicode__(self):
@@ -602,7 +613,7 @@ class SimpleEntry(models.Model):
         Make it a little more interesting for deleting logs
         """
         salt = '%i-%i-apple-%s-sauce' \
-            % (self.id, True, False) #self.is_paused, self.is_closed
+            % (self.id, True, False) # was self.is_paused, self.is_closed
         try:
             import hashlib
         except ImportError:
