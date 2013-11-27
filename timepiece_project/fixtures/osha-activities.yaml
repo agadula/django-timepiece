@@ -1,0 +1,55 @@
+- model: crm.business
+  pk: 1
+  fields:
+    name: "1.1 Foresight of new and emerging OSH risks associated with new technologies in green jobs"
+
+- model: crm.project
+  pk: 1
+  fields:
+    name: "Follow-up to Green Jobs Foresight: Policy-focus workshops"
+    business: 1
+    point_person : 1
+    type: 2
+    status: 1
+
+
+- model: crm.business
+  pk: 2
+  fields:
+    name: "1.2 Large-scale foresight"
+
+- model: crm.project
+  pk: 2
+  fields:
+    name: "Scoping study for a foresight on new and emerging OSH risks and challenges"
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 3
+  fields:
+    name: "Study to identify the success factors to transfer foresight findings into policy-making"
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 4
+  fields:
+    name: "Review of the new and emerging OSH trends in healthcare, incl. home and community care"
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 5
+  fields:
+    name: "OSH research priorities final publication and promotion (final stage of the project on OSH research priorities which started end 2011)"
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1

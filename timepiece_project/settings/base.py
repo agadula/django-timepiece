@@ -174,3 +174,5 @@ COMPRESS_ROOT = '%s/static/' % PROJECT_PATH
 # django-timepiece settings
 TIMEPIECE_DEFAULT_LOCATION_SLUG = None
 TIMEPIECE_PAID_LEAVE_PROJECTS = {}
+
+FIXTURE_DIRS = ( '%s/fixtures/' % PROJECT_PATH, )
