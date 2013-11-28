@@ -622,7 +622,7 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
         try:
             business = Business.objects.get(pk=business_id)
             # load any project belonging to that business, it's used for setting value in the form
-            proj_business = business.new_business_projects.all()[0] 
+            proj_business = business.new_business_projects.all()[0]
         except Business.DoesNotExist:
             raise Http404
     else:
