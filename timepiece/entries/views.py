@@ -629,9 +629,11 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
         proj_business = None
 
     entry_user = entry.user if entry else request.user
+    form_business = BusinessSelectionForm(instance=proj_business, user=entry_user)
+
     if request.method == 'POST':
         form = AddUpdateSimpleEntryForm(data=request.POST, instance=entry,
-                user=entry_user)
+                user=entry_user, business=business_id)
         if form.is_valid():
             entry = form.save()
             if entry_id:
@@ -647,7 +649,6 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
 
     else:
         initial = dict([(k, request.GET[k]) for k in request.GET.keys()])
-        form_business = BusinessSelectionForm(instance=proj_business, user=entry_user)
         form = AddUpdateSimpleEntryForm(instance=entry, user=entry_user, business=business_id,
                 initial=initial)
 
