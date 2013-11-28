@@ -20,6 +20,11 @@
 
             <br style="clear: both;" />
 
+            <form class="form-horizontal" action="" method="get" accept-charset="utf-8">
+                {{ form_business|as_bootstrap:"horizontal" }}
+            </form>
+
+            {% if proj_business %}
             <form class="form-horizontal" action="" method="post" accept-charset="utf-8">
                 {% csrf_token %}
                 {{ form|as_bootstrap:"horizontal" }}
@@ -28,6 +33,8 @@
                     <input class="btn" type='button' value='Cancel' onclick="history.back()" />
                 </div>
             </form>
+            {% endif %}
+
         </div>
     </div>
 {% endblock content %}

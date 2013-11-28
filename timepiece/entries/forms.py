@@ -6,6 +6,7 @@ from django import forms
 from timepiece import utils
 from timepiece.crm.models import Project
 from timepiece.entries.models import Entry, Location, ProjectHours, SimpleEntry
+from timepiece.crm.models import Business
 from timepiece.forms import INPUT_FORMATS, TimepieceSplitDateTimeWidget,\
         TimepieceDateInput
 
@@ -169,17 +170,35 @@ class ProjectHoursSearchForm(forms.Form):
         return utils.get_week_start(week_start, False) if week_start else None
 
 
+class BusinessSelectionForm(forms.ModelForm):
+
+    class Meta:
+        model = Project # because to have a dropdown menu we need a foreign key
+        fields = 'business'.split()
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(BusinessSelectionForm, self).__init__(*args, **kwargs)
+        self.instance.user = self.user
+
+        self.fields['business'].queryset = Business.objects.filter(new_business_projects__users=self.user).distinct()
+
+
 class AddUpdateSimpleEntryForm(forms.ModelForm):
 
     class Meta:
         model = SimpleEntry
-        exclude = ('user', 'status')
+        # exclude = ('user', 'status')
         fields = 'project date hours minutes comments'.split()
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
+        self.business = kwargs.pop('business')
         super(AddUpdateSimpleEntryForm, self).__init__(*args, **kwargs)
         self.instance.user = self.user
 
         self.fields['project'].queryset = Project.trackable.filter(
-                users=self.user)
+                users=self.user
+                ).filter(
+                business=self.business
+                )

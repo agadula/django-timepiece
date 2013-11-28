@@ -21,6 +21,18 @@
             <script charset="utf-8" src="{{ STATIC_URL }}timepiece/js/quick_search.js"></script>
         {% endif %}
         <script charset="utf-8" src="{{ STATIC_URL }}timepiece/js/widgets.js"></script>
+        
+<script type="text/javascript">
+     $(function() {
+          // navigate to page on click event
+          $('#id_business').bind('change', function() { goToPage(); } );
+     });
+
+     function goToPage() {
+      var baseUrl = '/simple_entry/add/from_business/';
+      window.location.href = baseUrl + $('#id_business').val()
+     }
+</script>
     {% endblock javascript %}
 
     {% block extrajs %}

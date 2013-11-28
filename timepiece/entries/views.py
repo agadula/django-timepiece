@@ -23,10 +23,10 @@ from timepiece import utils
 from timepiece.forms import DATE_FORM_FORMAT
 from timepiece.utils.csv import DecimalEncoder
 
-from timepiece.crm.models import Project, UserProfile
+from timepiece.crm.models import Project, UserProfile, Business
 from timepiece.entries.forms import ClockInForm, ClockOutForm, \
         AddUpdateEntryForm, ProjectHoursForm, ProjectHoursSearchForm, \
-        AddUpdateSimpleEntryForm
+        AddUpdateSimpleEntryForm, BusinessSelectionForm
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 
 
@@ -606,7 +606,7 @@ class ScheduleDetailView(ScheduleMixin, View):
 
 
 @permission_required('entries.change_entry')
-def create_edit_simple_entry(request, entry_id=None):
+def create_edit_simple_entry(request, entry_id=None, business_id=None):
     if entry_id:
         try:
             entry = SimpleEntry.no_join.get(pk=entry_id)
@@ -617,6 +617,16 @@ def create_edit_simple_entry(request, entry_id=None):
             raise Http404
     else:
         entry = None
+
+    if business_id:
+        try:
+            business = Business.objects.get(pk=business_id)
+            # load any project belonging to that business, it's used for setting value in the form
+            proj_business = business.new_business_projects.all()[0] 
+        except Business.DoesNotExist:
+            raise Http404
+    else:
+        proj_business = None
 
     entry_user = entry.user if entry else request.user
     if request.method == 'POST':
@@ -637,12 +647,15 @@ def create_edit_simple_entry(request, entry_id=None):
 
     else:
         initial = dict([(k, request.GET[k]) for k in request.GET.keys()])
-        form = AddUpdateSimpleEntryForm(instance=entry, user=entry_user,
+        form_business = BusinessSelectionForm(instance=proj_business, user=entry_user)
+        form = AddUpdateSimpleEntryForm(instance=entry, user=entry_user, business=business_id,
                 initial=initial)
 
     return render(request, 'timepiece/simple_entry/create_edit.html', {
         'form': form,
         'entry': entry,
+        'form_business': form_business,
+        'proj_business': proj_business,
     })
 
 
