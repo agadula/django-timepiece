@@ -71,7 +71,10 @@ class Dashboard(TemplateView):
                 .timespan(week_start, span='week', current=True) \
                 .select_related('project')
         
-        week_simple_entries = SimpleEntry.objects.filter(user=self.user)
+        week_simple_entries = SimpleEntry.objects.filter(user=self.user) \
+                .timespan(week_start, span='week') \
+                .select_related('project')
+
 
         assignments = ProjectHours.objects.filter(user=self.user,
                 week_start=week_start.date())
