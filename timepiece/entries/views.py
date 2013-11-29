@@ -610,6 +610,7 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
     if entry_id:
         try:
             entry = SimpleEntry.no_join.get(pk=entry_id)
+            business_id = entry.project.business_id
         except SimpleEntry.DoesNotExist:
             entry = None
         if not entry or not (entry.is_editable or
@@ -621,7 +622,7 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
     if business_id:
         try:
             business = Business.objects.get(pk=business_id)
-            # load any project belonging to that business, it's used for setting value in the form
+            # load any project belonging to that business. it's used for setting value in the dropdown
             proj_business = business.new_business_projects.all()[0]
         except Business.DoesNotExist:
             raise Http404
@@ -629,7 +630,7 @@ def create_edit_simple_entry(request, entry_id=None, business_id=None):
         proj_business = None
 
     entry_user = entry.user if entry else request.user
-    form_business = BusinessSelectionForm(instance=proj_business, user=entry_user)
+    form_business = BusinessSelectionForm(instance=proj_business, user=entry_user, disabled=True if entry else False )
 
     if request.method == 'POST':
         form = AddUpdateSimpleEntryForm(data=request.POST, instance=entry,

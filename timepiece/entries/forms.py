@@ -173,15 +173,21 @@ class ProjectHoursSearchForm(forms.Form):
 class BusinessSelectionForm(forms.ModelForm):
 
     class Meta:
-        model = Project # because to have a dropdown menu we need a foreign key
+        model = Project # to have dropdown menu with Businesses (foreign key from project)
         fields = 'business'.split()
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
+        try:
+            disabled = kwargs.pop('disabled')
+        except:
+            disabled = False
+
         super(BusinessSelectionForm, self).__init__(*args, **kwargs)
         self.instance.user = self.user
 
         self.fields['business'].queryset = Business.objects.filter(new_business_projects__users=self.user).distinct()
+        if disabled: self.fields['business'].widget.attrs['disabled'] = True
 
 
 class AddUpdateSimpleEntryForm(forms.ModelForm):

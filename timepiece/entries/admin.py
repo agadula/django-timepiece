@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from timepiece.entries.models import Activity, ActivityGroup, Entry, Location,\
-        ProjectHours
+        ProjectHours, SimpleEntry
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -56,8 +56,30 @@ class ProjectHoursAdmin(admin.ModelAdmin):
     _project.short_description = 'Project'
 
 
+class SimpleEntryAdmin(admin.ModelAdmin):
+    model = SimpleEntry
+    list_display = ('user', '_project', 'project_type',
+            'date', 'hours', 'minutes', 'status' )
+    list_filter = ['user', 'project']
+    search_fields = ['user__first_name', 'user__last_name', 'project__name',
+             'comments']
+    date_hierarchy = 'date'
+    ordering = ('-date',)
+
+    def project_type(self, simple_entry):
+        return simple_entry.project.type
+
+    def _project(self, obj):
+        """Use a proxy to avoid an infinite loop from ordering."""
+        return unicode(obj.project)
+    _project.admin_order_field = 'project__name'
+    _project.short_description = 'Project'
+
+
+
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityGroup, ActivityGroupAdmin)
 admin.site.register(Entry, EntryAdmin)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ProjectHours, ProjectHoursAdmin)
+admin.site.register(SimpleEntry, SimpleEntryAdmin)
