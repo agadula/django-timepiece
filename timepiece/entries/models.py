@@ -631,3 +631,16 @@ class SimpleEntry(models.Model):
     @property
     def total_hours(self):
         return self.get_total_seconds() / 3600.0
+
+    @staticmethod
+    def summary(user, date, end_date):
+        entries = user.simple_entries.filter(
+            date__gte=date, date__lt=end_date)
+        data = {
+            'total': Decimal('0')
+            }
+        hours = entries.aggregate(s=Sum('hours'))['s']
+        minutes = entries.aggregate(s=Sum('minutes'))['s']
+        total = hours+(minutes/60)
+        if total:  data['total'] = total
+        return data

@@ -233,6 +233,7 @@ def view_user_timesheet(request, user_id, active_tab):
     project_entries = month_qs.order_by().values(
         'project__name').annotate(sum=Sum('hours')).order_by('-sum')
     summary = Entry.summary(user, from_date, to_date)
+    summary_se = SimpleEntry.summary(user, from_date, to_date)
 
     show_approve = show_verify = False
     can_change = request.user.has_perm('entries.change_entry')
@@ -269,6 +270,7 @@ def view_user_timesheet(request, user_id, active_tab):
         'grouped_totals': totals,
         'project_entries': project_entries,
         'summary': summary,
+        'summary_se': summary_se,
     })
 
 

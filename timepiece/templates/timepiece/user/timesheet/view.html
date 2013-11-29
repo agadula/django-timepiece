@@ -92,8 +92,7 @@
                                     <th>Date</th>
                                     <th class="business">Activity</th>
                                     <th class="project">Project</th>
-                                    <th class="time">Hours</th>
-                                    <th class="time">Minutes</th>
+                                    <th class="time">Time</th>
                                     <th class="comments">Comments</th>
                                     <th>Status</th>
                                     <th class="aux"></th>
@@ -114,8 +113,7 @@
                                         {% endifchanged %}
                                         <td class="business">{{ entry.project.business }}</td>
                                         <td class="project">{{ entry.project }}</td>
-                                        <td class="time break">{{ entry.hours }}</td>
-                                        <td class="time break">{{ entry.minutes }}</td>
+                                        <td class="nowrap">{{ entry.get_total_seconds|humanize_seconds:"{hours:02d}:{minutes:02d}" }}</td>
                                         <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
                                         <td>{{ entry.status|title }}</td>
                                         <td class="aux">
@@ -133,13 +131,11 @@
                                         </td>
                                     </tr>
                                 {% endfor %}
-<!--
                                 <tr class="emphasized-row">
-                                    <th colspan=5 style="text-align: right;">Total over all entries:</th>
-                                    <th class="hours">{{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</th>
-                                    <th colspan=2></th>
+                                    <th colspan=3 style="text-align: right;">Total over all entries:</th>
+                                    <th class="hours">{{ summary_se.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</th>
+                                    <th colspan=3></th>
                                 </tr>
--->
                             </tbody>
                         </table>
                     {% else %}
