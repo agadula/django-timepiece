@@ -237,14 +237,21 @@ def view_user_timesheet(request, user_id, active_tab):
     show_approve = show_verify = False
     can_change = request.user.has_perm('entries.change_entry')
     can_approve = request.user.has_perm('entries.approve_timesheet')
+#     if can_change or can_approve or user == request.user:
+#         statuses = list(month_qs.values_list('status', flat=True))
+#         total_statuses = len(statuses)
+#         unverified_count = statuses.count(Entry.UNVERIFIED)
+#         verified_count = statuses.count(Entry.VERIFIED)
+#         approved_count = statuses.count(Entry.APPROVED)
     if can_change or can_approve or user == request.user:
-        statuses = list(month_qs.values_list('status', flat=True))
-        total_statuses = len(statuses)
-        unverified_count = statuses.count(Entry.UNVERIFIED)
-        verified_count = statuses.count(Entry.VERIFIED)
-        approved_count = statuses.count(Entry.APPROVED)
+        statuses_se = list(month_simple_entries.values_list('status', flat=True))
+        total_statuses_se = len(statuses_se)
+        unverified_count_se = statuses_se.count(SimpleEntry.UNVERIFIED)
+        verified_count_se = statuses_se.count(SimpleEntry.VERIFIED)
+
     if can_change or user == request.user:
-        show_verify = unverified_count != 0
+        # show_verify = unverified_count != 0
+        show_verify = unverified_count_se != 0
     if can_approve:
         show_approve = verified_count + approved_count == total_statuses \
                 and verified_count > 0 and total_statuses != 0
@@ -302,6 +309,17 @@ def change_user_timesheet(request, user_id, action):
     }
     entries = entries.filter(status=filter_status[action])
 
+
+    simple_entries = SimpleEntry.no_join.filter(user=user_id,
+                                   date__gte=from_date,
+                                   date__lt=to_date)
+    filter_status_se = {
+        'verify': SimpleEntry.UNVERIFIED,
+        'approve': SimpleEntry.VERIFIED,
+    }
+    simple_entries = simple_entries.filter(status=filter_status_se[action])
+
+
     return_url = reverse('view_user_timesheet', args=(user_id,))
     return_url += '?%s' % urllib.urlencode({
         'year': from_date.year,
@@ -318,11 +336,18 @@ def change_user_timesheet(request, user_id, action):
             'verify': 'verified',
             'approve': 'approved',
         }
-        entries.update(status=update_status[action])
+#         entries.update(status=update_status[action])
+        simple_entries.update(status=update_status[action])
         messages.info(request,
             'Your entries have been %s' % update_status[action])
         return redirect(return_url)
-    hours = entries.all().aggregate(s=Sum('hours'))['s']
+#     hours = entries.all().aggregate(s=Sum('hours'))['s']
+#     if not hours:
+#         msg = 'You cannot verify/approve a timesheet with no hours'
+#         messages.error(request, msg)
+#         return redirect(return_url)
+    hours = simple_entries.all().aggregate(s=Sum('hours'))['s']
+    minutes = simple_entries.all().aggregate(s=Sum('minutes'))['s']
     if not hours:
         msg = 'You cannot verify/approve a timesheet with no hours'
         messages.error(request, msg)

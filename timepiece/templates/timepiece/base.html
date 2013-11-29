@@ -32,6 +32,9 @@
               window.location.href = baseUrl + $('#id_business').val()
              }
         </script>
+        <script type="text/javascript">
+            $(document).ready(function() { $("label[for='id_business']").html('Activity'); });
+        </script>
     {% endblock javascript %}
 
     {% block extrajs %}

@@ -160,7 +160,8 @@ class Project(models.Model):
         )
 
     def __unicode__(self):
-        return '{0} ({1})'.format(self.name, self.business.get_display_name())
+        # return '{0} ({1})'.format(self.name, self.business.get_display_name())
+        return self.name
 
     @property
     def billable(self):
