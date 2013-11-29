@@ -90,6 +90,7 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
+                                    <th class="business">Activity</th>
                                     <th class="project">Project</th>
                                     <th class="time">Hours</th>
                                     <th class="time">Minutes</th>
@@ -111,15 +112,21 @@
                                         {% else %}
                                             <td></td>
                                         {% endifchanged %}
+                                        <td class="business">{{ entry.project.business }}</td>
                                         <td class="project">{{ entry.project }}</td>
                                         <td class="time break">{{ entry.hours }}</td>
                                         <td class="time break">{{ entry.minutes }}</td>
                                         <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
                                         <td>{{ entry.status|title }}</td>
                                         <td class="aux">
-                                            {% if entry.status == "unverified" or entry.status != 'invoiced' and perms.entries.view_payroll_summary %}
-                                                <a href="{% url 'edit_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}">Edit</a>
+
+                                            {% if entry.status == "unverified" %}
+                                                <a href="{% url 'edit_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-pencil"></i></a>
+                                                <a href="{% url 'delete_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
+                                            {% else %}
+                                                <span class="label label-success"><i class="icon-ok icon-white"></i></span>
                                             {% endif %}
+
                                             {% if perms.entries.view_payroll_summary and entry.status != "unverified" and entry.status != "invoiced" %}
                                                 | <a href="{% url 'reject_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}">Reject</a>
                                             {% endif %}
