@@ -622,3 +622,12 @@ class SimpleEntry(models.Model):
         else:
             key = hashlib.sha1(salt).hexdigest()
         return key
+
+    def get_total_seconds(self):
+        seconds = self.hours * 3600
+        seconds += self.minutes * 60
+        return seconds
+
+    @property
+    def total_hours(self):
+        return self.get_total_seconds() / 3600.0
