@@ -81,6 +81,7 @@
                 {% url "dashboard" "all-simple-entries" as link %}
                 <a class="tab-link" to="all-simple-entries" href="{{ link|add_parameters:request.GET }}">All Simple Entries</a>
             </li>
+<!--
             <li{% if active_tab == 'progress' %} class="active"{% endif %}>
                 {% url "dashboard" "progress" as link %}
                 <a class="tab-link" to="progress" href="{{ link|add_parameters:request.GET }}">Progress</a>
@@ -93,6 +94,7 @@
                 {% url "dashboard" "online-users" as link %}
                 <a class="tab-link" to="online-users" href="{{ link|add_parameters:request.GET }}">Online Users</a>
             </li>
+-->
         </ul>
 
         <div class="tab-content">
