@@ -35,7 +35,7 @@ class Dashboard(TemplateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, active_tab, *args, **kwargs):
-        self.active_tab = active_tab or 'progress'
+        self.active_tab = active_tab or 'all-simple-entries'
         self.user = request.user
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 

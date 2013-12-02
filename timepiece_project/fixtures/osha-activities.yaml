@@ -13,6 +13,7 @@
     status: 1
 
 
+
 - model: crm.business
   pk: 2
   fields:
@@ -50,6 +51,83 @@
   fields:
     name: "OSH research priorities final publication and promotion (final stage of the project on OSH research priorities which started end 2011)"
     business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 3
+  fields:
+    name: "2.1 European Survey of Enterprises on New & Emerging Risks (ESENER)"
+
+- model: crm.project
+  pk: 6
+  fields:
+    name: "Survey"
+    business: 3
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 4
+  fields:
+    name: "2.2 OSH overview: Older workers"
+
+- model: crm.project
+  pk: 7
+  fields:
+    name: "Reviews regarding OSH and an aging workforce"
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 8
+  fields:
+    name: "OSH policies, strategies, programmes and actions for an ageing workforce"
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 9
+  fields:
+    name: "Rehabilitation systems, strategies and programmes"
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 10
+  fields:
+    name: "Workplace practices and support for enterprises - examples, experiences and needs"
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 11
+  fields:
+    name: "Meeting in the European Parliament"
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 12
+  fields:
+    name: "Final analysis and support (content) to final seminar"
+    business: 4
     point_person : 1
     type: 2
     status: 1
