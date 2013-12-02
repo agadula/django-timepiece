@@ -150,7 +150,7 @@ class Project(models.Model):
 
     class Meta:
         db_table = 'timepiece_project'  # Using legacy table name.
-        ordering = ('name', 'status', 'type',)
+        ordering = ('business', 'name', 'status', 'type',)
         permissions = (
             ('view_project', 'Can view project'),
             ('email_project_report', 'Can email project report'),
