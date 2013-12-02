@@ -640,7 +640,8 @@ class SimpleEntry(models.Model):
             'total': Decimal('0')
             }
         hours = entries.aggregate(s=Sum('hours'))['s']
+        if not hours: hours = 0
         minutes = entries.aggregate(s=Sum('minutes'))['s']
-        total = hours+(minutes/60)
-        if total:  data['total'] = total
+        if minutes: hours += minutes/60
+        data['total'] = hours
         return data
