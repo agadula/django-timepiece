@@ -4,7 +4,7 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h1>minibooks Authentication</h1>
+<h1>Authentication</h1>
 
 <form id="login" class="form-horizontal" accept-charset="UTF-8" method="post" action="">
     {% csrf_token %}
@@ -12,7 +12,7 @@
 
     <div class="form-actions">
         <input class="btn btn-primary" type="submit" name="submit" value="Login" />&nbsp;
-        <a href="{% url reset_password %}">Forgot your password?</a>
+        <!-- <a href="{% url reset_password %}">Forgot your password?</a> -->
     </div>
 </form>
 {% endblock %}
