@@ -258,7 +258,7 @@ def view_user_timesheet(request, user_id, active_tab):
                 and verified_count > 0 and total_statuses != 0
 
     return render(request, 'timepiece/user/timesheet/view.html', {
-        'active_tab': active_tab or 'overview',
+        'active_tab': active_tab or 'all-simple-entries',
         'year_month_form': form,
         'from_date': from_date,
         'to_date': to_date - relativedelta(days=1),
