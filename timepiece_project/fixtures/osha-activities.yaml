@@ -1,3 +1,19 @@
+- model: crm.attribute
+  pk: 1
+  fields:
+    type: 'project-status'
+    label: "Active"
+    enable_timetracking: True
+
+- model: crm.attribute
+  pk: 2
+  fields:
+    type: 'project-type'
+    label: "Standard type"
+    enable_timetracking: True
+
+
+
 - model: crm.business
   pk: 1
   fields:

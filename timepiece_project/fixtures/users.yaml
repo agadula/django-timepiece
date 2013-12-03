@@ -1,33 +1,12 @@
+- model: auth.group
+  pk: 1
+  fields:
+    name: "D_General"
+
+
 - model: auth.user
   pk: 2
   fields:
     username: "gentisi"
-    first_name: "Simone"
-    last_name: "Gentilini"
     password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4=" # password is password
-
-- model: auth.user
-  pk: 3
-  fields:
-    username: "baillph"
-    password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4="
-
-- model: auth.user
-  pk: 4
-  fields:
-    username: "bejerje"
-    password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4="
-
-- model: auth.user
-  pk: 5
-  fields:
-    username: "marigca"
-    password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4="
-
-- model: auth.user
-  pk: 6
-  fields:
-    username: "guillal"
-    first_name: "Alban"
-    last_name: "Guillerm"
-    password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4="
+    groups: [1]
