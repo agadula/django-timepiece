@@ -1,3 +1,4 @@
+
 - model: crm.attribute
   pk: 1
   fields:
@@ -17,12 +18,30 @@
 - model: crm.business
   pk: 1
   fields:
-    name: "1.1 Foresight of new and emerging OSH risks associated with new technologies in green jobs"
+    name: '1.1. Foresight of new and emerging OSH risks  associated with new technologies in green jobs'
 
 - model: crm.project
   pk: 1
   fields:
-    name: "Follow-up to Green Jobs Foresight: Policy-focus workshops"
+    name: 'MEETING: Foresight promotion'
+    business: 1
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 2
+  fields:
+    name: 'New and emerging issues review articles'
+    business: 1
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 3
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
     business: 1
     point_person : 1
     type: 2
@@ -33,30 +52,12 @@
 - model: crm.business
   pk: 2
   fields:
-    name: "1.2 Large-scale foresight"
-
-- model: crm.project
-  pk: 2
-  fields:
-    name: "Scoping study for a foresight on new and emerging OSH risks and challenges"
-    business: 2
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 3
-  fields:
-    name: "Study to identify the success factors to transfer foresight findings into policy-making"
-    business: 2
-    point_person : 1
-    type: 2
-    status: 1
+    name: '1.2. Large-scale foresight'
 
 - model: crm.project
   pk: 4
   fields:
-    name: "Review of the new and emerging OSH trends in healthcare, incl. home and community care"
+    name: 'Scoping study for a foresight on new and emerging OSH risks and challenges'
     business: 2
     point_person : 1
     type: 2
@@ -65,7 +66,34 @@
 - model: crm.project
   pk: 5
   fields:
-    name: "OSH research priorities final publication and promotion (final stage of the project on OSH research priorities which started end 2011)"
+    name: 'Study to identify the success factors to transfer foresight findings into policy-making.'
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 6
+  fields:
+    name: 'Review of the new and emerging OSH trends in healthcare, incl. home and community care'
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 7
+  fields:
+    name: 'OSH research priorities final publication and promotion (final stage of the project on OSH research priorities which started end 2011)'
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 8
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
     business: 2
     point_person : 1
     type: 2
@@ -76,12 +104,30 @@
 - model: crm.business
   pk: 3
   fields:
-    name: "2.1 European Survey of Enterprises on New & Emerging Risks (ESENER)"
+    name: '2.1. European Survey of Enterprises on New & Emerging Risks (ESENER)'
 
 - model: crm.project
-  pk: 6
+  pk: 9
   fields:
-    name: "Survey"
+    name: 'ESENER 2 Survey'
+    business: 3
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 10
+  fields:
+    name: 'ESENER 2 Secondary analysis'
+    business: 3
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 11
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
     business: 3
     point_person : 1
     type: 2
@@ -92,58 +138,1352 @@
 - model: crm.business
   pk: 4
   fields:
-    name: "2.2 OSH overview: Older workers"
-
-- model: crm.project
-  pk: 7
-  fields:
-    name: "Reviews regarding OSH and an aging workforce"
-    business: 4
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 8
-  fields:
-    name: "OSH policies, strategies, programmes and actions for an ageing workforce"
-    business: 4
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 9
-  fields:
-    name: "Rehabilitation systems, strategies and programmes"
-    business: 4
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 10
-  fields:
-    name: "Workplace practices and support for enterprises - examples, experiences and needs"
-    business: 4
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 11
-  fields:
-    name: "Meeting in the European Parliament"
-    business: 4
-    point_person : 1
-    type: 2
-    status: 1
+    name: '2.2. OSH overview: Older workers'
 
 - model: crm.project
   pk: 12
   fields:
-    name: "Final analysis and support (content) to final seminar"
+    name: 'Reviews regarding OSH and an aging workforce'
     business: 4
     point_person : 1
     type: 2
     status: 1
+
+- model: crm.project
+  pk: 13
+  fields:
+    name: 'OSH policies, strategies, programmes and actions for an ageing workforce'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 14
+  fields:
+    name: 'Rehabilitation systems, strategies and programmes'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 15
+  fields:
+    name: 'Workplace practices and support for enterprises – examples, experiences and needs'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 16
+  fields:
+    name: 'Meeting in the European Parliament'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 17
+  fields:
+    name: 'Final analysis and support (content) to final seminar'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 18
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 4
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 5
+  fields:
+    name: '2.3. OSH overview: Micro and small enterprises'
+
+- model: crm.project
+  pk: 19
+  fields:
+    name: 'OSH overview: Micro and small enterprises'
+    business: 5
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 20
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 5
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 6
+  fields:
+    name: '2.4. OSH overview : Work-related diseases'
+
+- model: crm.project
+  pk: 21
+  fields:
+    name: 'MEETING: Reproductive risks'
+    business: 6
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 22
+  fields:
+    name: 'MEETING: Burden of work-related diseases'
+    business: 6
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 23
+  fields:
+    name: 'Scoping phase Work-related diseases'
+    business: 6
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 24
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 6
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 7
+  fields:
+    name: '2.5. Costs and benefits of OSH'
+
+- model: crm.project
+  pk: 25
+  fields:
+    name: 'Business case at enterprise level'
+    business: 7
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 26
+  fields:
+    name: 'MEETING: Business case at enterprise level'
+    business: 7
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 27
+  fields:
+    name: 'MEETING: Economic costs of poor OSH'
+    business: 7
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 28
+  fields:
+    name: 'OSH-OVERVIEW: Costs of poor OSH'
+    business: 7
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 29
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 7
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 8
+  fields:
+    name: '3.1. Online interactive Risk Assessment (OiRA) tool'
+
+- model: crm.project
+  pk: 30
+  fields:
+    name: 'Adapt, improve and maintain the OiRA software'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 31
+  fields:
+    name: 'Organise training/information seminars/meetings with (potential) OiRA partners'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 32
+  fields:
+    name: 'Promote OiRA project (in general) and OiRA sectoral tools'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 33
+  fields:
+    name: 'Manage the OiRA community'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 34
+  fields:
+    name: 'Foster the development of OiRA tools at EU and national level'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 35
+  fields:
+    name: 'Manage the "Interactive Risk Assessment tools" network'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 36
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 8
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 9
+  fields:
+    name: '3.2. Tool for implementing OSH solutions'
+
+- model: crm.project
+  pk: 37
+  fields:
+    name: 'Setting up the Agency OSH tools policy and discussion/validation by Agency stakeholders'
+    business: 9
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 38
+  fields:
+    name: 'Explore the possibilities of developing / promoting specific Online OSH tools'
+    business: 9
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 39
+  fields:
+    name: 'Study, implementation, development, promotion specific OSH tool'
+    business: 9
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 40
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 9
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 10
+  fields:
+    name: '4.1. Healthy Workplace Campaign (HWC): Working together for risk prevention'
+
+- model: crm.project
+  pk: 41
+  fields:
+    name: 'MEETING: Benchmarking meeting'
+    business: 10
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 42
+  fields:
+    name: 'Review of OSH benchmarking initiatives'
+    business: 10
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 43
+  fields:
+    name: 'HWC 2012-13 Evaluation'
+    business: 10
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 44
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 10
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 11
+  fields:
+    name: '4.2. Healthy Workplace Campaign (HWC): Healthy Workplaces manage stress'
+
+- model: crm.project
+  pk: 45
+  fields:
+    name: 'HWC 2014-15 European Campaign Assistance Package (ECAP)'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 46
+  fields:
+    name: 'Healthy Workplaces Campaign (HWC) 2014-2015: "Healthy workplaces manage stress"'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 47
+  fields:
+    name: 'Organisation of HWC 2014-15 flagship events'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 48
+  fields:
+    name: 'Promotion of HWC 2014-15 related activities through media &  PR actions and exhibitions'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 49
+  fields:
+    name: 'Development and maintenance of HWC 2014-15 related online tools'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 50
+  fields:
+    name: 'Production & dissemination of HWC 2014-15 promotion material'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 51
+  fields:
+    name: 'Development of an offline portable application for micro and small enterprises for managing stress and psychosocial risks'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 52
+  fields:
+    name: 'Collection of tools for managing stress and psychosocial risks at the national level'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 53
+  fields:
+    name: 'European Good Practice Awards Competition (GPA) (content related)'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 54
+  fields:
+    name: 'Organisational interventions on stress'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 55
+  fields:
+    name: 'Innovative product or ESENER-2 analysis (TBD)'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 56
+  fields:
+    name: 'MEETING: Organisational interventions + guide'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 57
+  fields:
+    name: 'MEETING: Benchmarking'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 58
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 11
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 12
+  fields:
+    name: '4.3. Healthy Workplace Campaign (HWC): 2016-17'
+
+- model: crm.project
+  pk: 59
+  fields:
+    name: 'HWC 2016-17'
+    business: 12
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 60
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 12
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 13
+  fields:
+    name: '4.4. Awareness raising actions'
+
+- model: crm.project
+  pk: 61
+  fields:
+    name: 'Napo'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 62
+  fields:
+    name: 'Healthy Workplaces Film Award - DOK Leipzig'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 63
+  fields:
+    name: 'OSH photo exhibitions'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 64
+  fields:
+    name: 'Participation with a stand in the OSH World Congress in Frankfurt'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 65
+  fields:
+    name: 'Other events (such as Europe Day, A+A Düsseldorf, etc…)'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 66
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 13
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 14
+  fields:
+    name: '5.1 OSHwiki'
+
+- model: crm.project
+  pk: 67
+  fields:
+    name: 'OSHwiki'
+    business: 14
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 68
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 14
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 15
+  fields:
+    name: '5.2. Other networking knowledge actions'
+
+- model: crm.project
+  pk: 69
+  fields:
+    name: 'Legislation / strategies'
+    business: 15
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 70
+  fields:
+    name: 'EMSA collaboration'
+    business: 15
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 71
+  fields:
+    name: 'MEETING: Research coordination and priorities'
+    business: 15
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 72
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 15
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 16
+  fields:
+    name: '6.1. Strategic Networking'
+
+- model: crm.project
+  pk: 73
+  fields:
+    name: 'Managing Board and Bureau relations'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 74
+  fields:
+    name: 'Managing Advisory Group relations: PRAG'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 75
+  fields:
+    name: 'Managing Advisory Group relations: CPAG'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 76
+  fields:
+    name: 'Managing relations to the European stakeholders'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 77
+  fields:
+    name: 'Information requests from Board, MS authorities, social partners at central level in MSs or at European level, European Institutions'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 78
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 16
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 17
+  fields:
+    name: '6.2. Operational Networking'
+
+- model: crm.project
+  pk: 79
+  fields:
+    name: 'XX World Congress Content'
+    business: 17
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 80
+  fields:
+    name: 'Focal Point Network'
+    business: 17
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 81
+  fields:
+    name: 'Non-EU relations'
+    business: 17
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 82
+  fields:
+    name: 'To support national networks in Member States, particularly through collaboration with the EEN network, in the transmission of occupational safety and health information'
+    business: 17
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 83
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 17
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 18
+  fields:
+    name: '6.3. Corporate Communications'
+
+- model: crm.project
+  pk: 84
+  fields:
+    name: 'EU-OSHA online strategy'
+    business: 18
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 85
+  fields:
+    name: 'Corporate publications strategy'
+    business: 18
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 86
+  fields:
+    name: 'Corporate promotion strategy'
+    business: 18
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 87
+  fields:
+    name: 'Information requests from others than Board, MS authorities, social partners at central level in MSs or at European level, European Institutions'
+    business: 18
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 88
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 18
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 19
+  fields:
+    name: 'A.1. Finance & Accounting'
+
+- model: crm.project
+  pk: 89
+  fields:
+    name: 'Accounting processes'
+    business: 19
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 90
+  fields:
+    name: 'Accounting systems'
+    business: 19
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 91
+  fields:
+    name: 'Activity Based Management'
+    business: 19
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 92
+  fields:
+    name: 'Budget management & implementation'
+    business: 19
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 93
+  fields:
+    name: 'Financial transactions'
+    business: 19
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 20
+  fields:
+    name: 'A.2. Information & Communication Technology (ICT)'
+
+- model: crm.project
+  pk: 94
+  fields:
+    name: 'ICT Management'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 95
+  fields:
+    name: 'ICT Management - ICT Security'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 96
+  fields:
+    name: 'ICT Management - Business Continuity Plan'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 97
+  fields:
+    name: 'ICT Helpdesk - Incident & Support to end-users'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 98
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Maintenance'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 99
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Evolution'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 100
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Tools and processes'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 101
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - Virtua – Infrastructure'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 102
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - Migrations and upgrades'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 103
+  fields:
+    name: 'ICT Communication + Specific Tools - Virtua – Intranet'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 104
+  fields:
+    name: 'ICT Communication + Specific Tools -Virtua – Workspaces'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 105
+  fields:
+    name: 'ICT Communication + Specific Tools -Virtua – Record Management System'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 106
+  fields:
+    name: 'ICT Communication + Specific Tools - ABB'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 107
+  fields:
+    name: 'ICT Communication + Specific Tools -Contact Database'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 108
+  fields:
+    name: 'ICT Communication + Specific Tools - Extranets'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 109
+  fields:
+    name: 'ICT Communication + Specific Tools - Office templates'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 110
+  fields:
+    name: 'ICT Communication + Specific Tools - Other Tool maintenances'
+    business: 20
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 21
+  fields:
+    name: 'A.3. Human Resources'
+
+- model: crm.project
+  pk: 111
+  fields:
+    name: 'Recruitment'
+    business: 21
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 112
+  fields:
+    name: 'HR rules & policies'
+    business: 21
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 113
+  fields:
+    name: 'HR administration & services'
+    business: 21
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 114
+  fields:
+    name: 'Learning & career development'
+    business: 21
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 115
+  fields:
+    name: 'Organisational development'
+    business: 21
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 22
+  fields:
+    name: 'A.4. General Services, premises and equipment'
+
+- model: crm.project
+  pk: 116
+  fields:
+    name: 'Security'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 117
+  fields:
+    name: 'Premises'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 118
+  fields:
+    name: 'Equipment'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 23
+  fields:
+    name: 'A.5. Documentation'
+
+- model: crm.project
+  pk: 119
+  fields:
+    name: 'Archives'
+    business: 23
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 120
+  fields:
+    name: 'Document management'
+    business: 23
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 24
+  fields:
+    name: 'A.6. Support to administrative activities'
+
+- model: crm.project
+  pk: 121
+  fields:
+    name: 'Administrative support'
+    business: 24
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 25
+  fields:
+    name: '7.1 Operational Management and Support'
+
+- model: crm.project
+  pk: 122
+  fields:
+    name: ''
+    business: 25
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 26
+  fields:
+    name: 'C.1 Management and control'
+
+- model: crm.project
+  pk: 123
+  fields:
+    name: 'Management supervision'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 124
+  fields:
+    name: 'Internal control'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 125
+  fields:
+    name: 'Business continuity'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 126
+  fields:
+    name: 'Risk Management'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 127
+  fields:
+    name: 'Data protection'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 128
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 26
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 27
+  fields:
+    name: 'C.2 Legal advice'
+
+- model: crm.project
+  pk: 129
+  fields:
+    name: 'Legal advice'
+    business: 27
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 28
+  fields:
+    name: 'C.3. Programming and evaluation'
+
+- model: crm.project
+  pk: 130
+  fields:
+    name: 'Monitoring and evaluation'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 131
+  fields:
+    name: 'Implementation of Activity Based Management (performance management)'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 132
+  fields:
+    name: 'Quality Management'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 133
+  fields:
+    name: 'Programming'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 134
+  fields:
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 29
+  fields:
+    name: '0.1 Cross-cutting categories'
+
+- model: crm.project
+  pk: 135
+  fields:
+    name: 'Staff Committee'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 136
+  fields:
+    name: 'Health & Safety Committee'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 137
+  fields:
+    name: 'Staff meetings'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 138
+  fields:
+    name: 'Unit meetings'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 139
+  fields:
+    name: 'Leave'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 140
+  fields:
+    name: 'Sick leave'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 141
+  fields:
+    name: 'Training'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
