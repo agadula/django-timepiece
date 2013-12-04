@@ -587,7 +587,7 @@ class SimpleEntry(models.Model):
     MINUTES = (
         (0, 0),
         (15, 15),
-        (30,30),
+        (30, 30),
         (45, 45)
     )
     minutes = models.DecimalField(max_digits=2, decimal_places=0, default=0, choices=MINUTES)
@@ -628,9 +628,8 @@ class SimpleEntry(models.Model):
         seconds += self.minutes * 60
         return seconds
 
-    @property
     def total_hours(self):
-        return self.get_total_seconds() / 3600.0
+        return self.get_total_seconds() / Decimal('3600.0')
 
     @staticmethod
     def summary(user, date, end_date):
@@ -645,3 +644,9 @@ class SimpleEntry(models.Model):
         if minutes: hours += minutes/60
         data['total'] = hours
         return data
+
+    def clean(self):
+        if (self.total_hours() < 0.25):
+            raise ValidationError('Minimum time per entry is 15 minutes')
+        if (self.total_hours() > 13.0):
+            raise ValidationError('Maximum time per entry is 13 hours')
