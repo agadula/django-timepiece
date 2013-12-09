@@ -30,7 +30,7 @@
                 {{ form|as_bootstrap:"horizontal" }}
                 <div class="form-actions">
                     <input class="btn btn-primary" type='submit' name='submit' value='Save' />
-                    <input class="btn" type='button' value='Cancel' onclick="history.back()" />
+                    <a href="{% url 'dashboard' %}"><input class="btn" type='button' value='Cancel'/></a>
                 </div>
             </form>
             {% endif %}
