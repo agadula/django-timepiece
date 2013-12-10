@@ -2,11 +2,20 @@
   pk: 1
   fields:
     name: "D_General"
+    permissions: [
+      70,
+      71,
+      72,
+      73,
+      74,
+      75
+    ]
 
 
-- model: auth.user
-  pk: 2
-  fields:
-    username: "gentisi"
-    password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4=" # password is password
-    groups: [1]
+# - model: auth.user
+#   pk: 2
+#   fields:
+#     username: "gentisi"
+#     #password: "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4=" # password is password
+#     password: "!"
+#     groups: [1]
