@@ -1,11 +1,12 @@
-input = 'activities-projects.txt'
-output = 'activities-projects.yaml'
+input = './fixtures/activities-projects.txt'
+output = './fixtures/activities-projects.yaml'
 
 
 def is_activity(line):
     cond_1 = line[0].isdigit() and line[1] == '.' and line[2].isdigit()
     cond_2 = line[0] in ['A', 'C'] and line[1] == '.' and line[2].isdigit()
-    if cond_1 or cond_2:
+    cond_3 = line.startswith("IPA") or line.startswith("ENP")
+    if cond_1 or cond_2 or cond_3:
         return True
 
 
@@ -58,10 +59,12 @@ with open(input) as f:
     lines = f.readlines()
     for line in lines:
         line = line.strip()
-        if line == '': 
+        if line == '' or line == "Administrative activities":
             continue
         if is_activity(line):
             activities.append( { 'name': line, 'projects': [] } )
+            if line.startswith("IPA") or line.startswith("ENP") or line.startswith("7.1 Operational Management and Support"):
+                activities[-1]['projects'].append( line )
         else:
             activities[-1]['projects'].append( line )
 

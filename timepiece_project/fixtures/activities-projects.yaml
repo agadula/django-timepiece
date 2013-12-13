@@ -32,15 +32,6 @@
 - model: crm.project
   pk: 2
   fields:
-    name: 'New and emerging issues review articles'
-    business: 1
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 3
-  fields:
     name: 'OTHER: Work on the activity not covered by the projects'
     business: 1
     point_person : 1
@@ -55,7 +46,7 @@
     name: '1.2. Large-scale foresight'
 
 - model: crm.project
-  pk: 4
+  pk: 3
   fields:
     name: 'Scoping study for a foresight on new and emerging OSH risks and challenges'
     business: 2
@@ -64,7 +55,7 @@
     status: 1
 
 - model: crm.project
-  pk: 5
+  pk: 4
   fields:
     name: 'Study to identify the success factors to transfer foresight findings into policy-making.'
     business: 2
@@ -73,7 +64,7 @@
     status: 1
 
 - model: crm.project
-  pk: 6
+  pk: 5
   fields:
     name: 'Review of the new and emerging OSH trends in healthcare, incl. home and community care'
     business: 2
@@ -82,9 +73,18 @@
     status: 1
 
 - model: crm.project
-  pk: 7
+  pk: 6
   fields:
     name: 'OSH research priorities final publication and promotion (final stage of the project on OSH research priorities which started end 2011)'
+    business: 2
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 7
+  fields:
+    name: 'New and emerging issues review articles'
     business: 2
     point_person : 1
     type: 2
@@ -936,48 +936,12 @@
 - model: crm.business
   pk: 19
   fields:
-    name: 'A.1. Finance & Accounting'
+    name: 'IPA'
 
 - model: crm.project
   pk: 89
   fields:
-    name: 'Accounting processes'
-    business: 19
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 90
-  fields:
-    name: 'Accounting systems'
-    business: 19
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 91
-  fields:
-    name: 'Activity Based Management'
-    business: 19
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 92
-  fields:
-    name: 'Budget management & implementation'
-    business: 19
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 93
-  fields:
-    name: 'Financial transactions'
+    name: 'IPA'
     business: 19
     point_person : 1
     type: 2
@@ -988,156 +952,12 @@
 - model: crm.business
   pk: 20
   fields:
-    name: 'A.2. Information & Communication Technology (ICT)'
+    name: 'ENP'
 
 - model: crm.project
-  pk: 94
+  pk: 90
   fields:
-    name: 'ICT Management'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 95
-  fields:
-    name: 'ICT Management - ICT Security'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 96
-  fields:
-    name: 'ICT Management - Business Continuity Plan'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 97
-  fields:
-    name: 'ICT Helpdesk - Incident & Support to end-users'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 98
-  fields:
-    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Maintenance'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 99
-  fields:
-    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Evolution'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 100
-  fields:
-    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Tools and processes'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 101
-  fields:
-    name: 'ICT Infrastructure, Internal Tools and Processes - Virtua – Infrastructure'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 102
-  fields:
-    name: 'ICT Infrastructure, Internal Tools and Processes - Migrations and upgrades'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 103
-  fields:
-    name: 'ICT Communication + Specific Tools - Virtua – Intranet'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 104
-  fields:
-    name: 'ICT Communication + Specific Tools -Virtua – Workspaces'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 105
-  fields:
-    name: 'ICT Communication + Specific Tools -Virtua – Record Management System'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 106
-  fields:
-    name: 'ICT Communication + Specific Tools - ABB'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 107
-  fields:
-    name: 'ICT Communication + Specific Tools -Contact Database'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 108
-  fields:
-    name: 'ICT Communication + Specific Tools - Extranets'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 109
-  fields:
-    name: 'ICT Communication + Specific Tools - Office templates'
-    business: 20
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 110
-  fields:
-    name: 'ICT Communication + Specific Tools - Other Tool maintenances'
+    name: 'ENP'
     business: 20
     point_person : 1
     type: 2
@@ -1148,48 +968,48 @@
 - model: crm.business
   pk: 21
   fields:
-    name: 'A.3. Human Resources'
+    name: 'A.1. Finance & Accounting'
 
 - model: crm.project
-  pk: 111
+  pk: 91
   fields:
-    name: 'Recruitment'
+    name: 'Accounting processes'
     business: 21
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 112
+  pk: 92
   fields:
-    name: 'HR rules & policies'
+    name: 'Accounting systems'
     business: 21
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 113
+  pk: 93
   fields:
-    name: 'HR administration & services'
+    name: 'Activity Based Management - Finance'
     business: 21
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 114
+  pk: 94
   fields:
-    name: 'Learning & career development'
+    name: 'Budget management & implementation'
     business: 21
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 115
+  pk: 95
   fields:
-    name: 'Organisational development'
+    name: 'Financial transactions'
     business: 21
     point_person : 1
     type: 2
@@ -1200,30 +1020,156 @@
 - model: crm.business
   pk: 22
   fields:
-    name: 'A.4. General Services, premises and equipment'
+    name: 'A.2. Information & Communication Technology (ICT)'
 
 - model: crm.project
-  pk: 116
+  pk: 96
   fields:
-    name: 'Security'
+    name: 'ICT Management'
     business: 22
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 117
+  pk: 97
   fields:
-    name: 'Premises'
+    name: 'ICT Management - ICT Security'
     business: 22
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 118
+  pk: 98
   fields:
-    name: 'Equipment'
+    name: 'ICT Management - Business Continuity Plan'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 99
+  fields:
+    name: 'ICT Helpdesk - Incident & Support to end-users'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 100
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Maintenance'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 101
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Infrastructure – Evolution'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 102
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - ICT Tools and processes'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 103
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - Virtua – Infrastructure'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 104
+  fields:
+    name: 'ICT Infrastructure, Internal Tools and Processes - Migrations and upgrades'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 105
+  fields:
+    name: 'ICT Communication + Specific Tools - Virtua – Intranet'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 106
+  fields:
+    name: 'ICT Communication + Specific Tools -Virtua – Workspaces'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 107
+  fields:
+    name: 'ICT Communication + Specific Tools -Virtua – Record Management System'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 108
+  fields:
+    name: 'ICT Communication + Specific Tools - ABB'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 109
+  fields:
+    name: 'ICT Communication + Specific Tools -Contact Database'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 110
+  fields:
+    name: 'ICT Communication + Specific Tools - Extranets'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 111
+  fields:
+    name: 'ICT Communication + Specific Tools - Office templates'
+    business: 22
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 112
+  fields:
+    name: 'ICT Communication + Specific Tools - Other Tool maintenances'
     business: 22
     point_person : 1
     type: 2
@@ -1234,21 +1180,48 @@
 - model: crm.business
   pk: 23
   fields:
-    name: 'A.5. Documentation'
+    name: 'A.3. Human Resources'
 
 - model: crm.project
-  pk: 119
+  pk: 113
   fields:
-    name: 'Archives'
+    name: 'Recruitment'
     business: 23
     point_person : 1
     type: 2
     status: 1
 
 - model: crm.project
-  pk: 120
+  pk: 114
   fields:
-    name: 'Document management'
+    name: 'HR rules & policies'
+    business: 23
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 115
+  fields:
+    name: 'HR administration & services'
+    business: 23
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 116
+  fields:
+    name: 'Learning & career development'
+    business: 23
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 117
+  fields:
+    name: 'Organisational development'
     business: 23
     point_person : 1
     type: 2
@@ -1259,12 +1232,30 @@
 - model: crm.business
   pk: 24
   fields:
-    name: 'A.6. Support to administrative activities'
+    name: 'A.4. General Services, premises and equipment'
 
 - model: crm.project
-  pk: 121
+  pk: 118
   fields:
-    name: 'Administrative support'
+    name: 'Security'
+    business: 24
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 119
+  fields:
+    name: 'Premises'
+    business: 24
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 120
+  fields:
+    name: 'Equipment'
     business: 24
     point_person : 1
     type: 2
@@ -1275,64 +1266,37 @@
 - model: crm.business
   pk: 25
   fields:
-    name: '7.1 Operational Management and Support'
+    name: 'A.5. Documentation'
+
+- model: crm.project
+  pk: 121
+  fields:
+    name: 'Archives'
+    business: 25
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 122
+  fields:
+    name: 'Document management'
+    business: 25
+    point_person : 1
+    type: 2
+    status: 1
 
 
 
 - model: crm.business
   pk: 26
   fields:
-    name: 'C.1 Management and control'
-
-- model: crm.project
-  pk: 122
-  fields:
-    name: 'Management supervision'
-    business: 26
-    point_person : 1
-    type: 2
-    status: 1
+    name: 'A.6. Support to administrative activities'
 
 - model: crm.project
   pk: 123
   fields:
-    name: 'Internal control'
-    business: 26
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 124
-  fields:
-    name: 'Business continuity'
-    business: 26
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 125
-  fields:
-    name: 'Risk Management'
-    business: 26
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 126
-  fields:
-    name: 'Data protection'
-    business: 26
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 127
-  fields:
-    name: 'OTHER: Work on the activity not covered by the projects'
+    name: 'Administrative support'
     business: 26
     point_person : 1
     type: 2
@@ -1343,12 +1307,12 @@
 - model: crm.business
   pk: 27
   fields:
-    name: 'C.2 Legal advice'
+    name: '7.1 Operational Management and Support'
 
 - model: crm.project
-  pk: 128
+  pk: 124
   fields:
-    name: 'Legal advice'
+    name: '7.1 Operational Management and Support'
     business: 27
     point_person : 1
     type: 2
@@ -1359,12 +1323,48 @@
 - model: crm.business
   pk: 28
   fields:
-    name: 'C.3. Programming and evaluation'
+    name: 'C.1 Management and control'
+
+- model: crm.project
+  pk: 125
+  fields:
+    name: 'Management supervision'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 126
+  fields:
+    name: 'Internal control'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 127
+  fields:
+    name: 'Business continuity'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 128
+  fields:
+    name: 'Risk Management'
+    business: 28
+    point_person : 1
+    type: 2
+    status: 1
 
 - model: crm.project
   pk: 129
   fields:
-    name: 'Monitoring and evaluation'
+    name: 'Data protection'
     business: 28
     point_person : 1
     type: 2
@@ -1372,33 +1372,6 @@
 
 - model: crm.project
   pk: 130
-  fields:
-    name: 'Implementation of Activity Based Management (performance management)'
-    business: 28
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 131
-  fields:
-    name: 'Quality Management'
-    business: 28
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 132
-  fields:
-    name: 'Programming'
-    business: 28
-    point_person : 1
-    type: 2
-    status: 1
-
-- model: crm.project
-  pk: 133
   fields:
     name: 'OTHER: Work on the activity not covered by the projects'
     business: 28
@@ -1411,13 +1384,47 @@
 - model: crm.business
   pk: 29
   fields:
-    name: '0.1 Cross-cutting categories'
+    name: 'C.2 Legal advice'
+
+- model: crm.project
+  pk: 131
+  fields:
+    name: 'Legal advice'
+    business: 29
+    point_person : 1
+    type: 2
+    status: 1
+
+
+
+- model: crm.business
+  pk: 30
+  fields:
+    name: 'C.3. Programming and evaluation'
+
+- model: crm.project
+  pk: 132
+  fields:
+    name: 'Monitoring and evaluation'
+    business: 30
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 133
+  fields:
+    name: 'Activity Based Management - performance management'
+    business: 30
+    point_person : 1
+    type: 2
+    status: 1
 
 - model: crm.project
   pk: 134
   fields:
-    name: 'Staff Committee'
-    business: 29
+    name: 'Quality Management'
+    business: 30
     point_person : 1
     type: 2
     status: 1
@@ -1425,8 +1432,8 @@
 - model: crm.project
   pk: 135
   fields:
-    name: 'Health & Safety Committee'
-    business: 29
+    name: 'Programming'
+    business: 30
     point_person : 1
     type: 2
     status: 1
@@ -1434,17 +1441,24 @@
 - model: crm.project
   pk: 136
   fields:
-    name: 'Staff meetings'
-    business: 29
+    name: 'OTHER: Work on the activity not covered by the projects'
+    business: 30
     point_person : 1
     type: 2
     status: 1
 
+
+
+- model: crm.business
+  pk: 31
+  fields:
+    name: '0.1 Cross-cutting categories'
+
 - model: crm.project
   pk: 137
   fields:
-    name: 'Unit meetings'
-    business: 29
+    name: 'Staff Committee'
+    business: 31
     point_person : 1
     type: 2
     status: 1
@@ -1452,8 +1466,8 @@
 - model: crm.project
   pk: 138
   fields:
-    name: 'Leave'
-    business: 29
+    name: 'Health & Safety Committee'
+    business: 31
     point_person : 1
     type: 2
     status: 1
@@ -1461,8 +1475,8 @@
 - model: crm.project
   pk: 139
   fields:
-    name: 'Sick leave'
-    business: 29
+    name: 'Staff meetings'
+    business: 31
     point_person : 1
     type: 2
     status: 1
@@ -1470,8 +1484,17 @@
 - model: crm.project
   pk: 140
   fields:
+    name: 'Unit meetings'
+    business: 31
+    point_person : 1
+    type: 2
+    status: 1
+
+- model: crm.project
+  pk: 141
+  fields:
     name: 'Training'
-    business: 29
+    business: 31
     point_person : 1
     type: 2
     status: 1
