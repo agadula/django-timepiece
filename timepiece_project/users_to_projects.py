@@ -1,5 +1,6 @@
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))) 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "timepiece_project.settings.production")
 
 from django.contrib.auth.models import User
 
