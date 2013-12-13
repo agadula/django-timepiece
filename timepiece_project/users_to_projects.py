@@ -15,7 +15,7 @@ def assign_to_projects_in_activity(username, activityname):
     
     businesses = Business.objects.filter(name__startswith = activityname)
     if len(businesses) != 1: 
-        raise Exception("No activities or too many corresponding Activities starting with the same name")
+        raise Exception("No activities or too many corresponding Activities starting with: "+activityname)
     b = businesses[0]
 
     projects = b.new_business_projects.all()
