@@ -33,13 +33,15 @@ if __name__ == "__main__":
     for user in users:
         assign_to_projects_in_activity(user.username, "0.1")
 
+
+#    not this year: 2.6 3.3
     assignments = {
                 'munarlo' : '2.3 3.1 3.2 5.2 6.3 7.1 A.3'.split(),
-                'azaolmo' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 2.6 3.1 3.2 3.3 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.3'.split(),
+                'azaolmo' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 3.1 3.2 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.3'.split(),
                 'cruzmar' : 'A.1 A.3'.split(),
                 'izaguan' : '3.1 5.2 6.2 6.3 7.1 A.2 A.3'.split(),
-                'mullebi' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 2.6 3.1 3.2 3.3 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.3'.split(),
-                'smithan' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 2.6 3.1 3.2 3.3 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.2 A.3 C.1 C.3'.split(),
+                'mullebi' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 3.1 3.2 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.3'.split(),
+                'smithan' : '1.1 1.2 2.1 2.2 2.3 2.4 2.5 3.1 3.2 4.1 4.2 4.3 4.4 5.1 5.2 6.1 6.2 6.3 7.1 A.2 A.3 C.1 C.3'.split(),
                 }
 
     for username, activities in assignments.iteritems():
