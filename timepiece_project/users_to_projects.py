@@ -147,6 +147,12 @@ if __name__ == "__main__":
             username = users_usernames[raw_user]
             assign_to_projects_in_activity(username, activity['name'][:3])
 
+
+    # Assign to admin every project
+    businesses = Business.objects.all()
+    for activity in businesses:
+        assign_to_projects_in_activity('admin', activity.name[:3])
+
 #     # reset passwords for cross check on development machine
 #     default_password = "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4=" # password is password
 #     users = User.objects.all()
