@@ -18,7 +18,7 @@
 - model: crm.business
   pk: 1
   fields:
-    name: '1.1. Foresight of new and emerging OSH risks  associated with new technologies in green jobs'
+    name: '1.1. Foresight of new and emerging OSH risks associated with new technologies in green jobs'
 
 - model: crm.project
   pk: 1

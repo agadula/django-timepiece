@@ -62,8 +62,10 @@ with open(input) as f:
         if line == '' or line == "Administrative activities":
             continue
         if is_activity(line):
+            line = " ".join(line.split()) # remove double spaces
             activities.append( { 'name': line, 'projects': [] } )
             if line.startswith("IPA") or line.startswith("ENP") or line.startswith("7.1 Operational Management and Support"):
+                # these activities have no projects, thus a single project with the same name is created
                 activities[-1]['projects'].append( line )
         else:
             activities[-1]['projects'].append( line )
