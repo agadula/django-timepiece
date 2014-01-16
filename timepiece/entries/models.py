@@ -568,9 +568,11 @@ class SimpleEntry(models.Model):
     """
     UNVERIFIED = 'unverified'
     VERIFIED = 'verified'
+    APPROVED = 'approved'
     STATUSES = {
         UNVERIFIED: 'Unverified',
         VERIFIED: 'Verified',
+        APPROVED: 'Approved',
     }
 
     user = models.ForeignKey(User, related_name='simple_entries')

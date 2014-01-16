@@ -249,13 +249,14 @@ def view_user_timesheet(request, user_id, active_tab):
         total_statuses_se = len(statuses_se)
         unverified_count_se = statuses_se.count(SimpleEntry.UNVERIFIED)
         verified_count_se = statuses_se.count(SimpleEntry.VERIFIED)
+        approved_count_se = statuses_se.count(SimpleEntry.APPROVED)
 
     if can_change or user == request.user:
         # show_verify = unverified_count != 0
         show_verify = unverified_count_se != 0
     if can_approve:
-        show_approve = verified_count + approved_count == total_statuses \
-                and verified_count > 0 and total_statuses != 0
+        show_approve = verified_count_se + approved_count_se == total_statuses_se \
+                and verified_count_se > 0 and total_statuses_se != 0
 
     return render(request, 'timepiece/user/timesheet/view.html', {
         'active_tab': active_tab or 'all-simple-entries',
