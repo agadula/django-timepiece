@@ -535,7 +535,7 @@ class ClockInTest(ViewTestMixin, TestCase):
         })
         response = self.client.post(self.url, data)
         err_msg = 'sick/personal is not allowed for this project. Please '
-        err_msg += 'choose among development, and Work'
+        err_msg += 'choose among Work, and development'
         self.assertFormError(response, 'form', None, err_msg)
 
     def test_clock_in_active_comments(self):
@@ -1259,7 +1259,7 @@ class CreateEditEntry(ViewTestMixin, TestCase):
         data.update({'activity': self.sick_activity.id})
         response = self.client.post(self.create_url, data)
         err_msg = 'sick/personal is not allowed for this project. Please '
-        err_msg += 'choose among development, and Work'
+        err_msg += 'choose among Work, and development'
         self.assertFormError(response, 'form', None, err_msg)
 
     def add_entry_test_helper(self):
