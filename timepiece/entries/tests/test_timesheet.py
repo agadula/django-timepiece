@@ -155,7 +155,7 @@ class MyLedgerTest(ViewTestMixin, LogTimeMixin, TestCase):
             utils.add_timezone(datetime.datetime(2011, 2, 1)),
             timezone.now(),
         ]
-        self.log_simple_time(project=self.p1, date=days[0], delta=(1, 0))
+        self.log_simple_time(project=self.p1, date=days[0], delta=(1, 15))
         self.log_simple_time(project=self.p2, date=days[0], delta=(1, 0))
         self.log_simple_time(project=self.p4, date=days[0], delta=(1, 0))
         self.log_simple_time(project=self.p1, date=days[1], delta=(1, 0))
@@ -169,15 +169,15 @@ class MyLedgerTest(ViewTestMixin, LogTimeMixin, TestCase):
         self.log_simple_time(project=self.p4, date=days[3], delta=(1, 0))
         self.log_simple_time(project=self.p1, date=days[4], delta=(1, 0))
         self.log_simple_time(project=self.p3, date=days[4], delta=(1, 0))
-        self.log_simple_time(project=self.p4, date=days[4], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[4], delta=(1, 15))
 
     def testCurrentTimeSheet(self):
         self.login_user(self.user)
-        self.make_entries()
+        self.make_simple_entries()
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(len(response.context['entries']), 3)
-        self.assertEqual(response.context['summary']['total'], Decimal(3))
+        self.assertEqual(len(response.context['month_simple_entries']), 3)
+        self.assertEqual(response.context['summary_se']['total'], Decimal(3.25)) # 3 hours and 15 minutes
 
     def testOldTimeSheet(self):
         self.login_user(self.user)
@@ -189,7 +189,7 @@ class MyLedgerTest(ViewTestMixin, LogTimeMixin, TestCase):
         response = self.client.get(self.url, data)
         self.assertEquals(response.status_code, 200)
         self.assertEqual(len(response.context['month_simple_entries']), 9)
-        self.assertEqual(response.context['summary_se']['total'], Decimal(9))
+        self.assertEqual(response.context['summary_se']['total'], Decimal(9.25)) # 9 hours and 15 minutes
 
 
 class ClockInTest(ViewTestMixin, TestCase):
