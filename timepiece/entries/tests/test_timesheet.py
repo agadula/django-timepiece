@@ -2259,7 +2259,7 @@ class CreateEditSimpleEntry(ViewTestMixin, TestCase):
 #         self.current_entry_data.update({
 #             'st_str': self.ten_min_ago.strftime('%H:%M:%S'),
 #         })
-        self.create_url = reverse('create_simple_entry')
+        self.create_url = reverse('create_simple_entry_from_business', args=[self.business.id])
         self.edit_closed_url = reverse('edit_simple_entry',
             args=[self.closed_entry.pk])
 #         self.edit_current_url = reverse('edit_entry',
