@@ -15,7 +15,7 @@ from timepiece.tests.base import ViewTestMixin, LogTimeMixin
 from timepiece.tests import factories
 
 from timepiece.crm.utils import grouped_totals
-from timepiece.entries.models import Activity, Entry
+from timepiece.entries.models import Activity, Entry, SimpleEntry
 from timepiece.entries.forms import ClockInForm
 
 
@@ -1675,36 +1675,35 @@ class StatusTest(ViewTestMixin, TestCase):
         self.assertFalse(response.context['show_approve'])
 
     def testVerifyPage(self):
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': timezone.now() - \
-                relativedelta(hours=1),
-            'end_time':  timezone.now(),
+            'date': timezone.now(),
+            'hours':  3,
         })
         response = self.client.get(self.verify_url())
-        entries = self.user.timepiece_entries.all()
-        self.assertEquals(entries[0].status, Entry.UNVERIFIED)
+        entries = self.user.simple_entries.all()
+        self.assertEquals(entries[0].status, SimpleEntry.UNVERIFIED)
         response = self.client.post(self.verify_url(), {'do_action': 'Yes'})
-        self.assertEquals(entries[0].status, Entry.VERIFIED)
+        self.assertEquals(entries[0].status, SimpleEntry.VERIFIED)
 
     def testApprovePage(self):
         self.login_with_permissions('approve_timesheet', 'view_entry_summary')
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': timezone.now() - relativedelta(hours=1),
-            'end_time':  timezone.now(),
+            'date': timezone.now(),
+            'hours': 3,
         })
 
-        self.assertEquals(entry.status, Entry.UNVERIFIED)
-        entry.status = Entry.VERIFIED
+        self.assertEquals(entry.status, SimpleEntry.UNVERIFIED)
+        entry.status = SimpleEntry.VERIFIED
         entry.save()
 
         response = self.client.get(self.approve_url(),)
-        self.assertEquals(entry.status, Entry.VERIFIED)
+        self.assertEquals(entry.status, SimpleEntry.VERIFIED)
 
         response = self.client.post(self.approve_url(), {'do_action': 'Yes'})
-        entry = Entry.objects.get(pk=entry.pk)
-        self.assertEquals(entry.status, Entry.APPROVED)
+        entry = SimpleEntry.objects.get(pk=entry.pk)
+        self.assertEquals(entry.status, SimpleEntry.APPROVED)
 
     def test_reject_user(self):
         """A regular user should not be able to reject an entry"""
