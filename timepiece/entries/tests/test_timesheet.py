@@ -1484,10 +1484,11 @@ class StatusTest(ViewTestMixin, TestCase):
         self.login_user(self.perm_user)
 
     def test_verify_link(self):
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': self.now - relativedelta(hours=1),
-            'end_time': self.now
+            'date': self.now,
+            'minutes': 10,
+            'hours': 1,
         })
 
         response = self.client.get(self.sheet_url)
