@@ -1642,11 +1642,10 @@ class StatusTest(ViewTestMixin, TestCase):
     def testVerifyButton(self):
         response = self.client.get(self.sheet_url)
         self.assertNotContains(response, self.verify_url())
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': timezone.now() - \
-                relativedelta(hours=1),
-            'end_time':  timezone.now(),
+            'date': timezone.now(),
+            'hours':  1,
         })
         response = self.client.get(self.sheet_url)
         self.assertTrue(response.context['show_verify'])
@@ -1659,10 +1658,10 @@ class StatusTest(ViewTestMixin, TestCase):
         self.login_as_admin()
         response = self.client.get(self.sheet_url)
         self.assertFalse(response.context['show_approve'])
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': timezone.now() - relativedelta(hours=1),
-            'end_time':  timezone.now(),
+            'date': timezone.now(),
+            'hours': 3,
         })
         response = self.client.get(self.sheet_url)
         self.assertFalse(response.context['show_approve'])
