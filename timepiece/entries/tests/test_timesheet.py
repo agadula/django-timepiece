@@ -1510,10 +1510,10 @@ class StatusTest(ViewTestMixin, TestCase):
 
     def test_approve_link(self):
         self.login_with_permissions('view_entry_summary', 'approve_timesheet')
-        entry = factories.Entry(**{
+        entry = factories.SimpleEntry(**{
             'user': self.user,
-            'start_time': self.now - relativedelta(hours=1),
-            'end_time': self.now,
+            'date': self.now,
+            'hours': 2,
             'status': Entry.VERIFIED
         })
         response = self.client.get(self.sheet_url)
