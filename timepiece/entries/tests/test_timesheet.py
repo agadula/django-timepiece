@@ -143,6 +143,34 @@ class MyLedgerTest(ViewTestMixin, LogTimeMixin, TestCase):
         self.log_time(project=self.p3, start=days[4], delta=(1, 0))
         self.log_time(project=self.p4, start=days[4], delta=(1, 0))
 
+    def make_simple_entries(self):
+        self.p1 = factories.BillableProject(name='1')
+        self.p2 = factories.NonbillableProject(name='2')
+        self.p4 = factories.BillableProject(name='4')
+        self.p3 = factories.NonbillableProject(name='1')
+        days = [
+            utils.add_timezone(datetime.datetime(2011, 1, 1)),
+            utils.add_timezone(datetime.datetime(2011, 1, 28)),
+            utils.add_timezone(datetime.datetime(2011, 1, 31)),
+            utils.add_timezone(datetime.datetime(2011, 2, 1)),
+            timezone.now(),
+        ]
+        self.log_simple_time(project=self.p1, date=days[0], delta=(1, 0))
+        self.log_simple_time(project=self.p2, date=days[0], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[0], delta=(1, 0))
+        self.log_simple_time(project=self.p1, date=days[1], delta=(1, 0))
+        self.log_simple_time(project=self.p3, date=days[1], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[1], delta=(1, 0))
+        self.log_simple_time(project=self.p1, date=days[2], delta=(1, 0))
+        self.log_simple_time(project=self.p2, date=days[2], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[2], delta=(1, 0))
+        self.log_simple_time(project=self.p1, date=days[3], delta=(1, 0))
+        self.log_simple_time(project=self.p3, date=days[3], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[3], delta=(1, 0))
+        self.log_simple_time(project=self.p1, date=days[4], delta=(1, 0))
+        self.log_simple_time(project=self.p3, date=days[4], delta=(1, 0))
+        self.log_simple_time(project=self.p4, date=days[4], delta=(1, 0))
+
     def testCurrentTimeSheet(self):
         self.login_user(self.user)
         self.make_entries()
@@ -153,15 +181,15 @@ class MyLedgerTest(ViewTestMixin, LogTimeMixin, TestCase):
 
     def testOldTimeSheet(self):
         self.login_user(self.user)
-        self.make_entries()
+        self.make_simple_entries()
         data = {
             'month': 1,
             'year': 2011,
         }
         response = self.client.get(self.url, data)
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(len(response.context['entries']), 9)
-        self.assertEqual(response.context['summary']['total'], Decimal(9))
+        self.assertEqual(len(response.context['month_simple_entries']), 9)
+        self.assertEqual(response.context['summary_se']['total'], Decimal(9))
 
 
 class ClockInTest(ViewTestMixin, TestCase):

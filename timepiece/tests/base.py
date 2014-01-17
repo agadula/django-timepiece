@@ -183,3 +183,28 @@ class LogTimeMixin(object):
         if status:
             data['status'] = status
         return factories.Entry(**data)
+
+    def log_simple_time(self, delta=None, project=None, date=None,
+            status=None, activity=None, user=None):
+        if not user:
+            user = self.user
+        if delta:
+            hours, minutes = delta
+        else:
+            hours = 4
+            minutes = 0
+
+        data = {'user': user,
+                'date': date,
+                'hours': hours,
+                'minutes': minutes,
+                }
+        if project:
+            data['project'] = project
+        else:
+            data['project'] = factories.BillableProject()
+
+        if status:
+            data['status'] = status
+
+        return factories.SimpleEntry(**data)
