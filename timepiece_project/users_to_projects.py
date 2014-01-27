@@ -18,6 +18,7 @@ def assign_to_projects_in_activity(username, activityname):
         raise Exception(username+" not found")
 
     b = _get_unique_activity(activityname)
+    print "Updating relations between "+username+" and "+str(b)
 
     projects = b.new_business_projects.all()
     for p in projects:
@@ -26,7 +27,7 @@ def assign_to_projects_in_activity(username, activityname):
             pr.user = u
             pr.project = p
             pr.save()
-            print pr
+            print " - "+str(pr)
 
 
 def get_activities_from_file(filename):
@@ -87,16 +88,7 @@ def map_users_to_usernames(raw_users):
     return users
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--settings')
-    args = parser.parse_args()
-
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", args.settings)
-    from django.contrib.auth.models import User
-    from timepiece.crm.models import Business, Project, ProjectRelationship
-
+def update_from_matrix_file():
     # Load activities and their users from the Matrix file
     activities = get_activities_from_file("./fixtures/users_to_activities.csv")
 
@@ -160,3 +152,84 @@ if __name__ == "__main__":
 #         user.password = default_password
 #         user.groups.add(1)
 #         user.save()
+    # Load activities and their users from the Matrix file
+    activities = get_activities_from_file("./fixtures/users_to_activities.csv")
+
+    # Remove activities which are in the Matrix but not available this year
+    not_this_year = "2.6 3.3 5.3".split()
+    activities = [a for a in activities if (a['name'][:3] not in not_this_year)]
+
+    # Use the first three letters of the activity to
+    check_that_activities_exist_in_db(activities)
+
+    # Get a list of raw users name and surname
+    raw_users = get_unique_users(activities)
+
+    # Try to map the raw names and surnames to existing usernames
+    users_usernames = map_users_to_usernames(raw_users)
+
+    users_by_hands = {
+                        u'AST 3': None,
+                        u'BEGONA GRA\xd1A': 'granabe',
+                        u'ENMMANUELLE BRUN': 'brunemm',
+                        u'MARIA JOSE URKIDI': 'urkidma',
+                        u'MONIZA AZAOLA': 'azaolmo',
+                        u'NATALIA DIMITROVA': 'dimitna',
+                        u'TIMOTY TREGENZA': 'tregeti',
+                        u'MARI CARMEN DE LA CRUZ': 'cruzmar',
+                        u'MARTA DE PRADO': 'deprama',
+                        u'MARTA URRUTIA': 'urrutma',
+                        u'MONICA VEGA': 'vegamon',
+                        u'SILVIA GRADOS': 'gradosi',
+                        u'XABIER ALTUBE': 'altubxa',
+                        u'XABIER IRASTORZA': 'irastxa',
+                    }
+    users_usernames.update(users_by_hands)
+
+    # Assign to all users the 0.1 Cross-cutting categories
+    users = User.objects.all()
+    for user in users:
+        assign_to_projects_in_activity(user.username, "0.1")
+
+    # Do special assignments
+    assign_to_projects_in_activity('bolabog', "IPA") # Add Boglarka BOLA to IPA
+    assign_to_projects_in_activity('tregeti', "ENP") # Add Tim TREGENZA to ENP
+
+    # Mass assignments based on the matrix
+    for activity in activities:
+        for raw_user in activity['users']:
+            if raw_user == "AST 3": continue
+            username = users_usernames[raw_user]
+            assign_to_projects_in_activity(username, activity['name'][:3])
+
+
+    # Assign to admin every project
+    businesses = Business.objects.all()
+    for activity in businesses:
+        assign_to_projects_in_activity('admin', activity.name[:3])
+
+#     # reset passwords for cross check on development machine
+#     default_password = "pbkdf2_sha256$10000$xKZKJn4h5ejo$uSlna78YyQfag7f0q7WdOWlMDyFzVjiPqoxjLrqedO4=" # password is password
+#     users = User.objects.all()
+#     for user in users:
+#         user.password = default_password
+#         user.groups.add(1)
+#         user.save()
+    
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--settings')
+    parser.add_argument('--user')
+    parser.add_argument('--activity', help="Activity name, or its first letters that identify uniquely")
+    args = parser.parse_args()
+
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", args.settings)
+    from django.contrib.auth.models import User
+    from timepiece.crm.models import Business, Project, ProjectRelationship
+
+    if args.user and args.activity:
+        assign_to_projects_in_activity(args.user, args.activity)
