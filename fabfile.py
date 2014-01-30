@@ -154,14 +154,12 @@ def users_to_projects(user=None, activity=None):
 
 def users_that_not_record_entries():
     """Prints active users that did not record any entry"""
-    import sys
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "timepiece_project."+env.settings_file)
-    from django.contrib.auth.models import User
-    from timepiece.entries.models import SimpleEntry
+    cmd = 'python helpers/users_that_not_record_entries.py --settings='+env.settings_file
     
-    users = User.objects.all()
-    for u in users:
-        if not u.simple_entries.all() and u.is_active:
-            print "("+u.username+") "+u.first_name+" "+u.last_name
+    if env.environment == 'development': 
+        with lcd(env.project_path):
+            local(cmd)
+    else:
+        with virtualenv():
+            run(cmd)
