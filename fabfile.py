@@ -138,12 +138,11 @@ def ldap_users_to_db():
     with virtualenv():
         run('python ldap_users_to_db.py')
 
-def users_to_projects(user=None, activity=None):
-    """Assign users to projects"""
+
+def _user_to_projects(user=None, do=None, activity=None):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
     cmd = 'python users_to_projects.py --settings='+env.settings_file
-    if user and activity:
-        cmd+= " --user="+user+" --activity="+activity
+    cmd+= " --user="+user+" --do="+do+" --activity="+activity
     
     if env.environment == 'development': 
         with lcd(env.project_path):
@@ -151,6 +150,15 @@ def users_to_projects(user=None, activity=None):
     else:
         with virtualenv():
             run(cmd)
+
+def add_user_to_projects(user=None, activity=None):
+    """Add user to projects: e.g. fab prod add_user_to_projects:user=username,activity=1.1"""
+    _user_to_projects(user=user, do="add", activity=activity)
+
+def remove_user_from_projects(user=None, activity=None):
+    """Remove user form projects: e.g. fab prod remove_user_from_projects:user=username,activity=1.1"""
+    _user_to_projects(user=user, do="remove", activity=activity)
+
 
 def users_that_not_record_entries():
     """Prints active users that did not record any entry"""

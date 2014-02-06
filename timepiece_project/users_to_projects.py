@@ -11,14 +11,27 @@ def _get_unique_activity(activityname):
     return b
 
 
-def assign_to_projects_in_activity(username, activityname):
+def _get_unique_project_relationship(user, project):
+    """ returns the project relationship or raises an error if 0 or more than 1 relationships corresponds"""
+    prs = ProjectRelationship.objects.filter(user=user).filter(project=project)
+    if len(prs) != 1:
+        raise Exception("No relationships or too many corresponding relationships starting with: "+user.username+" "+project.name)
+    pr = prs[0]
+    return pr
+
+
+def _get_user(username):
     try:
         u = User.objects.filter(username = username)[0]
     except:
         raise Exception(username+" not found")
+    return u
 
+
+def assign_to_projects_in_activity(username, activityname):
+    u = _get_user(username)
     b = _get_unique_activity(activityname)
-    print "Updating relations between "+username+" and "+str(b)
+    print "Adding relations between "+username+" and "+str(b)
 
     projects = b.new_business_projects.all()
     for p in projects:
@@ -27,7 +40,19 @@ def assign_to_projects_in_activity(username, activityname):
             pr.user = u
             pr.project = p
             pr.save()
-            print " - "+str(pr)
+            print " + "+str(pr)
+
+
+def remove_from_projects_in_activity(username, activityname):
+    u = _get_user(username)
+    b = _get_unique_activity(activityname)
+    print "Removing relations between "+username+" and "+str(b)
+
+    projects = b.new_business_projects.all()
+    for p in projects:
+        pr = _get_unique_project_relationship(u, p)
+        pr.delete()
+        print " - "+str(pr)
 
 
 def get_activities_from_file(filename):
@@ -221,9 +246,10 @@ def update_from_matrix_file():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--settings')
-    parser.add_argument('--user')
-    parser.add_argument('--activity', help="Activity name, or its first letters that identify uniquely")
+    parser.add_argument('--settings', required=True)
+    parser.add_argument('--user', required=True)
+    parser.add_argument('--do', choices=["add", "remove"], required=True)
+    parser.add_argument('--activity', required=True, help="Activity name, or its first letters that identify uniquely")
     args = parser.parse_args()
 
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
@@ -231,5 +257,7 @@ if __name__ == "__main__":
     from django.contrib.auth.models import User
     from timepiece.crm.models import Business, Project, ProjectRelationship
 
-    if args.user and args.activity:
+    if args.do == "add":
         assign_to_projects_in_activity(args.user, args.activity)
+    if args.do == "remove":
+        remove_from_projects_in_activity(args.user, args.activity)
