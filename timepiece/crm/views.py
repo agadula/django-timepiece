@@ -351,7 +351,8 @@ def change_user_timesheet(request, user_id, action):
 #         return redirect(return_url)
     hours = simple_entries.all().aggregate(s=Sum('hours'))['s']
     minutes = simple_entries.all().aggregate(s=Sum('minutes'))['s']
-    if not hours:
+    summary_se = SimpleEntry.summary(user, from_date, to_date)
+    if not hours and not minutes:
         msg = 'You cannot verify/approve a timesheet with no hours'
         messages.error(request, msg)
         return redirect(return_url)
@@ -362,6 +363,7 @@ def change_user_timesheet(request, user_id, action):
         'to_date': to_date - relativedelta(days=1),
         'return_url': return_url,
         'hours': hours,
+        'summary_se': summary_se,
     })
 
 

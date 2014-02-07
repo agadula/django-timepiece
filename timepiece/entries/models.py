@@ -582,7 +582,7 @@ class SimpleEntry(models.Model):
             default=UNVERIFIED)
 
     comments = models.TextField(blank=True)
-    date = models.DateField(default=date.today)
+    date = models.DateField()
     date_updated = models.DateTimeField(auto_now=True)
 
     hours = models.DecimalField(max_digits=2, decimal_places=0, default=0) #validators=[MinValueValidator(Decimal('0.01'))
