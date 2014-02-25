@@ -525,6 +525,24 @@ class ProjectHours(models.Model):
 
 class SimpleEntryQuerySet(models.query.QuerySet):
 
+    def date_trunc(self, key='month', extra_values=None):
+        select = {"day": {"date": """DATE_TRUNC('day', date)"""},
+                  "week": {"date": """DATE_TRUNC('week', date)"""},
+                  "month": {"date": """DATE_TRUNC('month', date)"""},
+                  "year": {"date": """DATE_TRUNC('year', date)"""},
+        }
+        basic_values = (
+            'user', 'date', 'user__first_name', 'user__last_name',
+        )
+        extra_values = extra_values or ()
+        qs = self.extra(select=select[key])
+        qs = qs.values(*basic_values + extra_values)
+
+        qs = qs.annotate(minutes=Sum('minutes'))
+        qs = qs.annotate(hours=Sum('hours'))
+        qs = qs.order_by('user__last_name', 'date')
+        return qs
+
     def timespan(self, from_date, to_date=None, span=None, current=False):
         """
         Takes a beginning date a filters entries. An optional to_date can be
@@ -560,6 +578,9 @@ class SimpleEntryManager(models.Manager):
         str(qs.query)
 
         return qs
+
+    def date_trunc(self, key='month', extra_values=()):
+        return self.get_query_set().date_trunc(key, extra_values)
 
 
 class SimpleEntry(models.Model):

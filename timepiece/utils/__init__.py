@@ -50,8 +50,11 @@ def get_hours_summary(entries):
     }
     for entry in entries:
         hours['total'] += entry['hours']
-        status = 'billable' if entry['billable'] else 'non_billable'
-        hours[status] += entry['hours']
+        if entry.has_key('billable') or entry.has_key('non_billable'): # is an Entry
+            status = 'billable' if entry['billable'] else 'non_billable'
+            hours[status] += entry['hours']
+        else: # is a SimpleEntry
+            hours['total'] += entry['minutes'] / 60
     return hours
 
 

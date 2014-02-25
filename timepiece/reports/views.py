@@ -15,7 +15,7 @@ from django.views.generic import TemplateView
 from timepiece import utils
 from timepiece.utils.csv import CSVViewMixin, DecimalEncoder
 
-from timepiece.entries.models import Entry, ProjectHours
+from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 from timepiece.reports.forms import BillableHoursReportForm, HourlyReportForm,\
         ProductivityReportForm, PayrollSummaryReportForm
 from timepiece.reports.utils import get_project_totals, get_payroll_totals,\
@@ -461,3 +461,164 @@ def report_productivity(request):
         'total_worked': sum([r[1] for r in report[1:]]),
         'total_assigned': sum([r[2] for r in report[1:]]),
     })
+
+
+class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
+    template_name = 'timepiece/reports/osha.html'
+
+    def convert_context_to_csv(self, context):
+        """Convert the context dictionary into a CSV file."""
+        content = []
+        date_headers = context['date_headers']
+
+        headers = ['Name']
+        headers.extend([date.strftime('%m/%d/%Y') for date in date_headers])
+        headers.append('Total')
+        content.append(headers)
+
+        if self.export_projects:
+            key = 'By Project'
+        else:
+            key = 'By User'
+
+        summaries = context['summaries']
+#         summary = summaries[key] if key in summaries else []
+        summary = []
+        for s in summaries:
+            if s[0] == key:
+                summary = s[1]
+                break
+
+        for rows, totals in summary:
+            for name, user_id, hours in rows:
+                data = [name]
+                data.extend(hours)
+                content.append(data)
+            total = ['Totals']
+            total.extend(totals)
+            content.append(total)
+        return content
+
+    @property
+    def defaults(self):
+        """Default filter form data when no GET data is provided."""
+        # Set default date span to previous week.
+        (start, end) = get_week_window(timezone.now() - relativedelta(days=7))
+        return {
+            'from_date': start,
+            'to_date': end,
+            'billable': True,
+            'non_billable': False,
+            'paid_leave': False,
+            'trunc': 'day',
+            'projects': [],
+        }
+
+    def get(self, request, *args, **kwargs):
+        self.export_users = request.GET.get('export_users', False)
+        self.export_projects = request.GET.get('export_projects', False)
+        context = self.get_context_data()
+        if self.export_users or self.export_projects:
+            kls = CSVViewMixin
+        else:
+            kls = TemplateView
+        return kls.render_to_response(self, context)
+
+    def get_context_data(self, **kwargs):
+#         context = super(OshaReport, self).get_context_data(**kwargs)
+        context = {}
+
+        form = self.get_form()
+        if form.is_valid():
+            data = form.cleaned_data
+            start, end = form.save()
+            #entryQ = self.get_entry_query(start, end, data)
+            trunc = data['trunc']
+#             if entryQ:
+            if True:
+                vals = ('pk', 'project', 'project__name',
+                        'project__status', 'project__type__label')
+                entries = SimpleEntry.objects.date_trunc(trunc,
+                        extra_values=vals).filter(Q(date__gte=start, date__lt=end))
+            else:
+                entries = SimpleEntry.objects.none()
+
+            end = end - relativedelta(days=1)
+            date_headers = generate_dates(start, end, by=trunc)
+            context.update({
+                'from_date': start,
+                'to_date': end,
+                'date_headers': date_headers,
+                'entries': entries,
+                'filter_form': form,
+                'trunc': trunc,
+            })
+        else:
+            context.update({
+                'from_date': None,
+                'to_date': None,
+                'date_headers': [],
+                'entries': SimpleEntry.objects.none(),
+                'filter_form': form,
+                'trunc': '',
+            })
+
+
+        # Sum the hours totals for each user & interval.
+        entries = context['entries']
+        date_headers = context['date_headers']
+
+        summaries = []
+        if context['entries']:
+#             print context['entries'][0]
+            summaries.append(('By User', get_project_totals(
+                    entries.order_by('user__last_name', 'user__id', 'date'),
+                    date_headers, 'total', total_column=True, by='user')))
+
+            entries = entries.order_by('project__type__label', 'project__name',
+                    'project__id', 'date')
+            func = lambda x: x['project__type__label']
+            for label, group in groupby(entries, func):
+                title = label + ' Projects'
+                summaries.append((title, get_project_totals(list(group),
+                        date_headers, 'total', total_column=True, by='project')))
+
+        # Adjust date headers & create range headers.
+        from_date = context['from_date']
+        from_date = utils.add_timezone(from_date) if from_date else None
+        to_date = context['to_date']
+        to_date = utils.add_timezone(to_date) if to_date else None
+        trunc = context['trunc']
+        date_headers, range_headers = self.get_headers(date_headers,
+                from_date, to_date, trunc)
+
+#         print date_headers
+#         print range_headers
+#         print summaries
+
+        context.update({
+            'date_headers': date_headers,
+            'summaries': summaries,
+            'range_headers': range_headers,
+        })
+        return context
+
+    def get_filename(self, context):
+        request = self.request.GET.copy()
+        from_date = request.get('from_date')
+        to_date = request.get('to_date')
+        return 'hours_{0}_to_{1}_by_{2}.csv'.format(from_date, to_date,
+            context.get('trunc', ''))
+
+    def get_form(self):
+        data = self.request.GET or self.defaults
+#         print data
+        data = data.copy()  # make mutable
+        # Fix booleans - the strings "0" and "false" are True in Python
+        for key in ['billable', 'non_billable', 'paid_leave']:
+            data[key] = key in data and \
+                        str(data[key]).lower() in ('on', 'true', '1')
+
+#         print 'data'
+#         print data
+        return HourlyReportForm(data)

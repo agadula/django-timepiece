@@ -191,8 +191,8 @@ class LogTimeMixin(object):
         if delta:
             hours, minutes = delta
         else:
-            hours = 4
-            minutes = 0
+            hours = 1
+            minutes = 15
 
         data = {'user': user,
                 'date': date,

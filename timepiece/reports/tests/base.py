@@ -65,6 +65,31 @@ class ReportsTestBase(TestCase):
         self.make_entries(projects=projects, dates=dates,
                           user=self.user2, hours=1)
 
+    def make_simple_entries(self, user=None, projects=None, dates=None,
+                 hours=1, minutes=30):
+        """Make several simple entries to help with reports tests"""
+        if not user:
+            user = self.user
+        if not projects:
+            projects = self.default_projects
+        if not dates:
+            dates = self.default_dates
+        for project in projects:
+            for day in dates:
+                self.log_simple_time(project=project, date=day,
+                              delta=(hours, minutes), user=user)
+
+    def bulk_simple_entries(self, start=datetime.datetime(2011, 1, 2),
+                   end=datetime.datetime(2011, 1, 4)):
+        start = utils.add_timezone(start)
+        end = utils.add_timezone(end)
+        dates = generate_dates(start, end, 'day')
+        projects = [self.p1, self.p2, self.p2, self.p4, self.p5, self.sick]
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user, hours=2, minutes=30)
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user2, hours=1, minutes=15)
+
     def check_generate_dates(self, start, end, trunc, dates):
         for index, day in enumerate(generate_dates(start, end, trunc)):
             if isinstance(day, datetime.datetime):

@@ -8,6 +8,9 @@
                 <h2>Reports</h2>
                 <ul class="nav nav-pills">
                     {% if perms.entries.view_entry_summary %}
+                        <li{% ifequal active 'osha_report' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'osha_report' %}#{% else %}{% url 'report_osha' %}{% endifequal %}">OSHA</a>
+                        </li>
                         <li{% ifequal active 'billable_hours' %} class="active"{% endifequal %}>
                             <a href="{% ifequal active 'billable_hours' %}#{% else %}{% url 'report_billable_hours' %}{% endifequal %}">Billable Hours</a>
                         </li>

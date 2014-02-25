@@ -21,7 +21,7 @@ def virtualenv():
 
 def dev():
     env.environment = 'development'
-    env.activate = 'source /Users/simonegentilini/.virtualenvs/timepiece_env/bin/activate'
+    env.activate = 'source /Users/simonegentilini/.virtualenvs/timepiece/bin/activate'
     env.project_path = "/Users/simonegentilini/Dropbox/workspace/timepiece/timepiece_project"
     env.settings_file = "settings.local"
 
