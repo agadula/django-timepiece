@@ -88,5 +88,24 @@ class HourlyReportForm(DateForm):
         self.fields['to_date'].required = True
 
 
+class OshaReportForm(DateForm):
+    TRUNC_CHOICES = (
+        ('day', 'Day'),
+        ('week', 'Week'),
+        ('month', 'Month'),
+        ('year', 'Year'),
+    )
+
+    trunc = forms.ChoiceField(label='Group Totals By', choices=TRUNC_CHOICES,
+            widget=forms.RadioSelect())
+    projects = selectable.AutoCompleteSelectMultipleField(ProjectLookup,
+            label='Project Name', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(OshaReportForm, self).__init__(*args, **kwargs)
+        self.fields['from_date'].required = True
+        self.fields['to_date'].required = True
+
+
 class PayrollSummaryReportForm(YearMonthForm):
     pass

@@ -25,11 +25,22 @@ class ReportsTestBase(TestCase):
             'vacation': self.vacation.pk,
         }
         self.leave = [self.sick.pk, self.vacation.pk]
-        self.p1 = factories.BillableProject(name='1')
-        self.p2 = factories.NonbillableProject(name='2')
-        self.p4 = factories.BillableProject(name='4')
-        self.p3 = factories.NonbillableProject(name='1')
-        self.p5 = factories.BillableProject(name='3')
+        self.p1 = factories.BillableProject(name='prj p1')
+        self.p2 = factories.NonbillableProject(name='prj p2')
+        self.p4 = factories.BillableProject(name='prj p4')
+        self.p3 = factories.NonbillableProject(name='prj p3')
+        self.p5 = factories.BillableProject(name='prj p5')
+
+        # give business grouping to projects
+        # p1 p2 p3 in the same business
+        self.p2.business = self.p1.business
+        self.p2.save()
+        self.p3.business = self.p1.business
+        self.p3.save()
+        # p4 p5 same business
+        self.p5.business = self.p4.business
+        self.p5.save()
+
         self.default_projects = [self.p1, self.p2, self.p3, self.p4, self.p5]
         self.default_dates = [
             utils.add_timezone(datetime.datetime(2011, 1, 3)),

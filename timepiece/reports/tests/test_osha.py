@@ -104,7 +104,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
     def test_weekly_total(self):
         start = utils.add_timezone(datetime.datetime(2011, 1, 3))
         end = utils.add_timezone(datetime.datetime(2011, 1, 6))
-        # 6 projects, 4 days, user 1 each entry 2:15, user 2 each entry 1:30
+        # 5 projects (proj #2 twice), 4 days, user 1 each entry 2:15, user 2 each entry 1:30
         self.bulk_simple_entries(start, end)
         trunc = 'week'
         date_headers = generate_dates(start, end, trunc)
@@ -140,9 +140,6 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         defaults = {
             'from_date': start.strftime('%Y-%m-%d'), # was '%m-%d-%Y'
             'to_date': end.strftime('%Y-%m-%d'), # was '%m-%d-%Y'
-            'billable': True,
-            'non_billable': True,
-            'paid_leave': True,
             'trunc': 'week',
         }
         defaults.update(kwargs)
@@ -151,7 +148,6 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
     def make_totals(self, args={}):
         """Return CSV from hourly report for verification in tests"""
         self.login_user(self.superuser)
-        args['export_users'] = True # arg to export the CSV
         response = self._get(data=args, follow=True)
         return [item.split(',') \
                 for item in response.content.split('\r\n')][:-1]
@@ -159,15 +155,25 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
     def check_totals(self, args, data):
         """assert that project_totals contains the data passed in"""
         totals = self.make_totals(args)
-        if len(data) > 0:
-            self.assertTrue(len(totals) >= len(data))
-        for row, datum in zip(totals, data):
-            self.assertEqual(row[1:], datum) # take away the first column with the name
+        is_testable = len(totals) >= len(data)
+        if is_testable:
+            for row, datum in zip(totals, data):
+                self.assertEqual(row[1:], datum) # take away the first column with the name
+        else:
+            err_msg = "Expecting at least "+str(len(data))+" lines in totals:\n"
+            for row in totals:
+                err_msg+= str(row)+"\n"
+            raise AssertionError(err_msg)
 
     def test_form_type__none(self):
         """When no types are checked, no results should be returned."""
         self.bulk_simple_entries()
-        args = {'billable': False, 'non_billable': False, 'paid_leave': False}
+        args = {
+            'billable': False,
+            'non_billable': False,
+            'paid_leave': False, 
+            'export_users' : True, # arg to export the CSV
+            }
         args = self.args_helper(**args)
         data = []
         self.check_totals(args, data)
@@ -175,9 +181,8 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
     def test_form_type__all(self):
         """When all types are checked, no filtering should occur."""
         self.bulk_simple_entries()
-#         args = {'billable': True, 'non_billable': True, 'paid_leave': True}
-#         args = self.args_helper(**args)
-        args = self.args_helper()
+        args = { 'export_users' : True } # arg to export the CSV
+        args = self.args_helper(**args)
         data = [
             ['01/02/2011', '01/03/2011', 'Total'], # two weeks header
             ['15.0', '30.0', '45.0'], # User 1
@@ -188,7 +193,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
     def test_form_day(self):
         """Hours should be totaled for each day in the date range."""
-        args = { 'trunc': 'day' }
+        args = { 'trunc': 'day', 'export_users' : True }
         args = self.args_helper(**args)
         data = [
             ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
@@ -201,7 +206,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
     def test_form_week(self):
         """Hours should be totaled for each week in the date range."""
-        args = { 'trunc': 'week' }
+        args = { 'trunc': 'week', 'export_users' : True }
         args = self.args_helper(**args)
         data = [
             ['01/02/2011', '01/03/2011', 'Total'], # two weeks header
@@ -217,7 +222,10 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         tz = timezone.get_current_timezone()
         start = datetime.datetime(2011, 1, 4, tzinfo=tz)
         end = datetime.datetime(2011, 3, 28, tzinfo=tz)
-        args = { 'trunc': 'month' } # NOTE: 28 days per month!
+        args = { 
+            'trunc': 'month', # NOTE: 28 days per month!
+            'export_users' : True,
+             }
         args = self.args_helper(start=start, end=end, **args)
         data = [
             ['01/04/2011', '02/01/2011', '03/01/2011', 'Total'],
@@ -228,68 +236,64 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         self.bulk_simple_entries(start, end)
         self.check_totals(args, data)
 
-#     def test_form_projects(self):
-#         """Filter hours for specific projects."""
-#         #Test project 1
-#         self.bulk_simple_entries()
-#         args = {
-#             'trunc': 'day',
-#             'projects_1': self.p1.id,
-#         }
-#         args = self.args_helper(**args)
-#         data = [
-#             ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
-#             ['2.50', '2.50', '2.50', '7.50'],
-#             ['1.25', '1.25', '1.25', '3.75'],
-#             ['3.00', '3.00', '3.00', '9.00'],
-#         ]
-#         self.check_totals(args, data)
-# 
-#         #Test with project 2
-#         args = {
-#             'billable': True,
-#             'non_billable': True,
-#             'paid_leave': False,
-#             'trunc': 'day',
-#             'projects_1': self.p2.id,
-#         }
-#         args = self.args_helper(**args)
-#         data = [
-#             ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
-#             ['4.00', '4.00', '4.00', '12.00'],
-#             ['2.00', '2.00', '2.00', '6.00'],
-#             ['6.00', '6.00', '6.00', '18.00'],
-#         ]
-#         self.check_totals(args, data)
-# 
-#         #Test with 2 project filters
-#         args = {
-#             'billable': True,
-#             'non_billable': True,
-#             'paid_leave': False,
-#             'trunc': 'day',
-#             'projects_1': [self.p2.id, self.p4.id],
-#         }
-#         args = self.args_helper(**args)
-#         data = [
-#             ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
-#             ['6.00', '6.00', '6.00', '18.00'],
-#             ['3.00', '3.00', '3.00', '9.00'],
-#             ['9.00', '9.00', '9.00', '27.00'],
-#         ]
-#         self.check_totals(args, data)
-# 
-#     def test_no_permission(self):
-#         """view_entry_summary permission is required to view this report."""
-#         self.login_user(self.user)
-#         response = self._get()
-#         self.assertEqual(response.status_code, 302)
-# 
-#     def test_entry_summary_permission(self):
-#         """view_entry_summary permission is required to view this report."""
-#         self.login_user(self.user)
-#         entry_summ_perm = Permission.objects.get(codename='view_entry_summary')
-#         self.user.user_permissions.add(entry_summ_perm)
-#         self.user.save()
-#         response = self._get()
-#         self.assertEqual(response.status_code, 200)
+    def test_form_projects(self):
+        """Filter hours for specific projects."""
+        self.bulk_simple_entries()
+
+        #Test project 1
+        args = {
+            'trunc': 'day',
+            'projects_1': self.p1.id,
+            'export_projects' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['3.75', '3.75', '3.75', '11.25'], # project 1 for all users
+            ['3.75', '3.75', '3.75', '11.25'],
+        ]
+        self.check_totals(args, data)
+
+        #Test with project 2. Note that on prj 2 entries are double
+        args = {
+            'trunc': 'day',
+            'projects_1': self.p2.id,
+            'export_projects' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['7.50', '7.50', '7.50', '22.50'], # project 2 for all users
+            ['7.50', '7.50', '7.50', '22.50'],
+        ]
+        self.check_totals(args, data)
+
+        #Test with 2 project filters
+        args = {
+            'trunc': 'day',
+            'projects_1': [self.p2.id, self.p4.id],
+            'export_projects' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['7.50', '7.50', '7.50', '22.50'], # project 2 for all users
+            ['3.75', '3.75', '3.75', '11.25'], # project 4 for all users
+            ['11.25', '11.25', '11.25', '33.75'],
+        ]
+        self.check_totals(args, data)
+
+    def test_no_permission(self):
+        """view_entry_summary permission is required to view this report."""
+        self.login_user(self.user)
+        response = self._get()
+        self.assertEqual(response.status_code, 302)
+
+    def test_entry_summary_permission(self):
+        """view_entry_summary permission is required to view this report."""
+        self.login_user(self.user)
+        entry_summ_perm = Permission.objects.get(codename='view_entry_summary')
+        self.user.user_permissions.add(entry_summ_perm)
+        self.user.save()
+        response = self._get()
+        self.assertEqual(response.status_code, 200)

@@ -17,7 +17,7 @@ from timepiece.utils.csv import CSVViewMixin, DecimalEncoder
 
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 from timepiece.reports.forms import BillableHoursReportForm, HourlyReportForm,\
-        ProductivityReportForm, PayrollSummaryReportForm
+        ProductivityReportForm, PayrollSummaryReportForm, OshaReportForm
 from timepiece.reports.utils import get_project_totals, get_payroll_totals,\
         generate_dates, get_week_window
 
@@ -485,8 +485,9 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
 #         summary = summaries[key] if key in summaries else []
         summary = []
         for s in summaries:
-            if s[0] == key:
-                summary = s[1]
+            k, v = s[0], s[1]
+            if k == key:
+                summary = v
                 break
 
         for rows, totals in summary:
@@ -507,12 +508,29 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         return {
             'from_date': start,
             'to_date': end,
-            'billable': True,
-            'non_billable': False,
-            'paid_leave': False,
             'trunc': 'day',
             'projects': [],
         }
+
+    def get_entry_query(self, start, end, data):
+        """Builds Entry query from form data."""
+
+        # All entries must meet time period requirements.
+        basicQ = Q(date__gte=start, date__lt=end)
+
+        # Filter by project
+        projects = data.get('projects', None)
+        basicQ &= Q(project__in=projects) if projects else Q() # original
+
+#         # Filter by user, activity, and project type for BillableReport.
+#         if 'users' in data:
+#             basicQ &= Q(user__in=data.get('users'))
+#         if 'activities' in data:
+#             basicQ &= Q(activity__in=data.get('activities'))
+#         if 'project_types' in data:
+#             basicQ &= Q(project__type__in=data.get('project_types'))
+
+        return basicQ
 
     def get(self, request, *args, **kwargs):
         self.export_users = request.GET.get('export_users', False)
@@ -532,14 +550,13 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         if form.is_valid():
             data = form.cleaned_data
             start, end = form.save()
-            #entryQ = self.get_entry_query(start, end, data)
+            entryQ = self.get_entry_query(start, end, data)
             trunc = data['trunc']
-#             if entryQ:
-            if True:
+            if entryQ:
                 vals = ('pk', 'project', 'project__name',
                         'project__status', 'project__type__label')
                 entries = SimpleEntry.objects.date_trunc(trunc,
-                        extra_values=vals).filter(Q(date__gte=start, date__lt=end))
+                        extra_values=vals).filter(entryQ)
             else:
                 entries = SimpleEntry.objects.none()
 
@@ -570,18 +587,26 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
 
         summaries = []
         if context['entries']:
-#             print context['entries'][0]
             summaries.append(('By User', get_project_totals(
                     entries.order_by('user__last_name', 'user__id', 'date'),
                     date_headers, 'total', total_column=True, by='user')))
 
-            entries = entries.order_by('project__type__label', 'project__name',
-                    'project__id', 'date')
-            func = lambda x: x['project__type__label']
-            for label, group in groupby(entries, func):
-                title = label + ' Projects'
-                summaries.append((title, get_project_totals(list(group),
-                        date_headers, 'total', total_column=True, by='project')))
+            summaries.append(('By Project', get_project_totals(
+                    entries.order_by('project__name', 'project__id', 'date'),
+                    date_headers, 'total', total_column=True, by='project')))
+
+#             entries = entries.order_by('project__type__label', 'project__name',
+#                     'project__id', 'date')
+#
+#             func = lambda x: x['project__type__label']
+#             for label, group in groupby(entries, func): # group is a list of projects of the same type
+#                 title = label + ' Projects'
+#                 summaries.append(
+#                     (title, get_project_totals(
+#                         list(group),
+#                         date_headers, 'total', total_column=True, by='project')
+#                     )
+#                 )
 
         # Adjust date headers & create range headers.
         from_date = context['from_date']
@@ -591,10 +616,6 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         trunc = context['trunc']
         date_headers, range_headers = self.get_headers(date_headers,
                 from_date, to_date, trunc)
-
-#         print date_headers
-#         print range_headers
-#         print summaries
 
         context.update({
             'date_headers': date_headers,
@@ -612,13 +633,5 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
 
     def get_form(self):
         data = self.request.GET or self.defaults
-#         print data
         data = data.copy()  # make mutable
-        # Fix booleans - the strings "0" and "false" are True in Python
-        for key in ['billable', 'non_billable', 'paid_leave']:
-            data[key] = key in data and \
-                        str(data[key]).lower() in ('on', 'true', '1')
-
-#         print 'data'
-#         print data
-        return HourlyReportForm(data)
+        return OshaReportForm(data)
