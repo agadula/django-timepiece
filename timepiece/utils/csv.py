@@ -22,7 +22,7 @@ class CSVViewMixin(object):
         fn = self.get_filename(context)
         response['Content-Disposition'] = 'attachment; filename=%s.csv' % fn
         rows = self.convert_context_to_csv(context)
-        writer = csv.writer(response)
+        writer = csv.writer(response, delimiter =";")
         for row in rows:
             writer.writerow(row)
         return response

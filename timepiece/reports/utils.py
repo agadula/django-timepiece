@@ -60,6 +60,7 @@ def get_project_totals(entries, date_headers, hour_type=None, overtime=False,
     """
     totals = [0 for date in date_headers]
     rows = []
+    # thing is the actual user or the actual project. thing_entries are the entries of the same "thing"
     for thing, thing_entries in groupby(entries, lambda x: x[by]):
         name, thing_id, date_dict = date_totals(thing_entries, by)
         dates = []

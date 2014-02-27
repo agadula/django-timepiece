@@ -468,36 +468,41 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
 
     def convert_context_to_csv(self, context):
         """Convert the context dictionary into a CSV file."""
+
+        if self.export_projects:
+            report_type = 'By Project'
+        elif self.export_users:
+            report_type = 'By User'
+        elif self.export_projects_and_users:
+            report_type = 'Project' # projects and users
+
+        is_special_report = report_type in ['Project'] # columns for both user and project. without final row "Total"
+
         content = []
         date_headers = context['date_headers']
 
         headers = ['Name']
+        if self.export_projects_and_users: headers.append('Project')
         headers.extend([date.strftime('%m/%d/%Y') for date in date_headers])
         headers.append('Total')
         content.append(headers)
 
-        if self.export_projects:
-            key = 'By Project'
-        else:
-            key = 'By User'
+        summaries = context['summaries'] # list of tuples: [(title, summary), (title, summary), ..]
 
-        summaries = context['summaries']
-#         summary = summaries[key] if key in summaries else []
-        summary = []
-        for s in summaries:
-            k, v = s[0], s[1]
-            if k == key:
-                summary = v
-                break
+        for title, summary in summaries:
+            if title.startswith(report_type):
+                if is_special_report: project_name = title.replace(report_type+": ", "") # e.g. remove "Project: "
+                for rows, totals in summary:
+                    for user, user_id, hours in rows:
+                        data = [user]
+                        if is_special_report: data.append(project_name)
+                        data.extend(hours)
+                        content.append(data)
+                    if not is_special_report:
+                        total = ['Totals']
+                        total.extend(totals)
+                        content.append(total)
 
-        for rows, totals in summary:
-            for name, user_id, hours in rows:
-                data = [name]
-                data.extend(hours)
-                content.append(data)
-            total = ['Totals']
-            total.extend(totals)
-            content.append(total)
         return content
 
     @property
@@ -535,8 +540,9 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         self.export_users = request.GET.get('export_users', False)
         self.export_projects = request.GET.get('export_projects', False)
+        self.export_projects_and_users = request.GET.get('export_projects_and_users', False)
         context = self.get_context_data()
-        if self.export_users or self.export_projects:
+        if self.export_users or self.export_projects or self.export_projects_and_users:
             kls = CSVViewMixin
         else:
             kls = TemplateView
@@ -595,6 +601,32 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
                     entries.order_by('project__name', 'project__id', 'date'),
                     date_headers, 'total', total_column=True, by='project')))
 
+            entries = entries.order_by('project__name',
+                    'project__id', 'user__last_name', 'user__id', 'date')
+
+            func = lambda x: x['project__name']
+            for label, group in groupby(entries, func): # group is a list of projects of the same type
+                title = 'Project: ' + label
+                summaries.append(
+                    (title, get_project_totals(
+                        list(group),
+                        date_headers, 'total', total_column=True, by='user')
+                    )
+                )
+
+#             entries = entries.order_by('project__business__name',
+#                     'project__id', 'date')
+#
+#             func = lambda x: x['project__business__name']
+#             for label, group in groupby(entries, func): # group is a list of projects of the same type
+#                 title = 'Activity: ' + label
+#                 summaries.append(
+#                     (title, get_project_totals(
+#                         list(group),
+#                         date_headers, 'total', total_column=True, by='user')
+#                     )
+#                 )
+
 #             entries = entries.order_by('project__type__label', 'project__name',
 #                     'project__id', 'date')
 #
@@ -628,7 +660,7 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         request = self.request.GET.copy()
         from_date = request.get('from_date')
         to_date = request.get('to_date')
-        return 'hours_{0}_to_{1}_by_{2}.csv'.format(from_date, to_date,
+        return 'hours_{0}_to_{1}_by_{2}'.format(from_date, to_date,
             context.get('trunc', ''))
 
     def get_form(self):

@@ -149,20 +149,26 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         """Return CSV from hourly report for verification in tests"""
         self.login_user(self.superuser)
         response = self._get(data=args, follow=True)
-        return [item.split(',') \
+        csv_delimiter = ";"
+        return [item.split(csv_delimiter) \
                 for item in response.content.split('\r\n')][:-1]
 
     def check_totals(self, args, data):
         """assert that project_totals contains the data passed in"""
         totals = self.make_totals(args)
         is_testable = len(totals) >= len(data)
+        columns_to_skip = 1 # avoid checking first column "name"
+        if args.has_key('export_projects_and_users') and args['export_projects_and_users'] == True :
+            columns_to_skip = 2 # avoid checking columns "name" and "project"
         if is_testable:
             for row, datum in zip(totals, data):
-                self.assertEqual(row[1:], datum) # take away the first column with the name
+                self.assertEqual(row[columns_to_skip:], datum) # take away the first column(s)
         else:
             err_msg = "Expecting at least "+str(len(data))+" lines in totals:\n"
+            err_msg+= " [\n"
             for row in totals:
-                err_msg+= str(row)+"\n"
+                err_msg+= str(row)+",\n"
+            err_msg+= " ]"
             raise AssertionError(err_msg)
 
     def test_form_type__none(self):
@@ -297,3 +303,53 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         self.user.save()
         response = self._get()
         self.assertEqual(response.status_code, 200)
+
+    def test_user_project_report(self):
+        start=datetime.datetime(2011, 1, 2)
+        start = utils.add_timezone(start)
+        end=datetime.datetime(2011, 1, 4)
+        end = utils.add_timezone(end)
+        dates = generate_dates(start, end, 'day')
+        projects = [self.p1, self.p2, self.p2, self.p3]
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user, hours=2, minutes=30)
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user2, hours=1, minutes=15)
+
+        # daily aggregation    
+        args = {
+            'trunc': 'day',
+            'export_projects_and_users' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '2.5', '2.5', '7.5'], # project 1 user 1
+            ['1.25', '1.25', '1.25', '3.75'], # project 1 user 2
+
+            ['5.0', '5.0', '5.0', '15.0'], # project 2 user 1
+            ['2.50', '2.50', '2.50', '7.50'], # project 2 user 2
+
+            ['2.5', '2.5', '2.5', '7.5'], # project 3 user 1
+            ['1.25', '1.25', '1.25', '3.75'], # project 3 user 2
+        ]
+        self.check_totals(args, data)
+
+        # test monthly aggregation
+        args = {
+            'trunc': 'month',
+            'export_projects_and_users' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', 'Total'], # the date here is the first date of the filter
+            ['7.5', '7.5'], # project 1 user 1
+            ['3.75', '3.75'], # project 1 user 2
+
+            ['15.0', '15.0'], # project 2 user 1
+            ['7.50', '7.50'], # project 2 user 2
+
+            ['7.5', '7.5'], # project 3 user 1
+            ['3.75', '3.75'], # project 3 user 2
+        ]
+        self.check_totals(args, data)

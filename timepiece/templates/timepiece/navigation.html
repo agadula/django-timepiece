@@ -66,6 +66,7 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Management <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 {% if perms.entries.view_entry_summary %}  {# FIXME: permission doesn't exist #}
+                                    <li><a href="{% url 'report_osha' %}">OSHA Report</a></li>
                                     <li><a href="{% url 'report_billable_hours' %}">Billable Hours</a></li>
                                     <li><a href="{% url 'report_hourly' %}">Hourly</a></li>
                                 {% endif %}
