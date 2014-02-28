@@ -172,6 +172,41 @@ class ProjectTimesheetCSV(CSVViewMixin, ProjectTimesheet):
         return rows
 
 
+class UserTimesheetCSV(CSVViewMixin):
+
+    def get_filename(self, context):
+        from_date = context['from_date']
+        month = from_date.month
+        year = from_date.year
+        return 'User_timesheet_{0}_{1:02d}'.format(year, month)
+
+    def convert_context_to_csv(self, context):
+        rows = []
+        rows.append([
+            'Date',
+            'User',
+            'Activity',
+            'Project',
+            'Hours',
+            'Minutes',
+            'Comments',
+            'Status',
+        ])
+        for entry in context['month_simple_entries']:
+            data = [
+                entry.date,
+                entry.user.first_name + ' ' + entry.user.last_name,
+                entry.project.business.name,
+                entry.project.name,
+                entry.hours,
+                entry.minutes,
+                entry.comments,
+                entry.status,
+            ]
+            rows.append(data)
+        return rows
+
+
 @login_required
 def view_user_timesheet(request, user_id, active_tab):
     # User can only view their own time sheet unless they have a permission.
@@ -258,7 +293,7 @@ def view_user_timesheet(request, user_id, active_tab):
         show_approve = verified_count_se + approved_count_se == total_statuses_se \
                 and verified_count_se > 0 and total_statuses_se != 0
 
-    return render(request, 'timepiece/user/timesheet/view.html', {
+    context = {
         'active_tab': active_tab or 'all-simple-entries',
         'year_month_form': form,
         'from_date': from_date,
@@ -272,7 +307,16 @@ def view_user_timesheet(request, user_id, active_tab):
         'project_entries': project_entries,
         'summary': summary,
         'summary_se': summary_se,
-    })
+    }
+
+    if 'csv' in request.GET:
+        request_get = request.GET.copy()
+        request_get.pop('csv')
+
+        user_csv = UserTimesheetCSV()
+        return user_csv.render_to_response(context)
+
+    return render(request, 'timepiece/user/timesheet/view.html', context)
 
 
 @login_required
