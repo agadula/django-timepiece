@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from timepiece.fields import UserModelChoiceField
 
-from timepiece.entries.models import Entry
+from timepiece.entries.models import Entry, SimpleEntry
 
 
 DATE_FORM_FORMAT = '%Y-%m-%d'
@@ -61,12 +61,12 @@ class YearMonthForm(forms.Form):
         this_year = now.year
         this_month = now.month
         try:
-            first_entry = Entry.no_join.values('end_time')\
-                                       .order_by('end_time')[0]
+            first_entry = SimpleEntry.no_join.values('date')\
+                                       .order_by('date')[0]
         except IndexError:
             first_year = this_year
         else:
-            first_year = first_entry['end_time'].year
+            first_year = first_entry['date'].year
         years = [(year, year) for year in xrange(first_year, this_year + 1)]
         self.fields['year'].choices = years
         initial = kwargs.get('initial')
