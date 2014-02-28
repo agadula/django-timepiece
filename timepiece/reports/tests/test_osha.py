@@ -157,8 +157,12 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         """assert that project_totals contains the data passed in"""
         totals = self.make_totals(args)
         is_testable = len(totals) >= len(data)
+
+        is_a_special_export = (args.has_key('export_projects_and_users') and args['export_projects_and_users'] == True)
+        is_a_special_export = is_a_special_export or (args.has_key('export_activities_and_users') and args['export_activities_and_users'] == True)
+
         columns_to_skip = 1 # avoid checking first column "name"
-        if args.has_key('export_projects_and_users') and args['export_projects_and_users'] == True :
+        if is_a_special_export:
             columns_to_skip = 2 # avoid checking columns "name" and "project"
         if is_testable:
             for row, datum in zip(totals, data):
@@ -316,7 +320,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         self.make_simple_entries(projects=projects, dates=dates,
                           user=self.user2, hours=1, minutes=15)
 
-        # daily aggregation    
+        # daily aggregation
         args = {
             'trunc': 'day',
             'export_projects_and_users' : True,
@@ -351,5 +355,61 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
             ['7.5', '7.5'], # project 3 user 1
             ['3.75', '3.75'], # project 3 user 2
+        ]
+        self.check_totals(args, data)
+
+    def test_user_activity_report(self):
+        start=datetime.datetime(2011, 1, 2)
+        start = utils.add_timezone(start)
+        end=datetime.datetime(2011, 1, 4)
+        end = utils.add_timezone(end)
+        dates = generate_dates(start, end, 'day')
+        projects = [self.sick, self.p1, self.p2, self.p3, self.p4, self.p5]
+        # p1 p2 p3 in the same business
+        # p4 p5 same business
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user, hours=2, minutes=30)
+        self.make_simple_entries(projects=projects, dates=dates,
+                          user=self.user2, hours=1, minutes=15)
+
+        # daily aggregation
+        args = {
+            'trunc': 'day',
+            'export_activities_and_users' : True,
+        }
+        args = self.args_helper(**args)
+
+        # the result order is affected by the business_id
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '2.5', '2.5', '7.5'], # activity 3 (sick) user 1
+            ['1.25', '1.25', '1.25', '3.75'], # activity 3 (sick) user 2
+
+            ['7.5', '7.5', '7.5', '22.5'], # activity 1 user 1
+            ['3.75', '3.75', '3.75', '11.25'], # activity 1 user 2
+
+            ['5.0', '5.0', '5.0', '15.0'], # activity 2 user 1
+            ['2.50', '2.50', '2.50', '7.50'], # activity 2 user 2
+        ]
+        self.check_totals(args, data)
+
+        # monthly aggregation
+        args = {
+            'trunc': 'month',
+            'export_activities_and_users' : True,
+        }
+        args = self.args_helper(**args)
+
+        # the result order is affected by the business_id
+        data = [
+            ['01/02/2011', 'Total'],
+            ['7.5', '7.5'], # activity 3 (sick) user 1
+            ['3.75', '3.75'], # activity 3 (sick) user 2
+
+            ['22.5', '22.5'], # activity 1 user 1
+            ['11.25', '11.25'], # activity 1 user 2
+
+            ['15.0', '15.0'], # activity 2 user 1
+            ['7.50', '7.50'], # activity 2 user 2
         ]
         self.check_totals(args, data)

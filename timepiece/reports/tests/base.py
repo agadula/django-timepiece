@@ -18,7 +18,7 @@ class ReportsTestBase(TestCase):
         self.superuser = factories.Superuser()
         self.devl_activity = factories.Activity(billable=True)
         self.activity = factories.Activity()
-        self.sick = factories.Project()
+        self.sick = factories.Project(name="sick")
         self.vacation = factories.Project()
         settings.TIMEPIECE_PAID_LEAVE_PROJECTS = {
             'sick': self.sick.pk,
