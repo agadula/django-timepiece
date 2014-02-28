@@ -54,7 +54,7 @@
                 {{ year_month_form|as_bootstrap:"inline" }}
                 <input type="submit" name="yearmonth" class="btn" value="Update" />
 {% for group in user.groups.all %}
-    {% if group.name == 'testers' or user.is_superuser%}
+    {% if group.name == 'testers' or user.is_superuser %}
         <button class="btn" type='submit' name='csv' value="csv" id='csv'>Download CSV</button>
     {% endif %}
 {% endfor %}

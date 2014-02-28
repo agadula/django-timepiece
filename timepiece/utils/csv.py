@@ -24,7 +24,7 @@ class CSVViewMixin(object):
         rows = self.convert_context_to_csv(context)
         writer = csv.writer(response, delimiter =";")
         for row in rows:
-            writer.writerow(row)
+            writer.writerow([unicode(s).encode("utf-8") for s in row])
         return response
 
     def get_filename(self, context):
