@@ -177,7 +177,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
     def test_form_type__none(self):
         """When no types are checked, no results should be returned."""
-        self.bulk_simple_entries()
+        self.bulk_simple_entries(status=SimpleEntry.VERIFIED)
         args = {
             'billable': False,
             'non_billable': False,
@@ -190,7 +190,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
     def test_form_type__all(self):
         """When all types are checked, no filtering should occur."""
-        self.bulk_simple_entries()
+        self.bulk_simple_entries(status=SimpleEntry.VERIFIED)
         args = { 'export_users' : True } # arg to export the CSV
         args = self.args_helper(**args)
         data = [
@@ -211,7 +211,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
             ['7.50', '7.50', '7.50', '22.50'], # User 2
             ['22.50', '22.50', '22.50', '67.50'], # Total
         ]
-        self.bulk_simple_entries()
+        self.bulk_simple_entries(status=SimpleEntry.VERIFIED)
         self.check_totals(args, data)
 
     def test_form_week(self):
@@ -224,7 +224,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
             ['7.50', '15.00', '22.50'], # User 2
             ['22.50', '45.00', '67.50'], # Total
         ]
-        self.bulk_simple_entries()
+        self.bulk_simple_entries(status=SimpleEntry.VERIFIED)
         self.check_totals(args, data)
 
     def test_form_month(self):
@@ -243,12 +243,12 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
             ['210.00', '210.00', '210.00', '630.00'],
             ['630.00', '630.00', '630.00', '1890.00'],
         ]
-        self.bulk_simple_entries(start, end)
+        self.bulk_simple_entries(start, end, status=SimpleEntry.VERIFIED)
         self.check_totals(args, data)
 
     def test_form_projects(self):
         """Filter hours for specific projects."""
-        self.bulk_simple_entries()
+        self.bulk_simple_entries(status=SimpleEntry.VERIFIED)
 
         #Test project 1
         args = {
@@ -316,9 +316,9 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         dates = generate_dates(start, end, 'day')
         projects = [self.p1, self.p2, self.p2, self.p3]
         self.make_simple_entries(projects=projects, dates=dates,
-                          user=self.user, hours=2, minutes=30)
+                          user=self.user, hours=2, minutes=30, status=SimpleEntry.VERIFIED)
         self.make_simple_entries(projects=projects, dates=dates,
-                          user=self.user2, hours=1, minutes=15)
+                          user=self.user2, hours=1, minutes=15, status=SimpleEntry.VERIFIED)
 
         # daily aggregation
         args = {
@@ -368,9 +368,9 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         # p1 p2 p3 in the same business
         # p4 p5 same business
         self.make_simple_entries(projects=projects, dates=dates,
-                          user=self.user, hours=2, minutes=30)
+                          user=self.user, hours=2, minutes=30, status=SimpleEntry.VERIFIED)
         self.make_simple_entries(projects=projects, dates=dates,
-                          user=self.user2, hours=1, minutes=15)
+                          user=self.user2, hours=1, minutes=15, status=SimpleEntry.VERIFIED)
 
         # daily aggregation
         args = {
@@ -411,5 +411,159 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
 
             ['15.0', '15.0'], # activity 2 user 1
             ['7.50', '7.50'], # activity 2 user 2
+        ]
+        self.check_totals(args, data)
+
+    def test_user_activity_report_filtering_unverified_entries(self):
+        self.bulk_simple_entries_for_unverified_filtering()
+
+        # daily aggregation
+        args = {
+            'trunc': 'day',
+            'export_activities_and_users' : True,
+            'include_unverified' : False,
+        }
+        args = self.args_helper(**args)
+
+        # the result order is affected by the business_id
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '', '2.5', '5.0'], # activity 3 (sick) user 1
+            ['1.25', '', '1.25', '2.50'], # activity 3 (sick) user 2
+
+            ['7.5', '', '7.5', '15.0'], # activity 1 user 1
+            ['3.75', '', '3.75', '7.50'], # activity 1 user 2
+
+            ['5.0', '', '5.0', '10.0'], # activity 2 user 1
+            ['2.50', '', '2.50', '5.00'], # activity 2 user 2
+        ]
+        self.check_totals(args, data)
+
+        # daily aggregation including unverified
+        args = {
+            'trunc': 'day',
+            'export_activities_and_users' : True,
+            'include_unverified' : True,
+        }
+        args = self.args_helper(**args)
+
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '2.5', '2.5', '7.5'], # activity 3 (sick) user 1
+            ['1.25', '1.25', '1.25', '3.75'], # activity 3 (sick) user 2
+
+            ['7.5', '7.5', '7.5', '22.5'], # activity 1 user 1
+            ['3.75', '3.75', '3.75', '11.25'], # activity 1 user 2
+
+            ['5.0', '5.0', '5.0', '15.0'], # activity 2 user 1
+            ['2.50', '2.50', '2.50', '7.50'], # activity 2 user 2
+        ]
+        self.check_totals(args, data)
+
+
+        # monthly aggregation
+        args = {
+            'trunc': 'month',
+            'export_activities_and_users' : True,
+            'include_unverified' : False,
+        }
+        args = self.args_helper(**args)
+
+        # the result order is affected by the business_id
+        data = [
+            ['01/02/2011', 'Total'],
+            ['5.0', '5.0'], # activity 3 (sick) user 1
+            ['2.50', '2.50'], # activity 3 (sick) user 2
+
+            ['15.0', '15.0'], # activity 1 user 1
+            ['7.50', '7.50'], # activity 1 user 2
+
+            ['10.0', '10.0'], # activity 2 user 1
+            ['5.00', '5.00'], # activity 2 user 2
+        ]
+        self.check_totals(args, data)
+
+    def test_user_project_report_filtering_unverified_entries(self):
+        self.bulk_simple_entries_for_unverified_filtering(projects=[self.p1, self.p2, self.p2, self.p3])
+
+        # daily aggregation including unverified
+        args = {
+            'trunc': 'day',
+            'export_projects_and_users' : True,
+            'include_unverified' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '2.5', '2.5', '7.5'], # project 1 user 1
+            ['1.25', '1.25', '1.25', '3.75'], # project 1 user 2
+
+            ['5.0', '5.0', '5.0', '15.0'], # project 2 user 1
+            ['2.50', '2.50', '2.50', '7.50'], # project 2 user 2
+
+            ['2.5', '2.5', '2.5', '7.5'], # project 3 user 1
+            ['1.25', '1.25', '1.25', '3.75'], # project 3 user 2
+        ]
+        self.check_totals(args, data)
+
+        # daily aggregation excluding unverified
+        args = {
+            'trunc': 'day',
+            'export_projects_and_users' : True,
+            'include_unverified' : False,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', '01/03/2011', '01/04/2011', 'Total'],
+            ['2.5', '', '2.5', '5.0'], # project 1 user 1
+            ['1.25', '', '1.25', '2.50'], # project 1 user 2
+
+            ['5.0', '', '5.0', '10.0'], # project 2 user 1
+            ['2.50', '', '2.50', '5.00'], # project 2 user 2
+
+            ['2.5', '', '2.5', '5.0'], # project 3 user 1
+            ['1.25', '', '1.25', '2.50'], # project 3 user 2
+        ]
+        self.check_totals(args, data)
+
+
+        # test monthly aggregation excluding unverified
+        args = {
+            'trunc': 'month',
+            'export_projects_and_users' : True,
+            'include_unverified' : False,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', 'Total'], # the date here is the first date of the filter
+            ['5.0', '5.0'], # project 1 user 1
+            ['2.50', '2.50'], # project 1 user 2
+
+            ['10.0', '10.0'], # project 2 user 1
+            ['5.00', '5.00'], # project 2 user 2
+
+            ['5.0', '5.0'], # project 3 user 1
+            ['2.50', '2.50'], # project 3 user 2
+        ]
+        self.check_totals(args, data)
+
+
+        # test monthly aggregation including unverified
+        args = {
+            'trunc': 'month',
+            'export_projects_and_users' : True,
+            'include_unverified' : True,
+        }
+        args = self.args_helper(**args)
+        data = [
+            ['01/02/2011', 'Total'], # the date here is the first date of the filter
+            ['7.5', '7.5'], # project 1 user 1
+            ['3.75', '3.75'], # project 1 user 2
+
+            ['15.0', '15.0'], # project 2 user 1
+            ['7.50', '7.50'], # project 2 user 2
+
+            ['7.5', '7.5'], # project 3 user 1
+            ['3.75', '3.75'], # project 3 user 2
         ]
         self.check_totals(args, data)

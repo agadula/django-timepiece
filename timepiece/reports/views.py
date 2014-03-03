@@ -530,6 +530,10 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         projects = data.get('projects', None)
         basicQ &= Q(project__in=projects) if projects else Q() # original
 
+        # Filter by entries status
+        include_unverified = data.get('include_unverified', False)
+        if not include_unverified: basicQ &= Q(status=SimpleEntry.VERIFIED)
+
 #         # Filter by user, activity, and project type for BillableReport.
 #         if 'users' in data:
 #             basicQ &= Q(user__in=data.get('users'))
