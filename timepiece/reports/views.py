@@ -4,6 +4,7 @@ from itertools import groupby
 import json
 
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Min, Max
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -603,9 +604,47 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
 
         summaries = []
         if context['entries']:
-            summaries.append(('By User', get_project_totals(
+            include_users_without_entries = data.get('include_users_without_entries', False)
+
+            summary_by_user = get_project_totals(
                     entries.order_by('user__last_name', 'user__id', 'date'),
-                    date_headers, 'total', total_column=True, by='user')))
+                    date_headers, 'total', total_column=True, by='user')
+
+            if include_users_without_entries:
+                all_users = list( User.objects.all() )
+                entries.order_by('user')
+
+                func = lambda x: x['user']
+                for user_id, group in groupby(entries, func):
+                    user = User.objects.get(id=user_id)
+                    all_users.remove(user) # remove users without entries
+
+                # remove non active users and the admin user
+                users_without_entries = []
+                for u in all_users:
+                    if u.is_active and u.username != "admin":
+                        users_without_entries.append(u)
+
+                summary_by_user_also_without_entries = []
+                rows = []
+                for curr_rows, curr_totals in summary_by_user:
+                    for name, pk, hours in curr_rows:
+                        row = (name, pk, hours)
+                        rows.append(row)
+                    totals = curr_totals
+
+                for user in users_without_entries:
+                    name = user.first_name + " " + user.last_name
+                    pk = user.id
+                    hours = ['' for date in date_headers]
+                    hours.append('')
+                    rows.append( (name, pk, hours) )
+
+                summary_by_user_also_without_entries.append( (rows, totals) )
+                summary_by_user = summary_by_user_also_without_entries
+
+
+            summaries.append(('By User', summary_by_user))
 
             summaries.append(('By Project', get_project_totals(
                     entries.order_by('project__name', 'project__id', 'date'),

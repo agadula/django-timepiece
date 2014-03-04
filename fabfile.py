@@ -82,7 +82,7 @@ def deploy():
     with cd(CODE_PATH):
         run("git pull")
         run("touch app.wsgi")
-    apache_update_conf()
+    apache_restart()
 
 def apache_update_conf():
     """ upload apache configuration to remote host """
