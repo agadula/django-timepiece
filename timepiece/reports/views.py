@@ -621,13 +621,6 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
                     if user not in users_with_entries:
                         users_with_entries.append(user)
 
-#                     try: all_users.remove(user) # remove users without entries
-#                     except:
-#                         err_msg = "Cannot find "+str(user)+" in user list\n"
-#                         err_msg+= "User list was:\n"
-#                         err_msg+= str( list( User.objects.all() ) )
-#                         raise Exception(err_msg)
-
                 # remove non active users and the admin user
                 users_without_entries = []
                 for u in all_users:
