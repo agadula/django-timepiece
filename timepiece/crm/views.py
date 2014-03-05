@@ -196,9 +196,9 @@ class UserTimesheetCSV(CSVViewMixin):
                 str(entry.date),
                 entry.user.first_name + ' ' + entry.user.last_name,
                 entry.project.business.name,
-                entry.project.name.replace,
+                entry.project.name,
                 str(entry.hours + entry.minutes/60),
-                entry.comments.replace,
+                entry.comments,
                 entry.status,
             ]
             data = [' '.join(elem.replace(",",".").split()) for elem in data] # remove all tabs, newlines, etc
