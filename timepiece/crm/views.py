@@ -187,8 +187,7 @@ class UserTimesheetCSV(CSVViewMixin):
             'User',
             'Activity',
             'Project',
-            'Hours',
-            'Minutes',
+            'Time',
             'Comments',
             'Status',
         ])
@@ -196,11 +195,10 @@ class UserTimesheetCSV(CSVViewMixin):
             data = [
                 entry.date,
                 entry.user.first_name + ' ' + entry.user.last_name,
-                entry.project.business.name,
-                entry.project.name,
-                entry.hours,
-                entry.minutes,
-                entry.comments,
+                entry.project.business.name.replace(",","."),
+                entry.project.name.replace(",","."),
+                str(entry.hours + entry.minutes/60).replace(".",","),
+                entry.comments.replace(",","."),
                 entry.status,
             ]
             rows.append(data)
