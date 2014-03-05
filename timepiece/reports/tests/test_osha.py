@@ -149,7 +149,7 @@ class TestOshaReport(ViewTestMixin, LogTimeMixin, ReportsTestBase):
         """Return CSV from hourly report for verification in tests"""
         self.login_user(self.superuser)
         response = self._get(data=args, follow=True)
-        csv_delimiter = ";"
+        csv_delimiter = ","
         return [item.split(csv_delimiter) \
                 for item in response.content.split('\r\n')][:-1]
 

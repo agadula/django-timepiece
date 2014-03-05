@@ -195,13 +195,13 @@ class UserTimesheetCSV(CSVViewMixin):
             data = [
                 str(entry.date),
                 entry.user.first_name + ' ' + entry.user.last_name,
-                entry.project.business.name.replace(",","."),
-                entry.project.name.replace(",","."),
-                str(entry.hours + entry.minutes/60), # .replace(".",","),
-                entry.comments.replace(",","."),
+                entry.project.business.name,
+                entry.project.name.replace,
+                str(entry.hours + entry.minutes/60),
+                entry.comments.replace,
                 entry.status,
             ]
-            data = [' '.join(elem.split()) for elem in data] # remove all tabs, newlines, etc
+            data = [' '.join(elem.replace(",",".").split()) for elem in data] # remove all tabs, newlines, etc
             rows.append(data)
         return rows
 
