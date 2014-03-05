@@ -617,7 +617,9 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
                 func = lambda x: x['user']
                 for user_id, group in groupby(entries, func):
                     user = User.objects.get(id=user_id)
-                    all_users.remove(user) # remove users without entries
+                    try: all_users.remove(user) # remove users without entries
+                    except:
+                        raise Exception("Cannot find "+str(user)+" in user list")
 
                 # remove non active users and the admin user
                 users_without_entries = []
