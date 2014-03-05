@@ -619,7 +619,10 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
                     user = User.objects.get(id=user_id)
                     try: all_users.remove(user) # remove users without entries
                     except:
-                        raise Exception("Cannot find "+str(user)+" in user list")
+                        err_msg = "Cannot find "+str(user)+" in user list\n"
+                        err_msg+= "User list was:\n"
+                        err_msg+= str( list( User.objects.all() ) )
+                        raise Exception(err_msg)
 
                 # remove non active users and the admin user
                 users_without_entries = []
