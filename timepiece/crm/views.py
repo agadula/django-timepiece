@@ -193,7 +193,7 @@ class UserTimesheetCSV(CSVViewMixin):
         ])
         for entry in context['month_simple_entries']:
             data = [
-                entry.date,
+                str(entry.date),
                 entry.user.first_name + ' ' + entry.user.last_name,
                 entry.project.business.name.replace(",","."),
                 entry.project.name.replace(",","."),
