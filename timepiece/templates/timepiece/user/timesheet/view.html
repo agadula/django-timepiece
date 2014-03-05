@@ -53,11 +53,7 @@
             <form class="form-inline visible-desktop" method="get" action="" accept-charset="utf-8">
                 {{ year_month_form|as_bootstrap:"inline" }}
                 <input type="submit" name="yearmonth" class="btn" value="Update Page" />
-{% for group in user.groups.all %}
-    {% if group.name == 'testers' %}
-        <button class="btn" type='submit' name='csv' value="csv" id='csv'>Download CSV</button>
-    {% endif %}
-{% endfor %}
+                <button class="btn" type='submit' name='csv' value="csv" id='csv'>Download CSV</button>
             </form>
             <form class="hidden-desktop" method="get" action="" accept-charset="utf-8">
                 {{ year_month_form|as_bootstrap }}
