@@ -8,9 +8,9 @@ TEMPLATE_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_timepiece',
-        'USER': 'timepiece',
-        'PASSWORD': 'timepiece',
+        'NAME': 'timepiece',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': '',
         'PORT': '',
     }

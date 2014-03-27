@@ -35,6 +35,11 @@
         <script type="text/javascript">
             $(document).ready(function() { $("label[for='id_business']").html('Activity'); });
         </script>
+        <script type="text/javascript">
+            $(function() {
+                $('.hasDatepicker').datepicker('option', 'firstDay', 1);
+             });
+        </script>
     {% endblock javascript %}
 
     {% block extrajs %}
