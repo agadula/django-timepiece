@@ -34,7 +34,9 @@
                     {% endblock quick-clock-in %}
 
                     {% if perms.entries.add_entry %}
-                        <li><a href="{% url 'view_user_timesheet' request.user.pk %}">Time Sheet</a></li>
+                        <li><a href="{% url 'create_multi_simple_entry' %}" title="Daily Entries">Daily Entries</a></li>
+                        <li><a href="{% url 'dashboard' %}" title="Weekly Entries">Weekly Entries</a></li>
+                        <li><a href="{% url 'view_user_timesheet' request.user.pk %}">Monthly Time Sheet</a></li>
                         <li><a href="{% url 'create_simple_entry' %}" title="Add Simple Entry">Add Simple Entry</a></li>
                     {% endif %}
 

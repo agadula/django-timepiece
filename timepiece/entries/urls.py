@@ -63,4 +63,7 @@ urlpatterns = patterns('',
     url(r'^simple_entry/add/from_business/$',
         views.create_edit_simple_entry,
         name='create_simple_entry_without_business'),
+    url(r'^simple_entry/add_multi/$',
+        views.create_edit_multi_simple_entries,
+        name='create_multi_simple_entry'),
 )

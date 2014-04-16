@@ -18,6 +18,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
+from django import forms
 
 from timepiece import utils
 from timepiece.forms import DATE_FORM_FORMAT
@@ -696,4 +697,117 @@ def delete_simple_entry(request, entry_id):
 
     return render(request, 'timepiece/simple_entry/delete.html', {
         'entry': entry,
+    })
+
+
+def make_simple_entries_formset(user, business, curr_date, request=None):
+    class _AddUpdateMultiSimpleEntryForm(forms.ModelForm):
+
+        class Meta:
+            model = SimpleEntry
+            fields = 'project hours minutes comments'.split()
+            widgets = {
+                'project': forms.widgets.Select(attrs={'class':'span12'}),
+                'hours': forms.widgets.TextInput(attrs={'style':'width: 30px;'}),
+                'minutes': forms.widgets.Select(attrs={'style':'width: 50px;'}),
+                'comments': forms.widgets.TextInput(attrs={'style':'width: 500px;'}),
+            }
+
+        def __init__(self, *args, **kwargs):
+            super(_AddUpdateMultiSimpleEntryForm, self).__init__(*args, **kwargs)
+            self.instance.user = user
+            self.fields['project'].queryset = Project.trackable.filter(
+                users=user
+                ).filter(
+                business=business
+                )
+
+    from django.forms.models import modelformset_factory
+    SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm, can_delete=True)
+
+    queryset = SimpleEntry.objects.filter(
+        user=user
+        ).filter(
+        project__business=business
+        ).filter(
+        date=curr_date
+        )
+
+    if not request:
+        formset = SimpleEntryFormset(queryset=queryset, prefix='business_'+str(business.id))
+    else:
+        formset = SimpleEntryFormset(request.POST, queryset=queryset, prefix='business_'+str(business.id))
+    return formset
+
+
+@permission_required('entries.change_entry')
+def create_edit_multi_simple_entries(request):
+
+    class DateForm(forms.Form):
+        curr_date = forms.DateField(widget=forms.DateInput(attrs={'class':'input-small'}))
+
+    user = request.user
+    businesses = Business.objects.filter(new_business_projects__users=user).distinct()
+    formsets = []
+
+    if request.method == 'GET':
+        date_form = DateForm(request.GET)
+        if date_form.is_valid():
+            curr_date_string = date_form['curr_date'].value() # YYYY-mm-dd
+            curr_date = datetime.datetime.strptime(curr_date_string, "%Y-%m-%d").date()
+        else:
+            date_form = DateForm(initial={'curr_date': datetime.date.today})
+            curr_date = date_form['curr_date'].value()
+
+        for business in businesses:
+            element={}
+            element['name'] = business.name
+            element['formset'] = make_simple_entries_formset(user, business, curr_date)
+            formsets.append(element)
+
+    if request.method == 'POST':
+        curr_date_string = request.POST['curr_date']
+        curr_date = datetime.datetime.strptime(curr_date_string, "%Y-%m-%d").date()
+        date_form = DateForm(initial={'curr_date': curr_date})
+        formsets_with_errors = 0
+        formsets_updated = 0
+        for business in businesses:
+            element={}
+            element['name'] = business.name
+            formset = make_simple_entries_formset(user, business, curr_date, request)
+            element['formset'] = formset
+            formsets.append(element)
+            if formset.is_valid():
+                entries = formset.save(commit=False)
+                if entries:
+                    for entry in entries:
+                        entry.date = curr_date
+                        entry.save()
+                    formset.save_m2m()
+                    formsets_updated += 1
+            else:
+                formsets_with_errors += 1
+
+        if formsets_updated:
+            message = 'The simple entries have been updated successfully.'
+            messages.info(request, message)
+
+        if formsets_with_errors:
+            message = 'Please fix the errors below.'
+            messages.error(request, message)
+        else:
+            url = request.REQUEST.get('next', reverse('create_multi_simple_entry')+'?curr_date='+curr_date_string)
+            return HttpResponseRedirect(url)
+
+    next_date = curr_date + datetime.timedelta(days=1)
+    prev_date = curr_date - datetime.timedelta(days=1)
+    summary = SimpleEntry.summary(user, curr_date, next_date)
+
+    return render(request, 'timepiece/simple_entry/create_edit_multi.html', {
+        'formsets': formsets,
+        'curr_date': curr_date,
+        'next_date_link': reverse('create_multi_simple_entry')+'?curr_date='+str(next_date),
+        'prev_date_link': reverse('create_multi_simple_entry')+'?curr_date='+str(prev_date),
+        'date_form': date_form,
+        'summary': summary,
     })

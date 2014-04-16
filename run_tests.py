@@ -21,7 +21,7 @@ if not settings.configured:
         DATABASES={
             'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                'NAME': 'django_timepiece',
+                'NAME': 'timepiece',
                 'TEST_NAME': db_name,
             }
         },

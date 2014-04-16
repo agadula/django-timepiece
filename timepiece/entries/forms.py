@@ -194,7 +194,6 @@ class AddUpdateSimpleEntryForm(forms.ModelForm):
 
     class Meta:
         model = SimpleEntry
-        # exclude = ('user', 'status')
         fields = 'project date hours minutes comments'.split()
 
     def __init__(self, *args, **kwargs):
