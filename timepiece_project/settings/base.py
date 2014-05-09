@@ -177,4 +177,4 @@ TIMEPIECE_PAID_LEAVE_PROJECTS = {}
 
 FIXTURE_DIRS = ( '%s/fixtures/' % PROJECT_PATH, )
 
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/simple_entry/add_multi/'
