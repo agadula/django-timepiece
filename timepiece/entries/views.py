@@ -723,7 +723,7 @@ def make_simple_entries_formset(user, business, curr_date, request=None):
                 )
 
     from django.forms.models import modelformset_factory
-    SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm, can_delete=True)
+    SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm)
 
     queryset = SimpleEntry.objects.filter(
         user=user

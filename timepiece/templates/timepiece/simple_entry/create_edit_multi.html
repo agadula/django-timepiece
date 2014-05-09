@@ -38,8 +38,8 @@
                             <th class="project">Activity / Project</th>
                             <th class="time">Hours</th>
                             <th class="time">Minutes</th>
-                            <th class="comments">Comments</th>
-                            <th class="aux">Delete</th>
+                            <th class="comments">Comment</th>
+                            <th class="aux">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,17 +54,42 @@
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
-    
+
                                 {% for field in form.visible_fields %}
                                     <td style="
                                     {% if field.name == 'project' %}padding-left:30px;{% endif %} 
                                     {% if field.errors or form.non_field_errors %}background-color:#f2dede;color:#b94a48{% endif %}
-                                        "> 
-                                        {{ field }}
-                                        {% if field.errors %} {{ field.errors }} {% endif %}
+                                        ">
+                                        {% if form.instance.status == "verified" %}
+                                            <!-- show plain text -->
+                                            {% if field.name == 'project' %}
+                                                <!-- special treatment of the select widget -->
+                                                {{ form.instance.project }}
+                                            {% else %}
+                                                {{ field.value }}
+                                            {% endif %}
+
+                                            {{ field.text }}
+                                            {{ field.as_hidden }}
+
+                                        {% elif form.instance.status == "unverified"  %}
+                                            {{ field }}
+                                            {% if field.errors %} {{ field.errors }} {% endif %}
+                                        {% endif %}
                                     </td>
                                 {% endfor %}
                                 
+                                <td>
+                                    {% if not form.instance.id %}
+                                        &nbsp;
+                                    {% elif form.instance.status == "verified" %}
+                                        <span class="label label-success"><i class="icon-ok icon-white"></i></span>
+                                    {% elif form.instance.status == "unverified"  %}
+                                        {% url 'create_multi_simple_entry' as next_url %}
+                                        <a href="{% url 'delete_simple_entry' form.instance.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
+                                    {% endif %}
+                                </td>
+
                                 {% if form.non_field_errors %}
                                 <tr style="background-color:#f2dede;color:#b94a48"><td colspan="5">
                                         {{ form.non_field_errors }}
@@ -73,11 +98,6 @@
     
                                 </tr>
                             {% endfor %}
-<!--
-                            <tr style="height: 35px;">
-                                <td colspan="5"></td>
-                            </tr>
--->
                         
                         {% endfor %}
 
