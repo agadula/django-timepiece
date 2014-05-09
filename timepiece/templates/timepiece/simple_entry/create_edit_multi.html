@@ -14,7 +14,7 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span12">
-            <h2>{{ curr_date|date:'D j M Y' }}</h2>
+            <h2>Daily Entries of {{ curr_date|date:'D j M Y' }}</h2>
 
             <form method="get" action="" class="form-inline visible-desktop">
                 <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>

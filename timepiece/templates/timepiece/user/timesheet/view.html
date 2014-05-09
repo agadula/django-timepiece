@@ -21,7 +21,7 @@
 {% endblock extrajs %}
 
 {% block content %}
-    <h2>{{ timesheet_user.get_name_or_username }} - Time Sheet for {{ from_date|date:'M Y' }}</h2>
+    <h2>Monthly Time Sheet for {{ from_date|date:'M Y' }} - {{ timesheet_user.get_name_or_username }}</h2>
 
     <div class="row-fluid">
         <div class="span12" id="header">
