@@ -1,0 +1,100 @@
+{% extends 'timepiece/base.html' %}
+{% load bootstrap_toolkit %}
+{% load url from future %}
+{% load timepiece_tags bootstrap_toolkit %}
+
+
+{% block title %}Create Simple Entries{% endblock title %}
+
+{% block crumbs %}
+    {{ block.super }}
+        <li><span class="divider">/</span> <a href="{% url 'create_multi_simple_entry' %}">Daily Entries</a></li>
+{% endblock crumbs %}
+
+{% block content %}
+    <div class="row-fluid">
+        <div class="span12">
+            <h2>{{ curr_date|date:'D j M Y' }}</h2>
+
+            <form method="get" action="" class="form-inline visible-desktop">
+                <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
+                <div class="input-append">
+                    {{ date_form.curr_date }}
+                    <button class="btn" type='submit'><i class="icon-ok"></i></button>
+                </div>
+                <a class="btn" href="{{ next_date_link }}"><i class="icon-chevron-right"></i></a>
+            </form>
+
+            <br style="clear: both;" />
+
+
+            <form class="form-horizontal" action="" method="post" accept-charset="utf-8">
+                <input type="hidden" name="curr_date" value='{{ curr_date|date:'Y-m-d' }}' id="id_curr_date">
+                {% csrf_token %}
+
+                <table class="table table-bordered table-condensed ">
+                    <thead>
+                        <tr>
+                            <th class="project">Activity / Project</th>
+                            <th class="time">Hours</th>
+                            <th class="time">Minutes</th>
+                            <th class="comments">Comments</th>
+                            <th class="aux">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for element in formsets %}
+                            
+                            
+                            {{ element.formset.management_form }}
+                            <tr class="emphasized-row" style="background-color:#d9edf7">
+                                <th colspan="5">{{ element.name }}</th>
+                            </tr>
+                            {% for form in element.formset %}
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+    
+                                {% for field in form.visible_fields %}
+                                    <td style="
+                                    {% if field.name == 'project' %}padding-left:30px;{% endif %} 
+                                    {% if field.errors or form.non_field_errors %}background-color:#f2dede;color:#b94a48{% endif %}
+                                        "> 
+                                        {{ field }}
+                                        {% if field.errors %} {{ field.errors }} {% endif %}
+                                    </td>
+                                {% endfor %}
+                                
+                                {% if form.non_field_errors %}
+                                <tr style="background-color:#f2dede;color:#b94a48"><td colspan="5">
+                                        {{ form.non_field_errors }}
+                                </td><tr>
+                                {% endif %}
+    
+                                </tr>
+                            {% endfor %}
+<!--
+                            <tr style="height: 35px;">
+                                <td colspan="5"></td>
+                            </tr>
+-->
+                        
+                        {% endfor %}
+
+                            <tr class="totals emphasized-row">
+                                <td style="text-align: right;"><strong>Overall total for the period:</strong></td>
+                                <td colspan="2" style="text-align: right;"><strong>{{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</strong></td>
+                                <td colspan="2">&nbsp;</td>
+                            </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-actions">
+                    <input class="btn btn-primary" type='submit' name='upd_entries' value='Update Entries' />
+                    <a href="{% url 'dashboard' %}"><input class="btn" type='button' value='Cancel'/></a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+{% endblock content %}
