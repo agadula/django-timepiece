@@ -28,6 +28,17 @@
     {% if perms.entries.can_clock_in %}
         <h2>Weekly Entries from {{ week_start|date:'M j' }} to {{ week_end|date:'M j' }}</h2>
 
+        <form method="get" action="" class="form-inline visible-desktop">
+            <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
+            <div class="input-append">
+                {{ date_form.curr_date }}
+                <button class="btn" type='submit'><i class="icon-ok"></i></button>
+            </div>
+            <a class="btn" href="{{ next_date_link }}"><i class="icon-chevron-right"></i></a>
+        </form>
+
+        <br style="clear: both;" />
+
 <!--
         <div class="row-fluid">
             <div class="span12" id="active-entry">
@@ -76,12 +87,12 @@
         </div>
 -->
 
+<!--
         <ul class="nav nav-tabs">
             <li{% if active_tab == 'all-simple-entries' %} class="active"{% endif %}>
                 {% url "dashboard" "all-simple-entries" as link %}
                 <a class="tab-link" to="all-simple-entries" href="{{ link|add_parameters:request.GET }}">All Simple Entries</a>
             </li>
-<!--
             <li{% if active_tab == 'progress' %} class="active"{% endif %}>
                 {% url "dashboard" "progress" as link %}
                 <a class="tab-link" to="progress" href="{{ link|add_parameters:request.GET }}">Progress</a>
@@ -94,8 +105,8 @@
                 {% url "dashboard" "online-users" as link %}
                 <a class="tab-link" to="online-users" href="{{ link|add_parameters:request.GET }}">Online Users</a>
             </li>
--->
         </ul>
+-->
 
         <div class="tab-content">
             <div class="tab-pane{% if active_tab == 'all-simple-entries' %} active{% endif %}" id="all-simple-entries">

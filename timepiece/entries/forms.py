@@ -207,3 +207,7 @@ class AddUpdateSimpleEntryForm(forms.ModelForm):
                 ).filter(
                 business=self.business
                 )
+
+
+class SimpleDateForm(forms.Form):
+    curr_date = forms.DateField(widget=forms.DateInput(attrs={'class':'input-small'}))

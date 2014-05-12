@@ -27,7 +27,7 @@ from timepiece.utils.csv import DecimalEncoder
 from timepiece.crm.models import Project, UserProfile, Business
 from timepiece.entries.forms import ClockInForm, ClockOutForm, \
         AddUpdateEntryForm, ProjectHoursForm, ProjectHoursSearchForm, \
-        AddUpdateSimpleEntryForm, BusinessSelectionForm
+        AddUpdateSimpleEntryForm, BusinessSelectionForm, SimpleDateForm
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 
 
@@ -41,7 +41,11 @@ class Dashboard(TemplateView):
         return super(Dashboard, self).dispatch(request, *args, **kwargs)
 
     def get_dates(self):
-        today = datetime.date.today()
+        if 'curr_date' in self.request.GET:
+            param = self.request.GET.get('curr_date')
+            today = datetime.datetime.strptime(param, '%Y-%m-%d').date()
+        else:
+            today = datetime.date.today()
         day = today
         if 'week_start' in self.request.GET:
             param = self.request.GET.get('week_start')
@@ -51,7 +55,7 @@ class Dashboard(TemplateView):
                 pass
         week_start = utils.get_week_start(day)
         week_end = week_start + relativedelta(days=6)
-        return today, week_start, week_end
+        return today, week_start, week_end, day
 
     def get_hours_per_week(self, user=None):
         """Retrieves the number of hours the user should work per week."""
@@ -62,7 +66,10 @@ class Dashboard(TemplateView):
         return profile.hours_per_week if profile else Decimal('40.00')
 
     def get_context_data(self, *args, **kwargs):
-        today, week_start, week_end = self.get_dates()
+        today, week_start, week_end, day = self.get_dates()
+        next_date = week_start + datetime.timedelta(days=7)
+        prev_date = week_start - datetime.timedelta(days=7)
+        date_form = SimpleDateForm(initial={'curr_date': day })
 
         # Query for the user's active entry if it exists.
         active_entry = utils.get_active_entry(self.user)
@@ -102,6 +109,9 @@ class Dashboard(TemplateView):
             'week_entries': week_entries,
             'week_simple_entries': week_simple_entries,
             'others_active_entries': others_active_entries,
+            'next_date_link': reverse('dashboard')+'?week_start='+str(next_date.date()),
+            'prev_date_link': reverse('dashboard')+'?week_start='+str(prev_date.date()),
+            'date_form': date_form,
         }
 
     def process_progress(self, entries, assignments):
@@ -742,21 +752,17 @@ def make_simple_entries_formset(user, business, curr_date, request=None):
 
 @permission_required('entries.change_entry')
 def create_edit_multi_simple_entries(request):
-
-    class DateForm(forms.Form):
-        curr_date = forms.DateField(widget=forms.DateInput(attrs={'class':'input-small'}))
-
     user = request.user
     businesses = Business.objects.filter(new_business_projects__users=user).distinct()
     formsets = []
 
     if request.method == 'GET':
-        date_form = DateForm(request.GET)
+        date_form = SimpleDateForm(request.GET)
         if date_form.is_valid():
             curr_date_string = date_form['curr_date'].value() # YYYY-mm-dd
             curr_date = datetime.datetime.strptime(curr_date_string, "%Y-%m-%d").date()
         else:
-            date_form = DateForm(initial={'curr_date': datetime.date.today})
+            date_form = SimpleDateForm(initial={'curr_date': datetime.date.today})
             curr_date = date_form['curr_date'].value()
 
         for business in businesses:
@@ -768,7 +774,7 @@ def create_edit_multi_simple_entries(request):
     if request.method == 'POST':
         curr_date_string = request.POST['curr_date']
         curr_date = datetime.datetime.strptime(curr_date_string, "%Y-%m-%d").date()
-        date_form = DateForm(initial={'curr_date': curr_date})
+        date_form = SimpleDateForm(initial={'curr_date': curr_date})
         formsets_with_errors = 0
         formsets_updated = 0
         for business in businesses:
