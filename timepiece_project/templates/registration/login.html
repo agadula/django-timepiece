@@ -5,6 +5,7 @@
 
 {% block content %}
 <h1>Authentication</h1>
+<h5 class="muted">(same credentials to access your computer)</h5>
 
 <form id="login" class="form-horizontal" accept-charset="UTF-8" method="post" action="">
     {% csrf_token %}
@@ -15,4 +16,5 @@
         <!-- <a href="{% url reset_password %}">Forgot your password?</a> -->
     </div>
 </form>
+
 {% endblock %}
