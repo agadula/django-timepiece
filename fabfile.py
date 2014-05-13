@@ -2,6 +2,9 @@ import os
 
 from fabric.api import *
 from fabric.contrib.console import confirm
+from fabric.contrib.files import sed
+from fabric.operations import get
+
 from contextlib import contextmanager as _contextmanager
 
 
@@ -10,6 +13,11 @@ STATIC_ABSPATH = "/var/www/django/timepiece/timepiece/static"
 SITEPACKAGES = "/var/www/.virtualenvs/timepiece/lib/python2.7/site-packages"
 CODE_PATH = "/var/www/django/timepiece"
 
+
+db_name = "timepiece"
+db_user = "gentisi"
+linux_user = db_user
+db_backup_file = 'dump_'+db_name+'.sql'
 
 
 @_contextmanager
@@ -53,7 +61,11 @@ def runserver():
     local("python timepiece_project/manage.py runserver")
 
 def shell():
-    local("python timepiece_project/manage.py shell")
+    if env.environment == 'development':
+        local("python timepiece_project/manage.py shell")
+    else:
+        with virtualenv():
+            run('python manage.py shell --settings='+env.settings_file )
 
 def commit():
     local("git add -p && git commit")
@@ -82,6 +94,12 @@ def deploy():
     with cd(CODE_PATH):
         run("git pull")
         run("touch app.wsgi")
+        if env.environment == 'staging':
+#             add in the banner menu that it's test version
+            before = '>Timepiece<'
+            after = 'style="color: red;">Timepiece TEST<'
+            filename = os.path.join(CODE_PATH, 'timepiece/templates/timepiece/navigation.html')
+            sed(filename, before, after)
     apache_restart()
 
 def apache_update_conf():
@@ -106,17 +124,18 @@ def apache_restart():
 def apache_errlog():
     run('tail /var/log/apache2/error.log')
 
-def createdb():
-    db_name = "timepiece"
-    db_user = "gentisi"
-    linux_user = db_user
-
-#     CHECK IF DB ALREADY EXISTS    
-#     psql -lqt | cut -d \| -f 1 | grep -w <DB_NAME> | wc -l
+def _remove_db_if_exists(remote=False):
     with settings(warn_only=True):
-        result = run("sudo -u {} dropdb '{}'".format(db_user, db_name) )
+        cmd = 'dropdb '+db_name
+        if remote:
+            result = run('sudo -u '+db_user+' '+cmd)
+        else:
+            result = local(cmd)
     if result.failed and not confirm("Remove of db failed. Continue anyway?"):
         abort("Aborting at user request.")
+
+def createdb():
+    _remove_db_if_exists(remote=True)
 
 #     CHECK IF USER ALREADY EXISTS IN THE DB
 #     psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='USR_NAME'"
@@ -128,6 +147,23 @@ def createdb():
 
     run('sudo -u {} createdb -E utf8 -O {} {} -T template0'.format(linux_user, db_user, db_name) )
     syncdb()
+
+def backupdb():
+	"""Backups the db and copies it locally"""
+	# pg_dump -U {user-name} {source_db} -f {dumpfilename.sql}
+	run('sudo -u postgres pg_dump {} > {}'.format(db_name, db_backup_file) )
+	get(db_backup_file, db_backup_file)
+	run("rm "+db_backup_file)
+
+def restoredb():
+	# psql -U {user-name} -d {desintation_db} -f {dumpfilename.sql}
+	_remove_db_if_exists()
+	local('psql --command="CREATE DATABASE {}"'.format(db_name) )
+	local('psql -d {} -f {}'.format(db_name, db_backup_file) )
+
+def copyremotedb():
+	backupdb()
+	restoredb()
 
 def syncdb():
     with virtualenv():

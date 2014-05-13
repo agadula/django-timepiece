@@ -62,14 +62,15 @@
         </div>
     </div>
 
+
     <div class="row-fluid">
         <div class="span12">
+<!--
             <ul class="nav nav-tabs">
                 <li{% if active_tab == 'all-simple-entries' %} class="active"{% endif %}>
                     {% url "view_user_timesheet" user.pk "'all-simple-entries'" as link %}
                     <a class="tab-link" to="all-simple-entries" href="{{ link|add_parameters:request.GET }}">All Simple Entries</a>
                 </li>
-<!--
                 <li{% if active_tab == 'overview' %} class="active"{% endif %}>
                     {% url "view_user_timesheet" user.pk "overview" as link %}
                     <a class="tab-link" to="overview" href="{{ link|add_parameters:request.GET }}">Overview</a>
@@ -82,10 +83,10 @@
                     {% url "view_user_timesheet" user.pk "daily-summary" as link %}
                     <a class="tab-link" to="daily-summary" href="{{ link|add_parameters:request.GET }}">Daily Summary</a>
                 </li>
--->
             </ul>
-            <div class="tab-content">
+-->
 
+            <div class="tab-content">
                 <div class="tab-pane{% if active_tab == 'all-simple-entries' %} active{% endif %}" id="all-simple-entries">
                     {% if month_simple_entries %}
                         {% url 'view_user_timesheet' timesheet_user.pk 'all-simple-entries' as next_url %}
