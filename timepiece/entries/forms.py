@@ -9,6 +9,7 @@ from timepiece.entries.models import Entry, Location, ProjectHours, SimpleEntry
 from timepiece.crm.models import Business
 from timepiece.forms import INPUT_FORMATS, TimepieceSplitDateTimeWidget,\
         TimepieceDateInput
+from timepiece.templatetags.timepiece_tags import humanize_hours
 
 
 class ClockInForm(forms.ModelForm):
@@ -207,6 +208,31 @@ class AddUpdateSimpleEntryForm(forms.ModelForm):
                 ).filter(
                 business=self.business
                 )
+
+    def clean(self):
+        cleaned_data = super(AddUpdateSimpleEntryForm, self).clean()
+
+        date = cleaned_data.get("date")
+        hours = cleaned_data.get("hours")
+        minutes = cleaned_data.get("minutes")
+        new_hours = hours+(minutes/60)
+
+        daily_entries_summary = SimpleEntry.summary(self.user, date, date+datetime.timedelta(days=1))
+        current_hours = daily_entries_summary['total']
+
+        hours_balance = current_hours + new_hours
+        if self.instance.id:
+            # it's an update, thus dont consider the old value
+            hours_balance -= self.instance.total_hours()
+
+        if hours_balance > SimpleEntry.MAXIMUM_HOURS_PER_DAY:
+            exceeding_time = hours_balance - SimpleEntry.MAXIMUM_HOURS_PER_DAY
+            err_msg = "You cannot enter more than {0} hours per day. ".format(SimpleEntry.MAXIMUM_HOURS_PER_DAY)
+            err_msg+= "Today's total is {0}, ".format(humanize_hours(current_hours, '{hours:02d}:{minutes:02d}'))
+            err_msg+= "remove at least {0} from this entry.".format(humanize_hours(exceeding_time, '{hours:02d}:{minutes:02d}'))
+            raise forms.ValidationError(err_msg)
+
+        return cleaned_data
 
 
 class SimpleDateForm(forms.Form):

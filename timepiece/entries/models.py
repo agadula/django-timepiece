@@ -595,6 +595,7 @@ class SimpleEntry(models.Model):
         VERIFIED: 'Verified',
         APPROVED: 'Approved',
     }
+    MAXIMUM_HOURS_PER_DAY = Decimal(13.00)
 
     user = models.ForeignKey(User, related_name='simple_entries')
     project = models.ForeignKey('crm.Project', related_name='simple_entries')
