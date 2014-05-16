@@ -191,6 +191,29 @@ class BusinessSelectionForm(forms.ModelForm):
         if disabled: self.fields['business'].widget.attrs['disabled'] = True
 
 
+def validate_daily_hours_limit(cleaned_data, user, instance, curr_date=None):
+    date = curr_date
+    if not curr_date: date = cleaned_data.get("date")
+    hours = cleaned_data.get("hours")
+    minutes = cleaned_data.get("minutes")
+    new_hours = hours+(minutes/60)
+
+    daily_entries_summary = SimpleEntry.summary(user, date, date+datetime.timedelta(days=1))
+    current_hours = daily_entries_summary['total']
+
+    hours_balance = current_hours + new_hours
+    if instance.id:
+        # it's an update, thus dont consider the old value
+        hours_balance -= instance.total_hours()
+
+    if hours_balance > SimpleEntry.MAXIMUM_HOURS_PER_DAY:
+        exceeding_time = hours_balance - SimpleEntry.MAXIMUM_HOURS_PER_DAY
+        err_msg = "You cannot enter more than {0} hours per day, ".format(SimpleEntry.MAXIMUM_HOURS_PER_DAY)
+        err_msg+= "today's total is {0}.".format(humanize_hours(current_hours, '{hours:02d}:{minutes:02d}'))
+#         err_msg+= "remove at least {0} from this entry.".format(humanize_hours(exceeding_time, '{hours:02d}:{minutes:02d}'))
+        raise forms.ValidationError(err_msg)
+
+
 class AddUpdateSimpleEntryForm(forms.ModelForm):
 
     class Meta:
@@ -211,28 +234,53 @@ class AddUpdateSimpleEntryForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(AddUpdateSimpleEntryForm, self).clean()
-
-        date = cleaned_data.get("date")
-        hours = cleaned_data.get("hours")
-        minutes = cleaned_data.get("minutes")
-        new_hours = hours+(minutes/60)
-
-        daily_entries_summary = SimpleEntry.summary(self.user, date, date+datetime.timedelta(days=1))
-        current_hours = daily_entries_summary['total']
-
-        hours_balance = current_hours + new_hours
-        if self.instance.id:
-            # it's an update, thus dont consider the old value
-            hours_balance -= self.instance.total_hours()
-
-        if hours_balance > SimpleEntry.MAXIMUM_HOURS_PER_DAY:
-            exceeding_time = hours_balance - SimpleEntry.MAXIMUM_HOURS_PER_DAY
-            err_msg = "You cannot enter more than {0} hours per day. ".format(SimpleEntry.MAXIMUM_HOURS_PER_DAY)
-            err_msg+= "Today's total is {0}, ".format(humanize_hours(current_hours, '{hours:02d}:{minutes:02d}'))
-            err_msg+= "remove at least {0} from this entry.".format(humanize_hours(exceeding_time, '{hours:02d}:{minutes:02d}'))
-            raise forms.ValidationError(err_msg)
-
+        validate_daily_hours_limit(cleaned_data, self.user, self.instance)
         return cleaned_data
+
+
+def make_simple_entries_formset(user, business, curr_date, request=None):
+    class _AddUpdateMultiSimpleEntryForm(forms.ModelForm):
+
+        class Meta:
+            model = SimpleEntry
+            fields = 'project hours minutes comments'.split()
+            widgets = {
+                'project': forms.widgets.Select(attrs={'class':'span12'}),
+                'hours': forms.widgets.TextInput(attrs={'style':'width: 30px;'}),
+                'minutes': forms.widgets.Select(attrs={'style':'width: 50px;'}),
+                'comments': forms.widgets.TextInput(attrs={'style':'width: 500px;'}),
+            }
+
+        def __init__(self, *args, **kwargs):
+            super(_AddUpdateMultiSimpleEntryForm, self).__init__(*args, **kwargs)
+            self.instance.user = user
+            self.fields['project'].queryset = Project.trackable.filter(
+                users=user
+                ).filter(
+                business=business
+                )
+
+        def clean(self):
+            cleaned_data = super(_AddUpdateMultiSimpleEntryForm, self).clean()
+            validate_daily_hours_limit(cleaned_data, user, self.instance, curr_date)
+            return cleaned_data
+
+    from django.forms.models import modelformset_factory
+    SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm)
+
+    queryset = SimpleEntry.objects.filter(
+        user=user
+        ).filter(
+        project__business=business
+        ).filter(
+        date=curr_date
+        )
+
+    if not request:
+        formset = SimpleEntryFormset(queryset=queryset, prefix='business_'+str(business.id))
+    else:
+        formset = SimpleEntryFormset(request.POST, queryset=queryset, prefix='business_'+str(business.id))
+    return formset
 
 
 class SimpleDateForm(forms.Form):

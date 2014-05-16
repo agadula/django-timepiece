@@ -27,7 +27,8 @@ from timepiece.utils.csv import DecimalEncoder
 from timepiece.crm.models import Project, UserProfile, Business
 from timepiece.entries.forms import ClockInForm, ClockOutForm, \
         AddUpdateEntryForm, ProjectHoursForm, ProjectHoursSearchForm, \
-        AddUpdateSimpleEntryForm, BusinessSelectionForm, SimpleDateForm
+        AddUpdateSimpleEntryForm, BusinessSelectionForm, \
+        SimpleDateForm, make_simple_entries_formset
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
 
 
@@ -708,46 +709,6 @@ def delete_simple_entry(request, entry_id):
     return render(request, 'timepiece/simple_entry/delete.html', {
         'entry': entry,
     })
-
-
-def make_simple_entries_formset(user, business, curr_date, request=None):
-    class _AddUpdateMultiSimpleEntryForm(forms.ModelForm):
-
-        class Meta:
-            model = SimpleEntry
-            fields = 'project hours minutes comments'.split()
-            widgets = {
-                'project': forms.widgets.Select(attrs={'class':'span12'}),
-                'hours': forms.widgets.TextInput(attrs={'style':'width: 30px;'}),
-                'minutes': forms.widgets.Select(attrs={'style':'width: 50px;'}),
-                'comments': forms.widgets.TextInput(attrs={'style':'width: 500px;'}),
-            }
-
-        def __init__(self, *args, **kwargs):
-            super(_AddUpdateMultiSimpleEntryForm, self).__init__(*args, **kwargs)
-            self.instance.user = user
-            self.fields['project'].queryset = Project.trackable.filter(
-                users=user
-                ).filter(
-                business=business
-                )
-
-    from django.forms.models import modelformset_factory
-    SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm)
-
-    queryset = SimpleEntry.objects.filter(
-        user=user
-        ).filter(
-        project__business=business
-        ).filter(
-        date=curr_date
-        )
-
-    if not request:
-        formset = SimpleEntryFormset(queryset=queryset, prefix='business_'+str(business.id))
-    else:
-        formset = SimpleEntryFormset(request.POST, queryset=queryset, prefix='business_'+str(business.id))
-    return formset
 
 
 @permission_required('entries.change_entry')
