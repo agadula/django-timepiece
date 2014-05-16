@@ -21,7 +21,7 @@
 {% endblock extrajs %}
 
 {% block content %}
-    <h2>Monthly Time Sheet for {{ from_date|date:'M Y' }} - {{ timesheet_user.get_name_or_username }}</h2>
+    <h2>Monthly Time Sheet for {{ from_date|date:'M Y' }} - total {{ summary_se.total|humanize_hours:"{hours:02d}:{minutes:02d}" }} <!-- {{ timesheet_user.get_name_or_username }} --></h2>
 
     <div class="row-fluid">
         <div class="span12" id="header">
@@ -135,11 +135,13 @@
                                         </td>
                                     </tr>
                                 {% endfor %}
+<!--
                                 <tr class="emphasized-row">
                                     <th colspan=3 style="text-align: right;">Total over all entries:</th>
                                     <th class="hours">{{ summary_se.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</th>
                                     <th colspan=3></th>
                                 </tr>
+-->
                             </tbody>
                         </table>
                     {% else %}

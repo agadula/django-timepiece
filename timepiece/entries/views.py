@@ -98,6 +98,8 @@ class Dashboard(TemplateView):
                 .exclude(user=self.user).select_related('user', 'project',
                 'activity')
 
+        summary = SimpleEntry.summary(self.user, week_start, week_end+datetime.timedelta(days=1))
+
         return {
             'active_tab': self.active_tab,
             'today': today,
@@ -113,6 +115,7 @@ class Dashboard(TemplateView):
             'next_date_link': reverse('dashboard')+'?week_start='+str(next_date.date()),
             'prev_date_link': reverse('dashboard')+'?week_start='+str(prev_date.date()),
             'date_form': date_form,
+            'summary': summary,
         }
 
     def process_progress(self, entries, assignments):

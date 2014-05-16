@@ -14,7 +14,7 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span12">
-            <h2>Daily Entries of {{ curr_date|date:'D j M Y' }}</h2>
+            <h2>Daily Entries of {{ curr_date|date:'D j M Y' }} - total {{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</h2>
 
             <form method="get" action="" class="form-inline visible-desktop">
                 <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
@@ -79,7 +79,7 @@
                                     </td>
                                 {% endfor %}
                                 
-                                <td>
+                                <td {% if field.errors or form.non_field_errors %}style="background-color:#f2dede;color:#b94a48"{% endif %}>
                                     {% if not form.instance.id %}
                                         &nbsp;
                                     {% elif form.instance.status == "verified" %}
@@ -101,11 +101,13 @@
                         
                         {% endfor %}
 
-                            <tr class="totals emphasized-row">
+ <!--
+                           <tr>
                                 <td style="text-align: right;"><strong>Overall total for the period:</strong></td>
                                 <td colspan="2" style="text-align: right;"><strong>{{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</strong></td>
                                 <td colspan="2">&nbsp;</td>
                             </tr>
+-->
                     </tbody>
                 </table>
 
