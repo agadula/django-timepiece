@@ -101,3 +101,19 @@ def get_year_start(day=None):
 def to_datetime(date):
     """Transforms a date or datetime object into a date object."""
     return datetime.datetime(date.year, date.month, date.day)
+
+def get_next_month(month, year):
+    if month == 12:
+        month = 1
+        year+= 1
+    else:
+        month+=1
+    return str(month), str(year)
+
+def get_prev_month(month, year):
+    if month == 1:
+        month = 12
+        year-= 1
+    else:
+        month-=1
+    return str(month), str(year)

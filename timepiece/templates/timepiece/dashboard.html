@@ -29,12 +29,14 @@
         <h2>Weekly Entries from {{ week_start|date:'M j' }} to {{ week_end|date:'M j' }} - total {{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</h2>
 
         <form method="get" action="" class="form-inline visible-desktop">
-            <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
+            <div class="input-prepend input-append">
+                <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
+                <a class="btn" href="{{ next_date_link }}"><i class="icon-chevron-right"></i></a>
+            </div>
             <div class="input-append">
                 {{ date_form.curr_date }}
                 <button class="btn" type='submit'><i class="icon-ok"></i></button>
             </div>
-            <a class="btn" href="{{ next_date_link }}"><i class="icon-chevron-right"></i></a>
         </form>
 
         <br style="clear: both;" />

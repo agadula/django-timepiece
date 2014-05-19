@@ -25,6 +25,23 @@
 
     <div class="row-fluid">
         <div class="span12" id="header">
+            {# We have to duplicate the form so the hidden fields are not in the same form #}
+            <form class="form-inline visible-desktop" method="get" action="" accept-charset="utf-8">
+                <div class="input-prepend input-append">
+                    <a class="btn" href="{{ prev_date_link }}"><i class="icon-chevron-left"></i></a>
+                    <a class="btn" href="{{ next_date_link }}"><i class="icon-chevron-right"></i></a>
+                </div>
+
+                {{ year_month_form|as_bootstrap:"inline" }}
+                <button class="btn" type='submit' name="yearmonth" value="Update Page"><i class="icon-ok"></i></button>
+                <button class="btn" type='submit' name='csv' value="csv" id='csv'>Download CSV <i class="icon-download-alt"></i></button>
+
+            </form>
+            <form class="hidden-desktop" method="get" action="" accept-charset="utf-8">
+                {{ year_month_form|as_bootstrap }}
+                <input type="submit" name="yearmonth" class="btn" value="Update" />
+            </form>
+
             <div id="options-buttons">
                 {% if show_verify %}
                     {% url 'change_user_timesheet' timesheet_user.id 'verify' as base_url %}
@@ -48,17 +65,6 @@
                     <a class="btn btn-primary" href="{% url 'view_user' timesheet_user.pk %}">View/Edit User</a>
                 {% endif %}
             </div>
-
-            {# We have to duplicate the form so the hidden fields are not in the same form #}
-            <form class="form-inline visible-desktop" method="get" action="" accept-charset="utf-8">
-                {{ year_month_form|as_bootstrap:"inline" }}
-                <input type="submit" name="yearmonth" class="btn" value="Update Page" />
-                <button class="btn" type='submit' name='csv' value="csv" id='csv'>Download CSV</button>
-            </form>
-            <form class="hidden-desktop" method="get" action="" accept-charset="utf-8">
-                {{ year_month_form|as_bootstrap }}
-                <input type="submit" name="yearmonth" class="btn" value="Update" />
-            </form>
         </div>
     </div>
 

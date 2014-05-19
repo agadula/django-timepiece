@@ -292,6 +292,9 @@ def view_user_timesheet(request, user_id, active_tab):
         show_approve = verified_count_se + approved_count_se == total_statuses_se \
                 and verified_count_se > 0 and total_statuses_se != 0
 
+    next_month, next_year = utils.get_next_month(from_date.month, from_date.year)
+    prev_month, prev_year = utils.get_prev_month(from_date.month, from_date.year)
+
     context = {
         'active_tab': active_tab or 'all-simple-entries',
         'year_month_form': form,
@@ -306,6 +309,8 @@ def view_user_timesheet(request, user_id, active_tab):
         'project_entries': project_entries,
         'summary': summary,
         'summary_se': summary_se,
+        'prev_date_link': reverse('view_user_timesheet', args=(user_id,))+'?month='+str(prev_month)+'&year='+str(prev_year),
+        'next_date_link': reverse('view_user_timesheet', args=(user_id,))+'?month='+str(next_month)+'&year='+str(next_year),
     }
 
     if 'csv' in request.GET:
