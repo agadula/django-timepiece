@@ -747,7 +747,15 @@ def create_edit_multi_simple_entries(request):
             formset = make_simple_entries_formset(user, business, curr_date, request)
             element['formset'] = formset
             formsets.append(element)
-            if formset.is_valid():
+            if not formset.is_valid():
+                formsets_with_errors += 1
+
+        if formsets_with_errors:
+            message = 'Data not saved. Please fix the errors below.'
+            messages.error(request, message)
+        else:
+            for elem in formsets:
+                formset = elem['formset']
                 entries = formset.save(commit=False)
                 if entries:
                     for entry in entries:
@@ -755,17 +763,9 @@ def create_edit_multi_simple_entries(request):
                         entry.save()
                     formset.save_m2m()
                     formsets_updated += 1
-            else:
-                formsets_with_errors += 1
-
-        if formsets_updated:
-            message = 'The simple entries have been updated successfully.'
-            messages.info(request, message)
-
-        if formsets_with_errors:
-            message = 'Please fix the errors below.'
-            messages.error(request, message)
-        else:
+            if formsets_updated:
+                message = 'The simple entries have been updated successfully.'
+                messages.info(request, message)
             url = request.REQUEST.get('next', reverse('create_multi_simple_entry')+'?curr_date='+curr_date_string)
             return HttpResponseRedirect(url)
 
