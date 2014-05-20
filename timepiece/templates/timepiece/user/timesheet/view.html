@@ -46,7 +46,7 @@
                 {% if show_verify %}
                     {% url 'change_user_timesheet' timesheet_user.id 'verify' as base_url %}
                     {% create_dict from_date=from_date|date:'Y-m-d' as params %}
-                    <a class="btn btn-primary" href="{{ base_url|add_parameters:params }}">Verify All Entries</a>
+                    <a class="btn btn-primary" href="{{ base_url|add_parameters:params }}">Confirm All Entries</a>
                 {% endif %}
 
                 {% if show_approve %}
@@ -125,7 +125,7 @@
                                         <td class="project">{{ entry.project }}</td>
                                         <td class="nowrap">{{ entry.get_total_seconds|humanize_seconds:"{hours:02d}:{minutes:02d}" }}</td>
                                         <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
-                                        <td>{{ entry.status|title }}</td>
+                                        <td>{% if entry.status == "unverified" %}Not {% endif %}Confirmed</td>
                                         <td class="aux">
 
                                             {% if entry.status == "unverified" %}

@@ -2,7 +2,7 @@
 {% load url from future %}
 {% load timepiece_tags %}
 
-{% block title %}{{ action.capitalize }} Hours for Time Sheet{% endblock title %}
+{% block title %} Confirm Hours for Time Sheet{% endblock title %}
 
 {% block crumbs %}
     {{ block.super }}
@@ -12,15 +12,15 @@
 {% block content %}
     <div class="row-fluid">
         <div class="span12">
-            <h2>{{ action.capitalize }} Hours for Time Sheet</h2>
+            <h2>Confirm Hours for Time Sheet</h2>
             <h3>
-                Are you sure you want to {{ action }} all of {{ timesheet_user.get_name_or_username }}'s time sheet,
+                Are you sure you want to confirm all of {{ timesheet_user.get_name_or_username }}'s time sheet,
                 from {{ from_date|date:"N j, Y" }} to {{ to_date|date:"N j, Y" }}, which includes a total of {{ summary_se.total|humanize_hours:"{hours:02d}:{minutes:02d}" }} hours?
             </h3>
             {% if action == "approve" %}
                 <p>After entries have been approved they are ready to be submitted for payroll.</p>
             {% else %}
-                <p>After entries are verified they cannot be changed.</p>
+                <p>After entries are confirmed they cannot be changed.</p>
             {% endif %}
         </div>
     </div>
