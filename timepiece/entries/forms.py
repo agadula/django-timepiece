@@ -246,8 +246,8 @@ def make_simple_entries_formset(user, business, curr_date, request=None):
             widgets = {
                 'project': forms.widgets.Select(attrs={'class':'span12'}),
                 'hours': forms.widgets.TextInput(attrs={'style':'width: 30px;'}),
-                'minutes': forms.widgets.Select(attrs={'style':'width: 50px;'}),
-                'comments': forms.widgets.TextInput(attrs={'style':'width: 500px;'}),
+                'minutes': forms.widgets.Select(attrs={'style':'width: 55px;'}),
+                'comments': forms.widgets.TextInput(attrs={'class':'span12'}),
             }
 
         def __init__(self, *args, **kwargs):
