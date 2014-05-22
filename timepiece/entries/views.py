@@ -30,6 +30,7 @@ from timepiece.entries.forms import ClockInForm, ClockOutForm, \
         AddUpdateSimpleEntryForm, BusinessSelectionForm, \
         SimpleDateForm, make_simple_entries_formset
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
+from timepiece.templatetags.timepiece_tags import humanize_hours
 
 
 class Dashboard(TemplateView):
@@ -741,18 +742,28 @@ def create_edit_multi_simple_entries(request):
         date_form = SimpleDateForm(initial={'curr_date': curr_date})
         formsets_with_errors = 0
         formsets_updated = 0
+        new_daily_hours = 0
         for business in businesses:
             element={}
             element['name'] = business.name
             formset = make_simple_entries_formset(user, business, curr_date, request)
             element['formset'] = formset
             formsets.append(element)
-            if not formset.is_valid():
+            if formset.is_valid():
+                for form in formset.cleaned_data:
+                    hours = form.get('hours', 0)
+                    minutes = form.get('minutes', 0)
+                    new_daily_hours+= hours+(minutes/60)
+            else:
                 formsets_with_errors += 1
 
-        if formsets_with_errors:
-            message = 'Data not saved. Please fix the errors below.'
-            messages.error(request, message)
+        if formsets_with_errors or (new_daily_hours > SimpleEntry.MAXIMUM_HOURS_PER_DAY):
+            if formsets_with_errors:
+                err_msg = 'Please fix the errors below.'
+            else:
+                err_msg = "Entries not updated. You are trying to save a total of {0}, ".format(humanize_hours(new_daily_hours, '{hours:02d}:{minutes:02d}'))
+                err_msg+= "the daily limit is {0} hours. ".format(SimpleEntry.MAXIMUM_HOURS_PER_DAY)
+            messages.error(request, err_msg)
         else:
             for elem in formsets:
                 formset = elem['formset']

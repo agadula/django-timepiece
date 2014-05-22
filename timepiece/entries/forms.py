@@ -210,7 +210,6 @@ def validate_daily_hours_limit(cleaned_data, user, instance, curr_date=None):
         exceeding_time = hours_balance - SimpleEntry.MAXIMUM_HOURS_PER_DAY
         err_msg = "You cannot enter more than {0} hours per day, ".format(SimpleEntry.MAXIMUM_HOURS_PER_DAY)
         err_msg+= "today's total is {0}.".format(humanize_hours(current_hours, '{hours:02d}:{minutes:02d}'))
-#         err_msg+= "remove at least {0} from this entry.".format(humanize_hours(exceeding_time, '{hours:02d}:{minutes:02d}'))
         raise forms.ValidationError(err_msg)
 
 
@@ -259,11 +258,6 @@ def make_simple_entries_formset(user, business, curr_date, request=None):
                 ).filter(
                 business=business
                 )
-
-        def clean(self):
-            cleaned_data = super(_AddUpdateMultiSimpleEntryForm, self).clean()
-            validate_daily_hours_limit(cleaned_data, user, self.instance, curr_date)
-            return cleaned_data
 
     from django.forms.models import modelformset_factory
     SimpleEntryFormset = modelformset_factory(SimpleEntry, form=_AddUpdateMultiSimpleEntryForm)
