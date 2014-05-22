@@ -34,14 +34,14 @@
                 <input type="hidden" name="curr_date" value='{{ curr_date|date:'Y-m-d' }}' id="id_curr_date">
                 {% csrf_token %}
 
-                <table class="table table-hover table-bordered table-condensed ">
+                <table class="table table-hover table-bordered">
                     <thead>
                         <tr>
+                            <th class="aux span1">&nbsp;</th>
                             <th class="project">Activity / Project</th>
                             <th class="time">Hours</th>
                             <th class="time">Minutes</th>
                             <th class="comments">Comment</th>
-                            <th class="aux">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,13 +49,26 @@
                             
                             
                             {{ element.formset.management_form }}
-                            <tr class="emphasized-row" style="background-color:#d9edf7">
-                                <th colspan="5">{{ element.name }}</th>
+                            <tr class="emphasized-row" style="<!-- background-color:#d9edf7 -->" >
+                                <th><!-- <i class="icon-plus-sign"></i><i class="icon-minus-sign"></i> --></th>
+                                <th colspan="4">{{ element.name }}</th>
                             </tr>
                             {% for form in element.formset %}
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
+                                <td style="text-align:center; vertical-align:middle;
+                                {% if field.errors or form.non_field_errors %}background-color:#f2dede;color:#b94a48;{% endif %}
+                                ">
+                                    {% if not form.instance.id %}
+                                        &nbsp;
+                                    {% elif form.instance.status == "verified" %}
+                                        <span class="label label-success"><i class="icon-ok icon-white"></i></span>
+                                    {% elif form.instance.status == "unverified"  %}
+                                        {% url 'create_multi_simple_entry' as next_url %}
+                                        <a href="{% url 'delete_simple_entry' form.instance.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
+                                    {% endif %}
+                                </td>
 
                                 {% for field in form.visible_fields %}
                                     <td style="
@@ -80,17 +93,6 @@
                                         {% endif %}
                                     </td>
                                 {% endfor %}
-                                
-                                <td {% if field.errors or form.non_field_errors %}style="background-color:#f2dede;color:#b94a48"{% endif %}>
-                                    {% if not form.instance.id %}
-                                        &nbsp;
-                                    {% elif form.instance.status == "verified" %}
-                                        <span class="label label-success"><i class="icon-ok icon-white"></i></span>
-                                    {% elif form.instance.status == "unverified"  %}
-                                        {% url 'create_multi_simple_entry' as next_url %}
-                                        <a href="{% url 'delete_simple_entry' form.instance.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
-                                    {% endif %}
-                                </td>
 
                                 {% if form.non_field_errors %}
                                 <tr style="background-color:#f2dede;color:#b94a48"><td colspan="5">

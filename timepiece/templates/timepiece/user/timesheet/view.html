@@ -99,35 +99,25 @@
                         <table class="table table-bordered table-condensed table-hover">
                             <thead>
                                 <tr>
+                                    <th class="aux span1"></th>
                                     <th>Date</th>
                                     <th class="business">Activity</th>
                                     <th class="project">Project</th>
                                     <th class="time">Time</th>
-                                    <th class="comments">Comments</th>
+                                    <th class="comments">Comment</th>
                                     <th>Status</th>
-                                    <th class="aux"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for entry in month_simple_entries %}
                                     {% ifchanged entry.date|date:"W" %}
                                         <tr class="emphasized-row">
-                                            <th colspan="11">Week of {{ entry.date|week_start|date:'M j, Y' }} </th>
+                                            <th class="aux span1"></th>
+                                            <th colspan="10">Week of {{ entry.date|week_start|date:'M j, Y' }} </th>
                                         </tr>
                                     {% endifchanged %}
                                     <tr>
-                                        {% ifchanged entry.date|date %}
-                                            <td>{{ entry.date|date:"d/m/Y (D)" }}</td>
-                                        {% else %}
-                                            <td></td>
-                                        {% endifchanged %}
-                                        <td class="business">{{ entry.project.business }}</td>
-                                        <td class="project">{{ entry.project }}</td>
-                                        <td class="nowrap">{{ entry.get_total_seconds|humanize_seconds:"{hours:02d}:{minutes:02d}" }}</td>
-                                        <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
-                                        <td>{% if entry.status == "unverified" %}Not {% endif %}Confirmed</td>
-                                        <td class="aux">
-
+                                        <td style="text-align:center; vertical-align:middle;">
                                             {% if entry.status == "unverified" %}
                                                 <a href="{% url 'edit_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-pencil"></i></a>
                                                 <a href="{% url 'delete_simple_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}"><i class="icon-remove"></i></a>
@@ -139,6 +129,17 @@
                                                 | <a href="{% url 'reject_entry' entry.id %}?next={{ next_url|add_parameters:request.GET|urlencode }}">Reject</a>
                                             {% endif %}
                                         </td>
+                                        {% ifchanged entry.date|date %}
+                                            <td>{{ entry.date|date:"d/m/Y (D)" }}</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endifchanged %}
+                                        <td class="business">{{ entry.project.business }}</td>
+                                        <td class="project">{{ entry.project }}</td>
+                                        <td class="nowrap">{{ entry.get_total_seconds|humanize_seconds:"{hours:02d}:{minutes:02d}" }}</td>
+                                        <td class="comments" title="{{entry.comments}}">{{ entry.comments|truncatewords:12|urlizetrunc:25|safe }}</td>
+                                        <td>{% if entry.status == "unverified" %}Not {% endif %}Confirmed</td>
+
                                     </tr>
                                 {% endfor %}
 <!--
