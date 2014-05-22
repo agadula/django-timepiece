@@ -26,7 +26,7 @@
 
 {% block content %}
     {% if perms.entries.can_clock_in %}
-        <h2>Weekly Entries from {{ week_start|date:'M j' }} to {{ week_end|date:'M j' }} - total {{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</h2>
+        <h2>Weekly Entries from {{ week_start|date:'M j' }} to {{ week_end|date:'M j' }}</h2>
 
         <form method="get" action="" class="form-inline visible-desktop">
             <div class="input-prepend input-append">
@@ -157,6 +157,12 @@
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
+                            <tr class="emphasized-row">
+                                <td>&nbsp;</td>
+                                <td colspan="2" style="text-align: right;"><strong>Total:</strong></td>
+                                <td><strong>{{ summary.total|humanize_hours:"{hours:02d}:{minutes:02d}" }}</strong></td>
+                                <td>&nbsp;</td>
+                            </tr>
                         </tbody>
                     </table>
                 {% else %}
