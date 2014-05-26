@@ -502,12 +502,15 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
     @property
     def defaults(self):
         """Default filter form data when no GET data is provided."""
-        # Set default date span to previous week.
-        (start, end) = get_week_window(timezone.now() - relativedelta(days=7))
+        end = utils.get_month_start(timezone.now())
+        end-= relativedelta(days=1) # last day of the previous month
+        start = utils.get_month_start(end)
+#         # Set default date span to previous week.
+#         (start, end) = get_week_window(timezone.now() - relativedelta(days=7))
         return {
             'from_date': start,
             'to_date': end,
-            'trunc': 'day',
+            'trunc': 'month',
             'projects': [],
         }
 
