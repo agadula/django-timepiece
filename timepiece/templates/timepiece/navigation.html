@@ -40,6 +40,21 @@
                         <!-- <li><a href="{% url 'create_simple_entry' %}" title="Add Simple Entry">Add Simple Entry</a></li> -->
                     {% endif %}
 
+                    {# FIXME: Some of those permissions don't exist #}
+                    {% if perms.entries.view_entry_summary or perms.entries.view_payroll_summary or perms.contracts.change_entrygroup or user.is_staff %}
+                    {#% if perms.entries.can_clock_in or perms.entries.view_entry_summary or perms.entries.view_payroll_summary or perms.contracts.change_entrygroup or user.is_staff %#}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                {% if perms.entries.view_entry_summary %}  {# FIXME: permission doesn't exist #}
+                                    <li><a href="{% url 'report_users' %}">Users</a></li>
+                                    <li><a href="{% url 'report_users_projects' %}">Users and Projects</a></li>
+                                    <li><a href="{% url 'report_users_activities' %}">Users and Activities</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
                     {# FIXME: Some permissions don't exist #}
                     {% if perms.crm.view_project or perms.auth.view_user or perms.crm.view_business or perms.contracts.add_project_contract %}
                         <li class="dropdown">

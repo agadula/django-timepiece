@@ -7,6 +7,18 @@ urlpatterns = patterns('',
         views.HourlyReport.as_view(),
         name='report_hourly'),
 
+    url(r'^reports/users/$',
+        views.UsersReport.as_view(),
+        name='report_users'),
+
+    url(r'^reports/users_projects/$',
+        views.UsersProjectsReport.as_view(),
+        name='report_users_projects'),
+
+    url(r'^reports/users_activities/$',
+        views.UsersActivitiesReport.as_view(),
+        name='report_users_activities'),
+
     url(r'^reports/osha/$',
         views.OshaReport.as_view(),
         name='report_osha'),

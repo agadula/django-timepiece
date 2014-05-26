@@ -1,4 +1,4 @@
-{% extends "timepiece/reports/base.html" %}
+{% extends "timepiece/reports/osha_base.html" %}
 {% load timepiece_tags bootstrap_toolkit %}
 {% load url from future %}
 
@@ -8,15 +8,10 @@
     {{ pj_filters.media }}
 {% endblock extrajs %}
 
-{% block bodyid %}osha-report{% endblock bodyid %}
-
-{% block crumbs %}
-    {{ block.super }}
-    <li><span class="divider">/</span> <a href="{% url 'report_osha' %}">OSHA Report</a></li>
-{% endblock crumbs %}
+{% block bodyid %}{{ report_type }}{% endblock bodyid %}
 
 {% block report_nav %}
-    {% with 'osha_report' as active %}
+    {% with report_type as active %}
         {{ block.super }}
     {% endwith %}
 {% endblock report_nav %}
@@ -34,10 +29,7 @@
                 {{ filter_form|as_bootstrap:"horizontal" }}
                 <button type="submit" class="btn btn-primary" name="ok" id="billable">Update Filters</button>
                 {% if perms.crm.export_project_time_sheet %}
-                    <button type="submit" class="btn" name="export_users" value="True">Export User Summary</button>
-                    <button type="submit" class="btn" name="export_projects" value="True">Export Project Summary</button>
-                    <button type="submit" class="btn" name="export_projects_and_users" value="True">Export Project and User Summary</button>
-                    <button type="submit" class="btn" name="export_activities_and_users" value="True">Export Activity and User Summary</button>
+                    <button type="submit" class="btn" name="export" value="True">Download CSV <i class="icon-download-alt"></i></button>
                 {% endif %}
             </form>
         </div>

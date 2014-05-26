@@ -464,6 +464,276 @@ def report_productivity(request):
     })
 
 
+class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
+    template_name = 'timepiece/reports/osha.html'
+
+    def convert_context_to_csv(self, context):
+        """Convert the context dictionary into a CSV file."""
+        report_type = self.get_report_type()
+        is_special_report = report_type in ['users_projects', 'users_activities'] # columns for both user and project (or activity). without final row "Total"
+
+        content = []
+        date_headers = context['date_headers']
+
+        headers = ['Name']
+        if report_type == 'users_projects': headers.append('Project')
+        if report_type == 'users_activities': headers.append('Activity')
+        headers.extend([date.strftime('%m/%d/%Y') for date in date_headers])
+        headers.append('Total')
+        content.append(headers)
+
+        summaries = context['summaries'] # list of tuples: [(title, summary), (title, summary), ..]
+
+        for title, summary in summaries:
+            if report_type == 'users_projects': project_or_activity_name = title.replace("Project: ", "")
+            if report_type == 'users_activities': project_or_activity_name = title.replace("Activity: ", "")
+            for rows, totals in summary:
+                for user, user_id, hours in rows:
+                    data = [user]
+                    if is_special_report: data.append(project_or_activity_name)
+                    data.extend(hours)
+                    content.append(data)
+                if not is_special_report:
+                    total = ['Totals']
+                    total.extend(totals)
+                    content.append(total)
+        return content
+
+    @property
+    def defaults(self):
+        """Default filter form data when no GET data is provided."""
+        # Set default date span to previous week.
+        (start, end) = get_week_window(timezone.now() - relativedelta(days=7))
+        return {
+            'from_date': start,
+            'to_date': end,
+            'trunc': 'day',
+            'projects': [],
+        }
+
+    def get_entry_query(self, start, end, data):
+        """Builds Entry query from form data."""
+
+        # All entries must meet time period requirements.
+        basicQ = Q(date__gte=start, date__lt=end)
+
+        # Filter by project
+        projects = data.get('projects', None)
+        basicQ &= Q(project__in=projects) if projects else Q() # original
+
+        # Filter by entries status
+        include_unverified = data.get('include_unverified', False)
+        if not include_unverified: basicQ &= Q(status=SimpleEntry.VERIFIED)
+
+#         # Filter by user, activity, and project type for BillableReport.
+#         if 'users' in data:
+#             basicQ &= Q(user__in=data.get('users'))
+#         if 'activities' in data:
+#             basicQ &= Q(activity__in=data.get('activities'))
+#         if 'project_types' in data:
+#             basicQ &= Q(project__type__in=data.get('project_types'))
+
+        return basicQ
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        export_as_csv = request.GET.get('export', False)
+        if export_as_csv:
+            kls = CSVViewMixin
+        else:
+            kls = TemplateView
+        return kls.render_to_response(self, context)
+
+    def get_context_data(self, **kwargs):
+        context = {}
+
+        form = self.get_form()
+        if form.is_valid():
+            data = form.cleaned_data
+            start, end = form.save()
+            entryQ = self.get_entry_query(start, end, data)
+            trunc = data['trunc']
+            if entryQ:
+                vals = ('pk', 'project', 'project__name',
+                        'project__status', 'project__type__label',
+                        'project__business', 'project__business__name')
+                entries = SimpleEntry.objects.date_trunc(trunc,
+                        extra_values=vals).filter(entryQ)
+            else:
+                entries = SimpleEntry.objects.none()
+
+            end = end - relativedelta(days=1)
+            date_headers = generate_dates(start, end, by=trunc)
+            context.update({
+                'from_date': start,
+                'to_date': end,
+                'date_headers': date_headers,
+                'entries': entries,
+                'filter_form': form,
+                'trunc': trunc,
+            })
+        else:
+            context.update({
+                'from_date': None,
+                'to_date': None,
+                'date_headers': [],
+                'entries': SimpleEntry.objects.none(),
+                'filter_form': form,
+                'trunc': '',
+            })
+
+
+        # Sum the hours totals for each user & interval.
+        entries = context['entries']
+        date_headers = context['date_headers']
+
+        self.summaries = []
+        if context['entries']:
+            self.run_report(context)
+#             summaries.append(('By Project', get_project_totals(
+#                     entries.order_by('project__name', 'project__id', 'date'),
+#                     date_headers, 'total', total_column=True, by='project')))
+
+#             entries = entries.order_by('project__type__label', 'project__name',
+#                     'project__id', 'date')
+#
+#             func = lambda x: x['project__type__label']
+#             for label, group in groupby(entries, func): # group is a list of projects of the same type
+#                 title = label + ' Projects'
+#                 summaries.append(
+#                     (title, get_project_totals(
+#                         list(group),
+#                         date_headers, 'total', total_column=True, by='project')
+#                     )
+#                 )
+
+        # Adjust date headers & create range headers.
+        from_date = context['from_date']
+        from_date = utils.add_timezone(from_date) if from_date else None
+        to_date = context['to_date']
+        to_date = utils.add_timezone(to_date) if to_date else None
+        trunc = context['trunc']
+        date_headers, range_headers = self.get_headers(date_headers,
+                from_date, to_date, trunc)
+
+        context.update({
+            'report_type': self.get_report_type(),
+            'date_headers': date_headers,
+            'summaries': self.summaries,
+            'range_headers': range_headers,
+        })
+        return context
+
+    def get_filename(self, context):
+        request = self.request.GET.copy()
+        from_date = request.get('from_date')
+        to_date = request.get('to_date')
+        prefix = self.get_report_type()
+        return prefix+'_{0}_to_{1}_by_{2}'.format(from_date, to_date,
+            context.get('trunc', ''))
+
+    def get_form(self):
+        data = self.request.GET or self.defaults
+        data = data.copy()  # make mutable
+        return OshaReportForm(data)
+
+
+class UsersReport(OshaBaseReport):
+    def get_report_type(self):
+        return 'users'
+
+    def run_report(self, context):
+        entries = context['entries']
+        date_headers = context['date_headers']
+        include_users_without_entries = True
+
+        summary_by_user = get_project_totals(
+                entries.order_by('user__last_name', 'user__id', 'date'),
+                date_headers, 'total', total_column=True, by='user')
+
+        if include_users_without_entries:
+            all_users = list( User.objects.all() )
+            entries.order_by('user')
+
+            users_with_entries = []
+            func = lambda x: x['user']
+            for user_id, group in groupby(entries, func):
+                user = User.objects.get(id=user_id)
+                if user not in users_with_entries:
+                    users_with_entries.append(user)
+
+            # remove non active users and the admin user
+            users_without_entries = []
+            for u in all_users:
+                if u not in users_with_entries and u.is_active and u.username != "admin":
+                    users_without_entries.append(u)
+
+            summary_by_user_also_without_entries = []
+            rows = []
+            for curr_rows, curr_totals in summary_by_user:
+                for name, pk, hours in curr_rows:
+                    row = (name, pk, hours)
+                    rows.append(row)
+                totals = curr_totals
+
+            for user in users_without_entries:
+                name = user.first_name + " " + user.last_name
+                pk = user.id
+                hours = ['' for date in date_headers]
+                hours.append('')
+                rows.append( (name, pk, hours) )
+
+            summary_by_user_also_without_entries.append( (rows, totals) )
+            summary_by_user = summary_by_user_also_without_entries
+
+        self.summaries.append(('By User', summary_by_user))
+
+
+class UsersActivitiesReport(OshaBaseReport):
+    def get_report_type(self):
+        return 'users_activities'
+
+    def run_report(self, context):
+        entries = context['entries']
+        date_headers = context['date_headers']
+
+        entries = entries.order_by('project__business__name',
+                'project__business__id', 'user__last_name', 'user__id', 'date')
+
+        func = lambda x: x['project__business__name']
+        for label, group in groupby(entries, func):
+            title = 'Activity: ' + label
+            self.summaries.append(
+                (title, get_project_totals(
+                    list(group),
+                    date_headers, 'total', total_column=True, by='user')
+                )
+            )
+
+
+class UsersProjectsReport(OshaBaseReport):
+    def get_report_type(self):
+        return 'users_projects'
+
+    def run_report(self, context):
+        entries = context['entries']
+        date_headers = context['date_headers']
+
+        entries = entries.order_by('project__name',
+                'project__id', 'user__last_name', 'user__id', 'date')
+
+        func = lambda x: x['project__name']
+        for label, group in groupby(entries, func):
+            title = 'Project: ' + label
+            self.summaries.append(
+                (title, get_project_totals(
+                    list(group),
+                    date_headers, 'total', total_column=True, by='user')
+                )
+            )
+
+
+
 class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
     template_name = 'timepiece/reports/osha.html'
 
