@@ -1,0 +1,28 @@
+{% extends "timepiece/base.html" %}
+{% load url from future %}
+
+{% block content %}
+    {% block report_nav %}
+        <div class="row-fluid">
+            <div class="span12">
+                <h2>Reports</h2>
+                <ul class="nav nav-pills">
+                    {% if perms.entries.view_entry_summary %}
+                        <li{% ifequal active 'users' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}{% endifequal %}">Users</a>
+                        </li>
+                        <li{% ifequal active 'users_projects' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}{% endifequal %}">Users and Projects</a>
+                        </li>
+                        <li{% ifequal active 'users_activities' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'users_activities' %}#{% else %}{% url 'report_users_activities' %}{% endifequal %}">Users and Activities</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endblock report_nav %}
+
+    {% block report_content %}
+    {% endblock report_content %}
+{% endblock content %}
