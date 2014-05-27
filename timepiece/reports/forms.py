@@ -96,7 +96,7 @@ class OshaReportForm(DateForm):
         ('year', 'Year'),
     )
 
-    include_unverified = forms.BooleanField(required=False)
+    include_non_confirmed = forms.BooleanField(required=False)
 
     trunc = forms.ChoiceField(label='Group Totals By', choices=TRUNC_CHOICES,
             widget=forms.RadioSelect())

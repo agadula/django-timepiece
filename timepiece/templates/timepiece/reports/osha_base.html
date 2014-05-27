@@ -11,6 +11,12 @@
                         <li{% ifequal active 'users' %} class="active"{% endifequal %}>
                             <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}{% endifequal %}">Users</a>
                         </li>
+                        <li{% ifequal active 'projects' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'projects' %}#{% else %}{% url 'report_projects' %}{% endifequal %}">Projects</a>
+                        </li>
+                        <li{% ifequal active 'activities' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'activities' %}#{% else %}{% url 'report_activities' %}{% endifequal %}">Activities</a>
+                        </li>
                         <li{% ifequal active 'users_projects' %} class="active"{% endifequal %}>
                             <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}{% endifequal %}">Users and Projects</a>
                         </li>

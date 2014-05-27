@@ -525,8 +525,8 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
         basicQ &= Q(project__in=projects) if projects else Q() # original
 
         # Filter by entries status
-        include_unverified = data.get('include_unverified', False)
-        if not include_unverified: basicQ &= Q(status=SimpleEntry.VERIFIED)
+        include_non_confirmed = data.get('include_non_confirmed', False)
+        if not include_non_confirmed: basicQ &= Q(status=SimpleEntry.VERIFIED)
 
 #         # Filter by user, activity, and project type for BillableReport.
 #         if 'users' in data:
@@ -593,9 +593,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
         self.summaries = []
         if context['entries']:
             self.run_report(context)
-#             summaries.append(('By Project', get_project_totals(
-#                     entries.order_by('project__name', 'project__id', 'date'),
-#                     date_headers, 'total', total_column=True, by='project')))
+
 
 #             entries = entries.order_by('project__type__label', 'project__name',
 #                     'project__id', 'date')
@@ -690,6 +688,31 @@ class UsersReport(OshaBaseReport):
             summary_by_user = summary_by_user_also_without_entries
 
         self.summaries.append(('By User', summary_by_user))
+
+
+class ProjectsReport(OshaBaseReport):
+    def get_report_type(self):
+        return 'projects'
+
+    def run_report(self, context):
+        entries = context['entries']
+        date_headers = context['date_headers']
+
+        self.summaries.append(('By Project', get_project_totals(
+                entries.order_by('project__name', 'project__id', 'date'),
+                date_headers, 'total', total_column=True, by='project')))
+
+
+class ActivitiesReport(OshaBaseReport):
+    def get_report_type(self):
+        return 'activities'
+
+    def run_report(self, context):
+        entries = context['entries']
+        date_headers = context['date_headers']
+        self.summaries.append(('By Activity', get_project_totals(
+                entries.order_by('project__business__name', 'project__business__id', 'date'),
+                date_headers, 'total', total_column=True, by='project__business__name')))
 
 
 class UsersActivitiesReport(OshaBaseReport):
@@ -805,8 +828,8 @@ class OshaReport(ReportMixin, CSVViewMixin, TemplateView):
         basicQ &= Q(project__in=projects) if projects else Q() # original
 
         # Filter by entries status
-        include_unverified = data.get('include_unverified', False)
-        if not include_unverified: basicQ &= Q(status=SimpleEntry.VERIFIED)
+        include_non_confirmed = data.get('include_non_confirmed', False)
+        if not include_non_confirmed: basicQ &= Q(status=SimpleEntry.VERIFIED)
 
 #         # Filter by user, activity, and project type for BillableReport.
 #         if 'users' in data:

@@ -48,6 +48,8 @@
                             <ul class="dropdown-menu">
                                 {% if perms.entries.view_entry_summary %}  {# FIXME: permission doesn't exist #}
                                     <li><a href="{% url 'report_users' %}">Users</a></li>
+                                    <li><a href="{% url 'report_projects' %}">Projects</a></li>
+                                    <li><a href="{% url 'report_activities' %}">Activities</a></li>
                                     <li><a href="{% url 'report_users_projects' %}">Users and Projects</a></li>
                                     <li><a href="{% url 'report_users_activities' %}">Users and Activities</a></li>
                                 {% endif %}
