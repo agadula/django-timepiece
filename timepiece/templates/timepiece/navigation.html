@@ -128,6 +128,12 @@
                                 <li class="divider"></li>
 -->
                                 <li><a href="{% url 'auth_logout' %}">Logout</a></li>
+                                <li></li>
+                                <li class="divider"></li>
+                                <li>Groups:</li>
+                                {% for group in user.groups.all %}
+                                    <li>- {{ group }}</li>
+                                {% endfor %}
                             </ul>
                         </li>
                     </ul>
