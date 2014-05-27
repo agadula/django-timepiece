@@ -41,17 +41,18 @@
                     {% endif %}
 
                     {# FIXME: Some of those permissions don't exist #}
-                    {% if perms.entries.view_entry_summary or perms.entries.view_payroll_summary or perms.contracts.change_entrygroup or user.is_staff %}
-                    {#% if perms.entries.can_clock_in or perms.entries.view_entry_summary or perms.entries.view_payroll_summary or perms.contracts.change_entrygroup or user.is_staff %#}
+                    {% if user.is_authenticated %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                {% if perms.entries.view_entry_summary %}  {# FIXME: permission doesn't exist #}
-                                    <li><a href="{% url 'report_users' %}">Users</a></li>
                                     <li><a href="{% url 'report_projects' %}">Projects</a></li>
                                     <li><a href="{% url 'report_activities' %}">Activities</a></li>
+                                {% if perms.entries.view_entry_summary or perms.entries.view_payroll_summary or perms.contracts.change_entrygroup or user.is_staff %}
+                                {% if perms.entries.view_entry_summary %}  {# FIXME: permission doesn't exist #}
+                                    <li><a href="{% url 'report_users' %}">Users</a></li>
                                     <li><a href="{% url 'report_users_projects' %}">Users and Projects</a></li>
                                     <li><a href="{% url 'report_users_activities' %}">Users and Activities</a></li>
+                                {% endif %}
                                 {% endif %}
                             </ul>
                         </li>

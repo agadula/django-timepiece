@@ -691,6 +691,10 @@ class UsersReport(OshaBaseReport):
 
 
 class ProjectsReport(OshaBaseReport):
+    @method_decorator(permission_required('entries.add_entry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
     def get_report_type(self):
         return 'projects'
 
@@ -704,6 +708,10 @@ class ProjectsReport(OshaBaseReport):
 
 
 class ActivitiesReport(OshaBaseReport):
+    @method_decorator(permission_required('entries.add_entry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
     def get_report_type(self):
         return 'activities'
 
