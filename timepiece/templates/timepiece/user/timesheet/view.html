@@ -130,7 +130,7 @@
                                             {% endif %}
                                         </td>
                                         {% ifchanged entry.date|date %}
-                                            <td>{{ entry.date|date:"d/m/Y (D)" }}</td>
+                                            <td>{{ entry.date|date:"D, d" }}</td>
                                         {% else %}
                                             <td></td>
                                         {% endifchanged %}
