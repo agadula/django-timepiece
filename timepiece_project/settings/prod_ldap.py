@@ -48,7 +48,7 @@ AUTH_LDAP_ALWAYS_UPDATE_USER = True
 
 # When user logs in, django db is updated with the user's LDAP groups. 
 # Any non-existing group will be created and the user's Django group membership will made to match his LDAP groups.
-# AUTH_LDAP_MIRROR_GROUPS = True
+AUTH_LDAP_MIRROR_GROUPS = True
 
 # Use LDAP group membership to calculate group permissions.
 AUTH_LDAP_FIND_GROUP_PERMS = True
