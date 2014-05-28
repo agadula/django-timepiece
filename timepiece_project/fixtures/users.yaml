@@ -1,7 +1,46 @@
 - model: auth.group
   pk: 1
   fields:
-    name: "D_General"
+    name: "G-INF"
+    permissions: [
+      70,
+      71,
+      72,
+      73,
+      74,
+      75
+    ]
+
+- model: auth.group
+  pk: 2
+  fields:
+    name: "G-PRU"
+    permissions: [
+      70,
+      71,
+      72,
+      73,
+      74,
+      75
+    ]
+
+- model: auth.group
+  pk: 3
+  fields:
+    name: "G-NET"
+    permissions: [
+      70,
+      71,
+      72,
+      73,
+      74,
+      75
+    ]
+
+- model: auth.group
+  pk: 4
+  fields:
+    name: "G-ADM"
     permissions: [
       70,
       71,
