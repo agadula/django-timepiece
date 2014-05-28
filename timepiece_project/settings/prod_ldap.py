@@ -13,7 +13,7 @@ AUTH_LDAP_USER_SEARCH = LDAPSearch("OU=Agency Staff,OU=Agency Users,DC=agency,DC
 # AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=users,dc=example,dc=com"
 
 # Set up the basic group parameters.
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=Visible,OU=Internal Lists,OU=Agency Distribution Lists,DC=agency,DC=dom",
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=Agency Groups,DC=agency,DC=dom", # OU=Visible,OU=Internal Lists,OU=Agency Distribution Lists,DC=agency,DC=dom",
      ldap.SCOPE_SUBTREE, "(objectClass=group)"
  )
 AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
