@@ -92,14 +92,17 @@ def deploy():
             run("chmod 775 "+STATIC_ABSPATH)
 
     with cd(CODE_PATH):
-        run("git pull")
-        run("touch app.wsgi")
         if env.environment == 'staging':
-#             add in the banner menu that it's test version
+#             write in the banner menu that it's test version
+            filename = os.path.join(CODE_PATH, 'timepiece/templates/timepiece/navigation.html')
+            run("git checkout "+filename)
+            run("git pull")
             before = '>Timepiece<'
             after = 'style="color: red;">Timepiece TEST<'
-            filename = os.path.join(CODE_PATH, 'timepiece/templates/timepiece/navigation.html')
             sed(filename, before, after)
+        else:
+            run("git pull")
+        run("touch app.wsgi")
     apache_restart()
 
 def apache_update_conf():
@@ -124,19 +127,7 @@ def apache_restart():
 def apache_errlog():
     run('tail /var/log/apache2/error.log')
 
-def _remove_db_if_exists(remote=False):
-    with settings(warn_only=True):
-        cmd = 'dropdb '+db_name
-        if remote:
-            result = run('sudo -u '+db_user+' '+cmd)
-        else:
-            result = local(cmd)
-    if result.failed and not confirm("Remove of db failed. Continue anyway?"):
-        abort("Aborting at user request.")
-
-def createdb():
-    _remove_db_if_exists(remote=True)
-
+def _create_user_in_db():
 #     CHECK IF USER ALREADY EXISTS IN THE DB
 #     psql postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='USR_NAME'"
 #     Yields 1 if found and nothing else.
@@ -145,35 +136,61 @@ def createdb():
     if result.failed and not confirm("Creation of role failed. Continue anyway?"):
         abort("Aborting at user request.")
 
+def  _create_db_on_linux():
     run('sudo -u {} createdb -E utf8 -O {} {} -T template0'.format(linux_user, db_user, db_name) )
-    syncdb()
+
+def _remove_db_if_exists():
+    with settings(warn_only=True):
+        cmd = 'dropdb '+db_name
+        if confirm("WARNING! You are removing the "+env.environment+" DB. Continue?"):
+            if env.environment == 'development':
+                result = local(cmd)
+            else:
+                result = run('sudo -u '+db_user+' '+cmd)
+        else:
+            abort("Aborting at user request.")
+
+        if result.failed and not confirm("Remove of DB failed. Continue anyway?"):
+            abort("Aborting at user request.")
+
+def createdb():
+    """Removes DB, creates user, creates db"""
+    _remove_db_if_exists()
+    _create_user_in_db()
+    _create_db_on_linux()
 
 def backupdb():
-	"""Backups the db and copies it locally"""
-	# pg_dump -U {user-name} {source_db} -f {dumpfilename.sql}
-	run('sudo -u postgres pg_dump {} > {}'.format(db_name, db_backup_file) )
-	get(db_backup_file, db_backup_file)
-	run("rm "+db_backup_file)
+    """Copy locally a DB backup"""
+    # pg_dump -U {user-name} {source_db} -f {dumpfilename.sql}
+    run('sudo -u postgres pg_dump {} > {}'.format(db_name, db_backup_file) )
+    get(db_backup_file, db_backup_file)
+    run("rm "+db_backup_file)
 
 def restoredb():
-	# psql -U {user-name} -d {desintation_db} -f {dumpfilename.sql}
-	_remove_db_if_exists()
-	local('psql --command="CREATE DATABASE {}"'.format(db_name) )
-	local('psql -d {} -f {}'.format(db_name, db_backup_file) )
-
-def copyremotedb():
-	backupdb()
-	restoredb()
+    """Restores the db from the local backup file"""
+    # psql -U {user-name} -d {desintation_db} -f {dumpfilename.sql}
+    restore_cmd = 'psql {} < {}'.format(db_name, db_backup_file)
+    _remove_db_if_exists()
+    if env.environment == 'development':
+        local('psql --command="CREATE DATABASE {}"'.format(db_name) )
+        local(restore_cmd)
+    else:
+        _create_db_on_linux()
+        put(db_backup_file, db_backup_file)
+        run('sudo -u '+db_user+' '+restore_cmd)
+        run("rm "+db_backup_file)
 
 def syncdb():
     with virtualenv():
         run('python manage.py syncdb --settings='+env.settings_file )
-        run('python manage.py loaddata users.yaml activities-projects.yaml --settings='+env.settings_file )
 
-def ldap_users_to_db():
+def loaddata(fixture):
     with virtualenv():
-        run('python ldap_users_to_db.py')
+        run('python manage.py loaddata '+fixture+' --settings='+env.settings_file )
 
+def sync_ldap_users_and_groups():
+    with virtualenv():
+        run('python sync_ldap_users_and_groups.py')
 
 def _user_to_projects(user=None, do=None, activity=None):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
