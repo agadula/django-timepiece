@@ -3,12 +3,52 @@
   fields:
     name: "Agency Staff"
     permissions: [
-      70,
-      71,
-      72,
-      73,
-      74,
-      75
+      70, # Can add entry
+      71, # Can change entry
+      72, # Can delete entry
+      73, # Can use Pendulum to clock in
+      74, # Can pause and unpause log entries
+      75  # Can use Pendulum to clock out
+    ]
+
+- model: auth.group
+  pk: 2
+  fields:
+    name: "GD-HoU-CPU"
+    permissions: [
+      76, # Can view entry summary page (report)
+    ]
+
+- model: auth.group
+  pk: 3
+  fields:
+    name: "GD-HoU-NET"
+    permissions: [
+      76, # Can view entry summary page (report)
+    ]
+
+- model: auth.group
+  pk: 4
+  fields:
+    name: "GD-HoU-PRU"
+    permissions: [
+      76, # Can view entry summary page (report)
+    ]
+
+- model: auth.group
+  pk: 5
+  fields:
+    name: "GD-HoU-RSC"
+    permissions: [
+      76, # Can view entry summary page (report)
+    ]
+
+- model: auth.group
+  pk: 6
+  fields:
+    name: "G-DIR"
+    permissions: [
+      76, # Can view entry summary page (report)
     ]
 
 # - model: auth.user
