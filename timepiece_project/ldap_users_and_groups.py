@@ -1,11 +1,5 @@
 import os, sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))) 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "timepiece_project.settings.production")
-
-from django.contrib.auth.models import User, Group
-from django.db import connection
-from django.core.exceptions import ObjectDoesNotExist
-
+import argparse
 import ldap
 
 
@@ -23,7 +17,7 @@ ldap_groups_needed = ldap_units+ldap_sections+ldap_hous+ldap_director
 
 
 
-def test_ldap():
+def test():
     user_dn = get_user_dn(username = "gentisi")
     if (user_dn == "CN=Simone GENTILINI,OU=Agency Staff,OU=Agency Users,DC=agency,DC=dom"):
         print "LDAP test ok"
@@ -64,8 +58,7 @@ def get_ldap_users():
                 for elem in elements:
                     if elem.startswith('CN'):
                         cn, group = elem.split('=')
-                        if group in ldap_groups_needed:
-                            groups.append(group)
+                        groups.append(group)
 
 
         user = {}
@@ -89,8 +82,17 @@ def user_belongs_to_a_unit(user):
     return assigned_to_a_unit
 
 
+def _create_group(group_name):
+    try:
+        group = Group.objects.get(name=group_name)
+    except ObjectDoesNotExist:
+        group = Group.objects.create(name=group_name)
+        print 'INFO: Group '+group_name+' created'
+    return group
 
-if __name__ == "__main__":
+
+def sync_users_and_groups():
+    preparedb()
     ldap_users = get_ldap_users()
     print 'INFO: '+str(len(ldap_users))+' users found in LDAP'
     for ldap_user in ldap_users:
@@ -109,17 +111,44 @@ if __name__ == "__main__":
         old_groups_set = set(old_groups)
         user.groups.clear()
         for group_name in ldap_user['groups']:
-            try:
-                group = Group.objects.get(name=group_name)
-            except ObjectDoesNotExist:
-                group = Group.objects.create(name=group_name)
-                print 'INFO: Group '+group_name+' created'
+            group = _create_group(group_name)
             user.groups.add(group)
-        
-        agency_group = Group.objects.get(name='Agency Staff')
-        user.groups.add(agency_group) # default group with CRUD on entries
 
         new_groups = user.groups.order_by('name')
         new_groups_set = set(new_groups)
         if old_groups_set <> new_groups_set:
             print 'INFO: '+user.username+' now belongs to :'+str(new_groups)+', previously was:'+str(old_groups)
+
+
+def preparedb():
+    permissions = ['Can add entry', 'Can change entry', 'Can delete entry']
+    for ldap_group in ldap_units:
+        group = _create_group(ldap_group)
+        for perm in permissions:
+            p = Permission.objects.get(name=perm)
+            group.permissions.add(p)
+
+    permissions = ['Can view entry summary page', 'Can export project time sheet'] # see special reports and download the CSV
+    for ldap_group in ldap_hous+ldap_director:
+        group = _create_group(ldap_group)
+        for perm in permissions:
+            p = Permission.objects.get(name=perm)
+            group.permissions.add(p)
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--settings', required=True)
+    parser.add_argument('--do', choices=["sync", 'preparedb', 'test'], required=True)
+    args = parser.parse_args()
+
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", args.settings)
+    from django.contrib.auth.models import User, Group, Permission
+    from django.db import connection
+    from django.core.exceptions import ObjectDoesNotExist
+
+    if args.do == "sync": sync_users_and_groups()
+    if args.do == "preparedb": preparedb()
+    if args.do == "test": test()

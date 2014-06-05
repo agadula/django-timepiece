@@ -21,13 +21,14 @@ db_backup_file = 'dump_'+db_name+'.sql'
 
 
 @_contextmanager
-def virtualenv():
+def _virtualenv():
     require('project_path', provided_by=('dev', 'stag', 'prod'))
     with cd(env.project_path):
         with prefix(env.activate):
             yield
 
 def dev():
+    """ use development environment on localhost"""
     env.environment = 'development'
     env.activate = 'source /Users/simonegentilini/.virtualenvs/timepiece/bin/activate'
     env.project_path = "/Users/simonegentilini/Dropbox/workspace/timepiece/timepiece_project"
@@ -64,7 +65,7 @@ def shell():
     if env.environment == 'development':
         local("python timepiece_project/manage.py shell")
     else:
-        with virtualenv():
+        with _virtualenv():
             run('python manage.py shell --settings='+env.settings_file )
 
 def commit():
@@ -181,16 +182,36 @@ def restoredb():
         run("rm "+db_backup_file)
 
 def syncdb():
-    with virtualenv():
+    with _virtualenv():
         run('python manage.py syncdb --settings='+env.settings_file )
 
 def loaddata(fixture):
-    with virtualenv():
+    with _virtualenv():
         run('python manage.py loaddata '+fixture+' --settings='+env.settings_file )
 
-def sync_ldap_users_and_groups():
-    with virtualenv():
-        run('python sync_ldap_users_and_groups.py')
+def _ldap_users_and_groups(do):
+    require('settings_file', provided_by=('dev', 'stag', 'prod'))
+    cmd = 'python ldap_users_and_groups.py'
+    cmd+= ' --settings='+env.settings_file
+    cmd+= " --do="+do
+    
+    if env.environment == 'development': 
+        with lcd(env.project_path):
+            local(cmd)
+    else:
+        with _virtualenv():
+            run(cmd)
+
+def ldap_users_and_groups_sync():
+    '''Prepares the needed Groups and Permissions. Creates Users and Groups if necessary, synchronises Users and Groups relations.'''
+    _ldap_users_and_groups('sync')
+
+def ldap_users_and_groups_preparedb():
+    '''Prepares the needed groups and permissions.'''
+    _ldap_users_and_groups('preparedb')
+
+def ldap_users_and_groups_test():
+    _ldap_users_and_groups('test')
 
 def _user_to_projects(user=None, do=None, activity=None):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
@@ -201,7 +222,7 @@ def _user_to_projects(user=None, do=None, activity=None):
         with lcd(env.project_path):
             local(cmd)
     else:
-        with virtualenv():
+        with _virtualenv():
             run(cmd)
 
 def add_user_to_projects(user=None, activity=None):
@@ -209,18 +230,5 @@ def add_user_to_projects(user=None, activity=None):
     _user_to_projects(user=user, do="add", activity=activity)
 
 def remove_user_from_projects(user=None, activity=None):
-    """Remove user form projects: e.g. fab prod remove_user_from_projects:user=username,activity=1.1"""
+    """Remove user from projects: e.g. fab prod remove_user_from_projects:user=username,activity=1.1"""
     _user_to_projects(user=user, do="remove", activity=activity)
-
-
-def users_that_not_record_entries():
-    """Prints active users that did not record any entry"""
-    require('settings_file', provided_by=('dev', 'stag', 'prod'))
-    cmd = 'python helpers/users_that_not_record_entries.py --settings='+env.settings_file
-    
-    if env.environment == 'development': 
-        with lcd(env.project_path):
-            local(cmd)
-    else:
-        with virtualenv():
-            run(cmd)

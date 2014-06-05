@@ -1,5 +1,5 @@
 from .base import *
-from .prod_ldap import *
+from .ldap_auth import *
 
 
 DEBUG = True
