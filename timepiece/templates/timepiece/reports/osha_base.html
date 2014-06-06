@@ -15,13 +15,13 @@
                         </li>
                     {% if perms.entries.view_entry_summary %}
                         <li{% ifequal active 'users' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}{% endifequal %}">Users</a>
+                            <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}{% endifequal %}">My Staff</a>
                         </li>
                         <li{% ifequal active 'users_projects' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}{% endifequal %}">Users and Projects</a>
+                            <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}{% endifequal %}">My Staff and Projects</a>
                         </li>
                         <li{% ifequal active 'users_activities' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users_activities' %}#{% else %}{% url 'report_users_activities' %}{% endifequal %}">Users and Activities</a>
+                            <a href="{% ifequal active 'users_activities' %}#{% else %}{% url 'report_users_activities' %}{% endifequal %}">My Staff and Activities</a>
                         </li>
                     {% endif %}
                 </ul>

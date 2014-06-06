@@ -638,13 +638,31 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
         data = data.copy()  # make mutable
         return OshaReportForm(data)
 
+    def accessible_users(self):
+        user = self.request.user
+
+        is_director = user.groups.filter(name='G-DIR').count()
+        is_cpu_hou = user.groups.filter(name='GD-HoU-CPU').count()
+        is_pru_hou = user.groups.filter(name='GD-HoU-PRU').count()
+        is_net_hou = user.groups.filter(name='GD-HoU-NET').count()
+        is_rsc_hou = user.groups.filter(name='GD-HoU-RSC').count()
+
+        groups = []
+        if is_director or user.is_superuser: groups+='G-INF G-NET G-PRU G-ADM'.split()
+        if is_cpu_hou: groups.append('G-INF')
+        if is_pru_hou: groups.append('G-PRU')
+        if is_net_hou: groups.append('G-NET')
+        if is_rsc_hou: groups.append('G-ADM')
+        return User.objects.filter(groups__name__in=groups)
+
+
 
 class UsersReport(OshaBaseReport):
     def get_report_type(self):
         return 'users'
 
     def run_report(self, context):
-        entries = context['entries']
+        entries = context['entries'].filter(user__in=self.accessible_users() )
         date_headers = context['date_headers']
         include_users_without_entries = True
 
@@ -653,7 +671,7 @@ class UsersReport(OshaBaseReport):
                 date_headers, 'total', total_column=True, by='user')
 
         if include_users_without_entries:
-            all_users = list( User.objects.all() )
+            all_users = list( self.accessible_users() )
             entries.order_by('user')
 
             users_with_entries = []
@@ -728,9 +746,7 @@ class UsersActivitiesReport(OshaBaseReport):
         return 'users_activities'
 
     def run_report(self, context):
-        entries = context['entries']
-        date_headers = context['date_headers']
-
+        entries = context['entries'].filter(user__in=self.accessible_users() )
         entries = entries.order_by('project__business__name',
                 'project__business__id', 'user__last_name', 'user__id', 'date')
 
@@ -740,7 +756,7 @@ class UsersActivitiesReport(OshaBaseReport):
             self.summaries.append(
                 (title, get_project_totals(
                     list(group),
-                    date_headers, 'total', total_column=True, by='user')
+                    context['date_headers'], 'total', total_column=True, by='user')
                 )
             )
 
@@ -749,10 +765,8 @@ class UsersProjectsReport(OshaBaseReport):
     def get_report_type(self):
         return 'users_projects'
 
-    def run_report(self, context):
-        entries = context['entries']
-        date_headers = context['date_headers']
-
+    def run_report(self, context):        
+        entries = context['entries'].filter(user__in=self.accessible_users() )
         entries = entries.order_by('project__name',
                 'project__id', 'user__last_name', 'user__id', 'date')
 
@@ -762,7 +776,7 @@ class UsersProjectsReport(OshaBaseReport):
             self.summaries.append(
                 (title, get_project_totals(
                     list(group),
-                    date_headers, 'total', total_column=True, by='user')
+                    context['date_headers'], 'total', total_column=True, by='user')
                 )
             )
 

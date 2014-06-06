@@ -123,7 +123,8 @@ def sync_users_and_groups():
 def preparedb():
     permissions = ['Can add entry', 'Can change entry', 'Can delete entry']
     permissions+= ['Can use Pendulum to clock in', 'Can use Pendulum to clock out', 'Can pause and unpause log entries']
-    for ldap_group in ldap_units:
+#     for ldap_group in ldap_units:
+    for ldap_group in ldap_groups_needed: # temporary solution waiting for AD exact groups
         group = _create_group(ldap_group)
         for perm in permissions:
             p = Permission.objects.get(name=perm)
