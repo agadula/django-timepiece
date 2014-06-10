@@ -8,20 +8,20 @@
                 <h2>Reports</h2>
                 <ul class="nav nav-pills">
                         <li{% ifequal active 'projects' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'projects' %}#{% else %}{% url 'report_projects' %}{% endifequal %}">Projects</a>
+                            <a href="{% ifequal active 'projects' %}#{% else %}{% url 'report_projects' %}?{{ request.GET.urlencode }}{% endifequal %}">Projects</a>
                         </li>
                         <li{% ifequal active 'activities' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'activities' %}#{% else %}{% url 'report_activities' %}{% endifequal %}">Activities</a>
+                            <a href="{% ifequal active 'activities' %}#{% else %}{% url 'report_activities' %}?{{ request.GET.urlencode }}{% endifequal %}">Activities</a>
                         </li>
                     {% if perms.entries.view_entry_summary %}
                         <li{% ifequal active 'users' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}{% endifequal %}">My Staff</a>
+                            <a href="{% ifequal active 'users' %}#{% else %}{% url 'report_users' %}?{{ request.GET.urlencode }}{% endifequal %}">My Staff</a>
                         </li>
                         <li{% ifequal active 'users_projects' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}{% endifequal %}">My Staff and Projects</a>
+                            <a href="{% ifequal active 'users_projects' %}#{% else %}{% url 'report_users_projects' %}?{{ request.GET.urlencode }}{% endifequal %}">My Staff and Projects</a>
                         </li>
                         <li{% ifequal active 'users_activities' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'users_activities' %}#{% else %}{% url 'report_users_activities' %}{% endifequal %}">My Staff and Activities</a>
+                            <a href="{% ifequal active 'users_activities' %}#{% else %}{% url 'report_users_activities' %}?{{ request.GET.urlencode }}{% endifequal %}">My Staff and Activities</a>
                         </li>
                     {% endif %}
                 </ul>
