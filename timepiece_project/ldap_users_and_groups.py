@@ -123,6 +123,7 @@ def sync_users_and_groups():
 def preparedb():
     permissions = ['Can add entry', 'Can change entry', 'Can delete entry']
     permissions+= ['Can use Pendulum to clock in', 'Can use Pendulum to clock out', 'Can pause and unpause log entries']
+    permissions+= ['Can export project time sheet'] # can download reports
 #     for ldap_group in ldap_units:
     for ldap_group in ldap_groups_needed: # temporary solution waiting for AD exact groups
         group = _create_group(ldap_group)
@@ -130,12 +131,12 @@ def preparedb():
             p = Permission.objects.get(name=perm)
             group.permissions.add(p)
 
-    permissions = ['Can view entry summary page', 'Can export project time sheet'] # see special reports and download the CSV
-    for ldap_group in ldap_hous+ldap_director:
-        group = _create_group(ldap_group)
-        for perm in permissions:
-            p = Permission.objects.get(name=perm)
-            group.permissions.add(p)
+#     permissions = ['Can view entry summary page'] # see special reports
+#     for ldap_group in ldap_hous+ldap_director:
+#         group = _create_group(ldap_group)
+#         for perm in permissions:
+#             p = Permission.objects.get(name=perm)
+#             group.permissions.add(p)
 
 
 
