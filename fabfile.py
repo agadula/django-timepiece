@@ -53,6 +53,7 @@ def prod():
 
 # LOCAL COMMANDS
 def test():
+    '''runs all the tests'''
     with settings(warn_only=True):
         result = local("./run_tests.py")
     if result.failed and not confirm("Tests failed. Continue anyway?"):
@@ -67,17 +68,6 @@ def shell():
     else:
         with _virtualenv():
             run('python manage.py shell --settings='+env.settings_file )
-
-def commit():
-    local("git add -p && git commit")
-
-def push():
-    local("git push")
-
-def prepare_deploy():
-    #test()
-    commit()
-    push()
 
 
 # REMOTE COMMANDS
@@ -126,6 +116,7 @@ def apache_restart():
     run('sudo /etc/init.d/apache2 restart')
     
 def apache_errlog():
+    """ show the tail of Apache error.log on remote host """
     run('tail /var/log/apache2/error.log')
 
 def _create_user_in_db():
@@ -155,17 +146,21 @@ def _remove_db_if_exists():
             abort("Aborting at user request.")
 
 def createdb():
-    """Removes DB, creates user, creates db"""
+    """Removes DB, creates user, creates DB"""
     _remove_db_if_exists()
     _create_user_in_db()
     _create_db_on_linux()
 
 def backupdb():
     """Copy locally a DB backup"""
-    # pg_dump -U {user-name} {source_db} -f {dumpfilename.sql}
-    run('sudo -u postgres pg_dump {} > {}'.format(db_name, db_backup_file) )
-    get(db_backup_file, db_backup_file)
-    run("rm "+db_backup_file)
+    cmd = 'pg_dump {} > {}'.format(db_name, db_backup_file)
+    if env.environment == 'development':
+        local(cmd)
+    else:
+        # pg_dump -U {user-name} {source_db} -f {dumpfilename.sql}
+        run('sudo -u postgres '+cmd )
+        get(db_backup_file, db_backup_file)
+        run("rm "+db_backup_file)
 
 def restoredb():
     """Restores the db from the local backup file"""
@@ -185,9 +180,22 @@ def syncdb():
     with _virtualenv():
         run('python manage.py syncdb --settings='+env.settings_file )
 
+def obfuscatedb():
+    '''Randomizes the owner of each entry'''
+    require('settings_file', provided_by=('dev', 'stag', 'prod'))
+    cmd = 'python obfuscatedb.py --settings='+env.settings_file
+
+    if env.environment == 'development':
+        with lcd(env.project_path):
+            local(cmd)
+    else:
+        with _virtualenv():
+            run(cmd)
+
 def loaddata(fixture):
     with _virtualenv():
         run('python manage.py loaddata '+fixture+' --settings='+env.settings_file )
+
 
 def _ldap_users_and_groups(do):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
@@ -195,7 +203,7 @@ def _ldap_users_and_groups(do):
     cmd+= ' --settings='+env.settings_file
     cmd+= " --do="+do
     
-    if env.environment == 'development': 
+    if env.environment == 'development':
         with lcd(env.project_path):
             local(cmd)
     else:
@@ -203,32 +211,33 @@ def _ldap_users_and_groups(do):
             run(cmd)
 
 def ldap_users_and_groups_sync():
-    '''Prepares the needed Groups and Permissions. Creates Users and Groups if necessary, synchronises Users and Groups relations.'''
+    '''Runs ldap_users_and_groups_preparedb. Creates Users and Groups if necessary, synchronises Users and Groups relations.'''
     _ldap_users_and_groups('sync')
 
 def ldap_users_and_groups_preparedb():
-    '''Prepares the needed groups and permissions.'''
+    '''Prepares the needed Groups and Permissions.'''
     _ldap_users_and_groups('preparedb')
 
 def ldap_users_and_groups_test():
     _ldap_users_and_groups('test')
 
-def _user_to_projects(user=None, do=None, activity=None):
+
+def _user_to_activity(user=None, do=None, activity=None):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
-    cmd = 'python users_to_projects.py --settings='+env.settings_file
+    cmd = 'python user_to_activity.py --settings='+env.settings_file
     cmd+= " --user="+user+" --do="+do+" --activity="+activity
     
-    if env.environment == 'development': 
+    if env.environment == 'development':
         with lcd(env.project_path):
             local(cmd)
     else:
         with _virtualenv():
             run(cmd)
 
-def add_user_to_projects(user=None, activity=None):
-    """Add user to projects: e.g. fab prod add_user_to_projects:user=username,activity=1.1"""
-    _user_to_projects(user=user, do="add", activity=activity)
+def add_user_to_activity(user=None, activity=None):
+    """Add user to activity: e.g. fab prod add_user_to_activity:user=username,activity=1.1"""
+    _user_to_activity(user=user, do="add", activity=activity)
 
-def remove_user_from_projects(user=None, activity=None):
-    """Remove user from projects: e.g. fab prod remove_user_from_projects:user=username,activity=1.1"""
-    _user_to_projects(user=user, do="remove", activity=activity)
+def remove_user_from_activity(user=None, activity=None):
+    """Remove user from activity: e.g. fab prod remove_user_from_activity:user=username,activity=1.1"""
+    _user_to_activity(user=user, do="remove", activity=activity)
