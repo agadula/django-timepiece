@@ -7,11 +7,17 @@
             <div class="span12">
                 <h2>Reports</h2>
                 <ul class="nav nav-pills">
+                        <li{% ifequal active 'my_projects' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'my_projects' %}#{% else %}{% url 'report_my_projects' %}?{{ request.GET.urlencode }}{% endifequal %}">My Projects</a>
+                        </li>
+                        <li{% ifequal active 'my_activities' %} class="active"{% endifequal %}>
+                            <a href="{% ifequal active 'my_activities' %}#{% else %}{% url 'report_my_activities' %}?{{ request.GET.urlencode }}{% endifequal %}">My Activities</a>
+                        </li>
                         <li{% ifequal active 'projects' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'projects' %}#{% else %}{% url 'report_projects' %}?{{ request.GET.urlencode }}{% endifequal %}">Projects</a>
+                            <a href="{% ifequal active 'projects' %}#{% else %}{% url 'report_projects' %}?{{ request.GET.urlencode }}{% endifequal %}">Agency Projects</a>
                         </li>
                         <li{% ifequal active 'activities' %} class="active"{% endifequal %}>
-                            <a href="{% ifequal active 'activities' %}#{% else %}{% url 'report_activities' %}?{{ request.GET.urlencode }}{% endifequal %}">Activities</a>
+                            <a href="{% ifequal active 'activities' %}#{% else %}{% url 'report_activities' %}?{{ request.GET.urlencode }}{% endifequal %}">Agency Activities</a>
                         </li>
                     {% if perms.entries.view_entry_summary %}
                         <li{% ifequal active 'users' %} class="active"{% endifequal %}>

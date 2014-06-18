@@ -708,6 +708,39 @@ class UsersReport(OshaBaseReport):
         self.summaries.append(('By User', summary_by_user))
 
 
+class MyProjectsReport(OshaBaseReport):
+    @method_decorator(permission_required('entries.add_entry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_report_type(self):
+        return 'my_projects'
+
+    def run_report(self, context):
+        entries = context['entries'].filter(user=self.request.user)
+        date_headers = context['date_headers']
+
+        self.summaries.append(('By Project', get_project_totals(
+                entries.order_by('project__name', 'project__id', 'date'),
+                date_headers, 'total', total_column=True, by='project')))
+
+
+class MyActivitiesReport(OshaBaseReport):
+    @method_decorator(permission_required('entries.add_entry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_report_type(self):
+        return 'my_activities'
+
+    def run_report(self, context):
+        entries = context['entries'].filter(user=self.request.user)
+        date_headers = context['date_headers']
+        self.summaries.append(('By Activity', get_project_totals(
+                entries.order_by('project__business__name', 'project__business__id', 'date'),
+                date_headers, 'total', total_column=True, by='project__business__name')))
+
+
 class ProjectsReport(OshaBaseReport):
     @method_decorator(permission_required('entries.add_entry'))
     def dispatch(self, request, *args, **kwargs):
@@ -779,7 +812,6 @@ class UsersProjectsReport(OshaBaseReport):
                     context['date_headers'], 'total', total_column=True, by='user')
                 )
             )
-
 
 
 class OshaReport(ReportMixin, CSVViewMixin, TemplateView):

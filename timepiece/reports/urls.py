@@ -27,6 +27,14 @@ urlpatterns = patterns('',
         views.UsersActivitiesReport.as_view(),
         name='report_users_activities'),
 
+    url(r'^reports/my_projects/$',
+        views.MyProjectsReport.as_view(),
+        name='report_my_projects'),
+
+    url(r'^reports/my_activities/$',
+        views.MyActivitiesReport.as_view(),
+        name='report_my_activities'),
+
     url(r'^reports/osha/$',
         views.OshaReport.as_view(),
         name='report_osha'),
