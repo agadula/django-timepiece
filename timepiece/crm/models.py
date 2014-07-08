@@ -116,7 +116,7 @@ class TrackableProjectManager(models.Manager):
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     tracker_url = models.CharField(max_length=255, blank=True, null=False,
             default="")
     business = models.ForeignKey(
