@@ -30,25 +30,27 @@ def _virtualenv():
 def dev():
     """ use development environment on localhost"""
     env.environment = 'development'
-    env.activate = 'source /Users/simonegentilini/.virtualenvs/timepiece/bin/activate'
-    env.project_path = "/Users/simonegentilini/Dropbox/workspace/timepiece/timepiece_project"
+    env.activate = 'source ~/.virtualenvs/timepiece/bin/activate'
     env.settings_file = "settings.local"
+    CODE_PATH = os.path.dirname(os.path.realpath(__file__))
+    env.project_path = os.path.join(CODE_PATH, "timepiece_project")
+
+def _stag_and_prod():
+    env.activate = 'source /var/www/.virtualenvs/timepiece/bin/activate'
+    env.settings_file = "settings.production"
+    env.project_path = os.path.join(CODE_PATH, "timepiece_project")
 
 def stag():
     """ use staging environment on remote host"""
     env.environment = 'staging'
     env.hosts = ['root@192.168.141.235']
-    env.activate = 'source /var/www/.virtualenvs/timepiece/bin/activate'
-    env.project_path = "/var/www/django/timepiece/timepiece_project"
-    env.settings_file = "settings.production"
+    _stag_and_prod()
 
 def prod():
     """ use production environment on remote host"""
     env.environment = 'production'
     env.hosts = ['root@192.168.141.11']
-    env.activate = 'source /var/www/.virtualenvs/timepiece/bin/activate'
-    env.project_path = "/var/www/django/timepiece/timepiece_project"
-    env.settings_file = "settings.production"
+    _stag_and_prod()
 
 
 # LOCAL COMMANDS
@@ -177,14 +179,19 @@ def restoredb():
         run("rm "+db_backup_file)
 
 def syncdb():
-    with _virtualenv():
-        run('python manage.py syncdb --settings='+env.settings_file )
+    require('settings_file', provided_by=('dev', 'stag', 'prod'))
+    cmd = 'python manage.py syncdb --settings='+env.settings_file
+    if env.environment == 'development':
+        with lcd(env.project_path):
+            local(cmd)
+    else:
+        with _virtualenv():
+            run(cmd)
 
 def obfuscatedb():
     '''Randomizes the owner of each entry'''
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
     cmd = 'python obfuscatedb.py --settings='+env.settings_file
-
     if env.environment == 'development':
         with lcd(env.project_path):
             local(cmd)
@@ -202,7 +209,6 @@ def _ldap_users_and_groups(do):
     cmd = 'python ldap_users_and_groups.py'
     cmd+= ' --settings='+env.settings_file
     cmd+= " --do="+do
-    
     if env.environment == 'development':
         with lcd(env.project_path):
             local(cmd)
@@ -226,7 +232,6 @@ def _user_to_activity(user=None, do=None, activity=None):
     require('settings_file', provided_by=('dev', 'stag', 'prod'))
     cmd = 'python user_to_activity.py --settings='+env.settings_file
     cmd+= " --user="+user+" --do="+do+" --activity="+activity
-    
     if env.environment == 'development':
         with lcd(env.project_path):
             local(cmd)
