@@ -2,52 +2,25 @@ from django.conf.urls import patterns, url
 from timepiece.reports import views
 
 
+def create_pattern(class_obj):
+    report_filter, report_type = views.split_report_class(class_obj)
+    regex = r'^reports/'+report_type+'/'+report_filter+'/$' # r'^reports/users_and_activities/agency/$'
+    view = class_obj.as_view()
+    url_name='report_'+report_filter+'_'+report_type # 'report_agency_users_and_activities'
+    # url(regex, view, kwargs=None, name=None, prefix='')
+    return url(regex, view, name=url_name)
+
+
 urlpatterns = patterns('',
-    url(r'^reports/hourly/$',
-        views.HourlyReport.as_view(),
-        name='report_hourly'),
-
-    url(r'^reports/users/$',
-        views.UsersReport.as_view(),
-        name='report_users'),
-
-    url(r'^reports/projects/$',
-        views.ProjectsReport.as_view(),
-        name='report_projects'),
-
-    url(r'^reports/activities/$',
-        views.ActivitiesReport.as_view(),
-        name='report_activities'),
-
-    url(r'^reports/users_projects/$',
-        views.UsersProjectsReport.as_view(),
-        name='report_users_projects'),
-
-    url(r'^reports/users_activities/$',
-        views.UsersActivitiesReport.as_view(),
-        name='report_users_activities'),
-
-    url(r'^reports/my_projects/$',
-        views.MyProjectsReport.as_view(),
-        name='report_my_projects'),
-
-    url(r'^reports/my_activities/$',
-        views.MyActivitiesReport.as_view(),
-        name='report_my_activities'),
-
-    url(r'^reports/osha/$',
-        views.OshaReport.as_view(),
-        name='report_osha'),
-
-    url(r'^reports/payroll/$',
-        views.report_payroll_summary,
-        name='report_payroll_summary'),
-
-    url(r'^reports/billable_hours/$',
-        views.BillableHours.as_view(),
-        name='report_billable_hours'),
-
-    url(r'^reports/productivity/$',
-        views.report_productivity,
-        name='report_productivity'),
+#     url(r'^reports/users_and_activities/my/$',
+#         views.MyUsersAndActivitiesReport.as_view(),
+#         name='report_my_users_and_activities'),
+# 
+#     url(r'^reports/users_and_activities/agency/$',
+#         views.AgencyUsersAndActivitiesReport.as_view(),
+#         name='report_agency_users_and_activities'),
 )
+
+
+for class_obj in views.get_report_classes():
+    urlpatterns += patterns('', create_pattern(class_obj), )

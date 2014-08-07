@@ -8,13 +8,7 @@ timepiece_ldap_user_dn = "CN=Django Timepiece,OU=Special Users,OU=Agency Users,D
 timepiece_ldap_password = "Cowboy1234"
 base_dn= "OU=Agency Staff,OU=Agency Users,DC=agency,DC=dom"
 
-# LDAP GROUPS NEEDED IN TIMEPIECE
-ldap_director = 'G-DIR'.split()
-ldap_units = 'G-INF G-NET G-PRU G-ADM'.split()
-ldap_hous = 'GD-HoU-CPU GD-HoU-NET GD-HoU-PRU GD-HoU-RSC'.split()
-ldap_sections = 'G-ICT G-WebTeam G-HHRR'.split()
-ldap_groups_needed = ldap_units+ldap_sections+ldap_hous+ldap_director
-
+ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
 
 
 def test():
@@ -91,6 +85,30 @@ def _create_group(group_name):
     return group
 
 
+def _reset_permission(codename):
+    try:
+        p = Permission.objects.get(codename=codename)
+        p.delete()
+        print 'INFO: Permission '+p.codename+' deleted'
+    except ObjectDoesNotExist:
+        pass
+    return _create_permission(codename)
+
+
+def _create_permission(codename):
+    base_p = Permission.objects.get(codename='add_entry')
+    try:
+        p = Permission.objects.get(codename=codename)
+    except ObjectDoesNotExist:
+        p = Permission()
+        p.codename = codename
+        p.name = codename.replace('_',' ')
+        p.content_type = base_p.content_type
+        p.save()
+        print 'INFO: Permission '+p.codename+' created'
+    return p
+
+
 def sync_users_and_groups():
     preparedb()
     ldap_users = get_ldap_users()
@@ -120,23 +138,63 @@ def sync_users_and_groups():
             print 'INFO: '+user.username+' now belongs to :'+str(new_groups)+', previously was:'+str(old_groups)
 
 
-def preparedb():
-    permissions = ['Can add entry', 'Can change entry', 'Can delete entry']
-    permissions+= ['Can use Pendulum to clock in', 'Can use Pendulum to clock out', 'Can pause and unpause log entries']
-    permissions+= ['Can export project time sheet'] # can download reports
-#     for ldap_group in ldap_units:
-    for ldap_group in ldap_groups_needed: # temporary solution waiting for AD exact groups
-        group = _create_group(ldap_group)
-        for perm in permissions:
-            p = Permission.objects.get(name=perm)
-            group.permissions.add(p)
 
-#     permissions = ['Can view entry summary page'] # see special reports
-#     for ldap_group in ldap_hous+ldap_director:
-#         group = _create_group(ldap_group)
-#         for perm in permissions:
-#             p = Permission.objects.get(name=perm)
-#             group.permissions.add(p)
+def _give_permission_to_groups(perm, groups):
+    for group_name in groups:
+        group = Group.objects.get(name=group_name)
+        group.permissions.add(perm)
+        print 'INFO: Permission '+perm.codename+' given to '+group_name
+
+
+def _give_permission_to_users(perm, users):
+    for user_name in users:
+        user = User.objects.get(username=user_name)
+        user.user_permissions.add(perm)
+        print 'INFO: Permission '+perm.codename+' given to '+user_name
+
+
+def preparedb():
+    # set basic permissions
+    basic_perms = ['add_entry', 'change_entry', 'delete_entry']
+    basic_perms+= ['can_clock_in', 'can_clock_out', 'can_pause']
+    basic_perms+= ['can_download_report'] # can download reports
+
+    for ldap_group in ldap_units+['G-DIR', 'G-ICT']: # TO FIX!
+        group = _create_group(ldap_group)
+        for perm in basic_perms:
+            p = _create_permission(perm)
+            group.permissions.add(p)
+        print 'INFO: Basic Permissions given to '+group.name
+
+    # reset (delete+set) special reports permissions, groups and users must exist
+    see_all_reports_groups = ['G-DIR']
+    see_all_reports_users = ['baillph', 'marigca', 'ruiznoe']
+    reports_permissions_map = [
+        # (report filter, groups, users)
+        ('cpu', ['GD-HoU-CPU'], [] ),
+        ('net', ['GD-HoU-NET'], [] ),
+        ('pru', ['GD-HoU-PRU'], [] ),
+        ('rsc', ['GD-HoU-RSC'], [] ),
+        ('ict', [], ['guillal'] ),
+    ]
+
+    view_some_report = _reset_permission('view_some_report') # basic special reports permission
+    _give_permission_to_groups(view_some_report, see_all_reports_groups)
+    _give_permission_to_users(view_some_report, see_all_reports_users)
+
+    for report_permission in reports_permissions_map:
+        report_filter, groups, users = report_permission
+        perm = 'view_'+report_filter+'_report'
+        p = _reset_permission(perm)
+        # give basic special reports permission
+        _give_permission_to_groups(view_some_report, groups)
+        _give_permission_to_users(view_some_report, users)
+        
+        # give specific special report permissions and groups/user that can see all reports get all the permissions
+        groups+=see_all_reports_groups
+        users+=see_all_reports_users
+        _give_permission_to_groups(p, groups)
+        _give_permission_to_users(p, users)
 
 
 

@@ -1,86 +1,27 @@
 {% extends "timepiece/reports/osha_base.html" %}
-{% load timepiece_tags bootstrap_toolkit %}
+{% load timepiece_tags %}
 {% load url from future %}
-
-{% block title %}Osha Report{% endblock title %}
 
 {% block extrajs %}
     {{ pj_filters.media }}
 {% endblock extrajs %}
 
-{% block bodyid %}{{ report_type }}{% endblock bodyid %}
+{% block bodyid %}{{ curr_type }}{% endblock bodyid %}
+
 
 {% block report_nav %}
-    {% with report_type as active %}
-        {{ block.super }}
-    {% endwith %}
-{% endblock report_nav %}
-
-{% block report_content %}
-    <div class="row-fluid">
-        <div class="span12">
-            {% date_filters "report-filters" %}
-        </div>
-    </div>
-
-    <div class="row-fluid">
-        <div class="row-fluid">
-            <form class="span12 form-horizontal" method="get" action="" id="report-filters" accept-charset="utf-8">
-                {{ filter_form|as_bootstrap:"horizontal" }}
-                <button type="submit" class="btn btn-primary" name="ok" id="billable">Update Filters</button>
-                {% if perms.crm.export_project_time_sheet %}
-                    <button type="submit" class="btn" name="export" value="True">Download CSV <i class="icon-download-alt"></i></button>
+<div class="row-fluid">
+    <div class="span12">
+        <h2>{{ nice_type|title }} Reports</h2>
+        <ul class="nav nav-pills">
+            {% for filter in report_filters %}
+                {% if filter.visible %}
+                <li{% ifequal curr_name filter.name|report_name:curr_type %} class=active{% endifequal %}>
+                    <a href="{% ifequal curr_name filter.name|report_name:curr_type %}#{% else %}{% url filter.name|report_url:curr_type %}?{{ request.GET.urlencode }}{% endifequal %}">{{ filter.name|upper }} {% ifequal filter.name 'my' %} Data {% endifequal %}</a>
+                </li>
                 {% endif %}
-            </form>
-        </div>
-    </div>
-
-    <div class="row-fluid">
-        <div class="span12">
-            {% for title, summary in summaries %}
-                <h3>{{ title }}</h3>
-                <table class="table table-bordered table-striped table-condensed">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            {% for date in range_headers %}
-                                <th>
-                                    {% if trunc == 'day' %}
-                                        {{ date|date:'M j' }}
-                                    {% elif trunc == 'year' %}
-                                        {{ date.0|date:'M j' }} - {{ date.1|date:'M j Y' }}
-                                    {% elif date.0 == date.1 %}
-                                        {{ date.0|date:'M j' }}
-                                    {% else %}
-                                        {{ date.0|date:'M j' }} - {{ date.1|date:'M j' }}
-                                    {% endif %}
-                                </th>
-                            {% endfor %}
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for rows, totals in summary %}
-                            {% for name, pk, hours in rows %}
-                                <tr>
-                                    <th>{{ name }}</th>
-                                    {% for num in hours %}
-                                        <td class="hours" title="{{ name }}">{{ num|floatformat:2 }}</td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                            <tr class="total">
-                                <th>Total</th>
-                                {% for total in totals %}
-                                    <td class="hours">{{ total|floatformat:2 }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% empty %}
-                <p>No entries found.</p>
             {% endfor %}
-        </div>
+        </ul>
     </div>
-{% endblock report_content %}
+</div>
+{% endblock report_nav %}

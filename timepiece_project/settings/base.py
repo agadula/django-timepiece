@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     'compressor',
     'bootstrap_toolkit',
     'selectable',
+    'django_extensions',
 )
 
 # A sample logging configuration. The only tangible logging

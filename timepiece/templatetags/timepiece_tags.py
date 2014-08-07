@@ -230,3 +230,14 @@ def user_timesheet_url(user_id, date=None):
 def week_start(date):
     """Return the starting day of the week with the given date."""
     return utils.get_week_start(date)
+
+
+@register.filter
+def report_name(prefix, category):
+    """Return the full report type."""
+    return prefix+'_'+category # e.g. my_activities
+
+@register.filter
+def report_url(prefix, category):
+    """Return the full report type."""
+    return 'report_'+prefix+'_'+category # e.g. report_my_activities

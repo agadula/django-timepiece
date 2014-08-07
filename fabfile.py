@@ -71,6 +71,13 @@ def shell():
         with _virtualenv():
             run('python manage.py shell --settings='+env.settings_file )
 
+def shell_plus():
+    if env.environment == 'development':
+        local("python timepiece_project/manage.py shell_plus --ipython")
+    else:
+        with _virtualenv():
+            run('python manage.py shell_plus --ipython --settings='+env.settings_file )
+
 
 # REMOTE COMMANDS
 def deploy():
