@@ -7,8 +7,8 @@ AUTH_LDAP_SERVER_URI = "ldap://192.168.141.2"
 
 AUTH_LDAP_BIND_DN = "CN=Django Timepiece,OU=Special Users,OU=Agency Users,DC=agency,DC=dom"
 AUTH_LDAP_BIND_PASSWORD = "Cowboy1234"
-AUTH_LDAP_USER_SEARCH = LDAPSearch("OU=Agency Staff,OU=Agency Users,DC=agency,DC=dom",
-    ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
+AUTH_LDAP_USER_SEARCH_BASEDN = "OU=Agency Staff,OU=Agency Users,DC=agency,DC=dom"
+AUTH_LDAP_USER_SEARCH = LDAPSearch(AUTH_LDAP_USER_SEARCH_BASEDN, ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
 # or perhaps:
 # AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=users,dc=example,dc=com"
 

@@ -3,13 +3,6 @@ import argparse
 import ldap
 
 
-ldap_server="192.168.141.2"
-timepiece_ldap_user_dn = "CN=Django Timepiece,OU=Special Users,OU=Agency Users,DC=agency,DC=dom"
-timepiece_ldap_password = "Cowboy1234"
-base_dn= "OU=Agency Staff,OU=Agency Users,DC=agency,DC=dom"
-
-ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
-
 
 def test():
     user_dn = get_user_dn(username = "gentisi")
@@ -21,12 +14,12 @@ def test():
 def get_user_dn(username):
     connect = ldap.open(ldap_server)
     connect.bind_s(timepiece_ldap_user_dn,timepiece_ldap_password)
-    search_filter = "(&(objectclass=user)(sAMAccountName="+username+"))"    
+    search_filter = "(&(objectclass=user)(sAMAccountName="+username+"))"
     result = connect.search_s(base_dn,ldap.SCOPE_SUBTREE,search_filter)
     connect.unbind_s()
     return result[0][0]
 
-def get_ldap_users():
+def get_users_from_ldap_users():
     connect = ldap.open(ldap_server)
     connect.bind_s(timepiece_ldap_user_dn,timepiece_ldap_password)
     search_filter = "(objectclass=user)"    
@@ -111,31 +104,31 @@ def _create_permission(codename):
 
 def sync_users_and_groups():
     preparedb()
-    ldap_users = get_ldap_users()
-    print 'INFO: '+str(len(ldap_users))+' users found in LDAP'
-    for ldap_user in ldap_users:
+    users = get_users_from_ldap_users()
+    print 'INFO: '+str(len(users))+' users found in LDAP'
+    for user in users:
         try:
-            user = User.objects.get(username=ldap_user['username'])
+            u = User.objects.get(username=user['username'])
         except ObjectDoesNotExist:
-            user = User.objects.create_user(ldap_user['username'])
-            if ldap_user['first_name'] is not None:
-                user.first_name = ldap_user['first_name']
-            if ldap_user['last_name'] is not None:
-                user.last_name = ldap_user['last_name']
-            user.save()
-            print 'INFO: User '+ldap_user['username']+' created'
+            u = User.objects.create_user(user['username'])
+            if user['first_name'] is not None:
+                u.first_name = user['first_name']
+            if user['last_name'] is not None:
+                u.last_name = user['last_name']
+            u.save()
+            print 'INFO: User '+user['username']+' created'
 
-        old_groups = user.groups.order_by('name')
+        old_groups = u.groups.order_by('name')
         old_groups_set = set(old_groups)
-        user.groups.clear()
-        for group_name in ldap_user['groups']:
+        u.groups.clear()
+        for group_name in user['groups']:
             group = _create_group(group_name)
-            user.groups.add(group)
+            u.groups.add(group)
 
-        new_groups = user.groups.order_by('name')
+        new_groups = u.groups.order_by('name')
         new_groups_set = set(new_groups)
         if old_groups_set <> new_groups_set:
-            print 'INFO: '+user.username+' now belongs to :'+str(new_groups)+', previously was:'+str(old_groups)
+            print 'INFO: '+u.username+' now belongs to :'+str(new_groups)+', previously was:'+str(old_groups)
 
 
 
@@ -209,6 +202,15 @@ if __name__ == "__main__":
     from django.contrib.auth.models import User, Group, Permission
     from django.db import connection
     from django.core.exceptions import ObjectDoesNotExist
+    from django.conf import settings
+
+
+    ldap_server = getattr(settings, "AUTH_LDAP_SERVER_URI", None).replace('ldap://','')
+    timepiece_ldap_user_dn = getattr(settings, "AUTH_LDAP_BIND_DN", None)
+    timepiece_ldap_password = getattr(settings, "AUTH_LDAP_BIND_PASSWORD", None)
+    base_dn = getattr(settings, "AUTH_LDAP_USER_SEARCH_BASEDN", None)
+
+    ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
 
     if args.do == "sync": sync_users_and_groups()
     if args.do == "preparedb": preparedb()
