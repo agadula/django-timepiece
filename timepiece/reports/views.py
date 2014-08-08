@@ -354,8 +354,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
         else:
             user = self.request.user
             if user.has_perm('entries.view_some_report'):
-#                 if user.has_perm('entries.view_all_report') or report_filter=='my':
-                if report_filter=='my':
+                if user.has_perm('entries.view_all_report') or report_filter=='my':
                     result = True
                 else:
                     permission = 'entries.view_'+report_filter+'_report' # view_cpu_report
