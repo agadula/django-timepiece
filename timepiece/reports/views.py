@@ -682,7 +682,7 @@ class IctReportMixin():
         return 'ict'
 
     def accessible_users(self):
-        return User.objects.filter(groups__name__in=['G-ICT']).distinct().order_by('last_name')
+        return User.objects.filter(groups__name__in=['G-ABB-ICT']).distinct().order_by('last_name')
 
 
 class IctProjectsReport(ProjectsReportMixin, IctReportMixin):

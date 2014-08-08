@@ -224,10 +224,10 @@ def _ldap_users_and_groups(do):
             run(cmd)
 
 def ldap_users_and_groups_sync():
-    '''Runs ldap_users_and_groups_preparedb. Creates Users and Groups if necessary, synchronises Users and Groups relations.'''
+    '''Creates Users and Groups if necessary, synchronises Users and Groups relations. Runs ldap_users_and_groups_prepare_permissions_and_groups.'''
     _ldap_users_and_groups('sync')
 
-def ldap_users_and_groups_preparedb():
+def ldap_users_and_groups_prepare_permissions_and_groups():
     '''Prepares the needed Groups and Permissions.'''
     _ldap_users_and_groups('preparedb')
 

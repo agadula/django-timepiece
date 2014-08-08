@@ -47,7 +47,6 @@ def get_users_from_ldap_users():
                         cn, group = elem.split('=')
                         groups.append(group)
 
-
         user = {}
         user['username'] = username
         user['first_name'] = first_name
@@ -56,7 +55,7 @@ def get_users_from_ldap_users():
         user['groups'] = groups
         users.append(user)
         if not user_belongs_to_a_unit(user):
-            print 'WARNING: '+user['username']+' is not assigned to any unit'
+            print 'WARNING: '+user['username']+' is not assigned to any unit of '+str(ldap_units)
     return users
 
 
@@ -103,7 +102,6 @@ def _create_permission(codename):
 
 
 def sync_users_and_groups():
-    preparedb()
     users = get_users_from_ldap_users()
     print 'INFO: '+str(len(users))+' users found in LDAP'
     for user in users:
@@ -128,8 +126,10 @@ def sync_users_and_groups():
         new_groups = u.groups.order_by('name')
         new_groups_set = set(new_groups)
         if old_groups_set <> new_groups_set:
-            print 'INFO: '+u.username+' now belongs to :'+str(new_groups)+', previously was:'+str(old_groups)
-
+            print 'INFO: '+u.username
+            print 'now: '+str(new_groups)
+            print 'was: '+str(old_groups)
+    prepare_permissions_and_groups()
 
 
 def _give_permission_to_groups(perm, groups):
@@ -146,29 +146,29 @@ def _give_permission_to_users(perm, users):
         print 'INFO: Permission '+perm.codename+' given to '+user_name
 
 
-def preparedb():
+def prepare_permissions_and_groups():
     # set basic permissions
     basic_perms = ['add_entry', 'change_entry', 'delete_entry']
     basic_perms+= ['can_clock_in', 'can_clock_out', 'can_pause']
     basic_perms+= ['can_download_report'] # can download reports
 
-    for ldap_group in ldap_units+['G-DIR', 'G-ICT']: # TO FIX!
-        group = _create_group(ldap_group)
+    for ldap_group in ldap_units:
+        group = Group.objects.get(name=ldap_group)
         for perm in basic_perms:
             p = _create_permission(perm)
             group.permissions.add(p)
         print 'INFO: Basic Permissions given to '+group.name
 
     # reset (delete+set) special reports permissions, groups and users must exist
-    see_all_reports_groups = ['G-DIR']
-    see_all_reports_users = ['baillph', 'marigca', 'ruiznoe']
+    see_all_reports_groups = ['G-ABB-DIRECTOR', 'G-ABB-ADMIN-HR', 'G-ABB-ADMIN-FIN']
+    see_all_reports_users = []
     reports_permissions_map = [
         # (report filter, groups, users)
-        ('cpu', ['GD-HoU-CPU'], [] ),
-        ('net', ['GD-HoU-NET'], [] ),
-        ('pru', ['GD-HoU-PRU'], [] ),
-        ('rsc', ['GD-HoU-RSC'], [] ),
-        ('ict', [], ['guillal'] ),
+        ('cpu', ['G-ABB-HOU-CPU'], [] ),
+        ('net', ['G-ABB-DIRECTOR'], [] ),
+        ('pru', ['G-ABB-HOU-PRU'], [] ),
+        ('rsc', ['G-ABB-HOU-RSC'], [] ),
+        ('ict', ['G-ABB-ICT'], [] ),
     ]
 
     view_some_report = _reset_permission('view_some_report') # basic special reports permission
@@ -213,5 +213,5 @@ if __name__ == "__main__":
     ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
 
     if args.do == "sync": sync_users_and_groups()
-    if args.do == "preparedb": preparedb()
+    if args.do == "preparedb": prepare_permissions_and_groups()
     if args.do == "test": test()
