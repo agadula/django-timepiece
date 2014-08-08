@@ -160,21 +160,19 @@ def prepare_permissions_and_groups():
         print 'INFO: Basic Permissions given to '+group.name
 
     # reset (delete+set) special reports permissions, groups and users must exist
-    see_all_reports_groups = ['G-ABB-DIRECTOR', 'G-ABB-ADMIN-HR', 'G-ABB-ADMIN-FIN']
-    see_all_reports_users = []
     reports_permissions_map = [
         # (report filter, groups, users)
+        ('all', ['G-ABB-DIRECTOR', 'G-ABB-ADMIN-HR', 'G-ABB-ADMIN-FIN'], [] ),
         ('cpu', ['G-ABB-HOU-CPU'], [] ),
         ('net', ['G-ABB-DIRECTOR'], [] ),
         ('pru', ['G-ABB-HOU-PRU'], [] ),
         ('rsc', ['G-ABB-HOU-RSC'], [] ),
         ('ict', ['G-ABB-ICT'], [] ),
     ]
+    see_all_reports_groups = reports_permissions_map[0][1]
+    see_all_reports_users = reports_permissions_map[0][2]
 
     view_some_report = _reset_permission('view_some_report') # basic special reports permission
-    _give_permission_to_groups(view_some_report, see_all_reports_groups)
-    _give_permission_to_users(view_some_report, see_all_reports_users)
-
     for report_permission in reports_permissions_map:
         report_filter, groups, users = report_permission
         perm = 'view_'+report_filter+'_report'
@@ -183,9 +181,10 @@ def prepare_permissions_and_groups():
         _give_permission_to_groups(view_some_report, groups)
         _give_permission_to_users(view_some_report, users)
         
-        # give specific special report permissions and groups/user that can see all reports get all the permissions
-        groups+=see_all_reports_groups
-        users+=see_all_reports_users
+        # give specific special report permissions
+        if report_permission != 'all': #  groups/user that can see all reports get all the permissions
+            groups+=see_all_reports_groups
+            users+=see_all_reports_users
         _give_permission_to_groups(p, groups)
         _give_permission_to_users(p, users)
 
