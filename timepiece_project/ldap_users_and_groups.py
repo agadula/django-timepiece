@@ -167,7 +167,7 @@ def prepare_permissions_and_groups():
         ('net', ['G-ABB-DIRECTOR'], [] ),
         ('pru', ['G-ABB-HOU-PRU'], [] ),
         ('rsc', ['G-ABB-HOU-RSC'], [] ),
-        ('ict', ['G-ABB-ICT'], [] ),
+        ('ict', ['G-ABB-ICT-COORD'], [] ),
     ]
     see_all_reports_groups = reports_permissions_map[0][1]
     see_all_reports_users = reports_permissions_map[0][2]
