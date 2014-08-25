@@ -20,7 +20,10 @@ def date_totals(entries, by):
             name = ' '.join((d_entries[0]['user__first_name'],
                     d_entries[0]['user__last_name']))
         elif by == 'project':
-            name = d_entries[0]['project__name']
+#             name = d_entries[0]['project__name']
+            project_name = d_entries[0]['project__name']
+            business_name = d_entries[0]['project__business__name']
+            name = business_name+' - '+project_name
         else:
             name = d_entries[0][by]
 

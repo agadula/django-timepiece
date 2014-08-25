@@ -19,6 +19,7 @@ from timepiece import utils
 from timepiece.utils.csv import CSVViewMixin, DecimalEncoder
 
 from timepiece.entries.models import Entry, ProjectHours, SimpleEntry
+from timepiece.crm.models import Project
 from timepiece.reports.forms import BillableHoursReportForm, HourlyReportForm,\
         ProductivityReportForm, PayrollSummaryReportForm, OshaReportForm
 from timepiece.reports.utils import get_project_totals, get_payroll_totals,\
@@ -380,7 +381,7 @@ class ProjectsReportMixin(OshaBaseReport):
         date_headers = context['date_headers']
 
         self.summaries.append(('By Project', get_project_totals(
-                entries.order_by('project__name', 'project__id', 'date'),
+                entries.order_by('project__business__name', 'project__business__id', 'project__name', 'project__id', 'date'),
                 date_headers, 'total', total_column=True, by='project')))
 
 
@@ -453,12 +454,13 @@ class UsersAndProjectsReportMixin(OshaBaseReport):
 
     def run_report(self, context):
         entries = context['entries'].filter(user__in=self.accessible_users() )
-        entries = entries.order_by('project__name',
+        entries = entries.order_by('project__business__name', 'project__business__id', 'project__name',
                 'project__id', 'user__last_name', 'user__id', 'date')
 
         func = lambda x: x['project__name']
         for label, group in groupby(entries, func):
-            title = 'Project: ' + label
+            p = Project.objects.get(name=label)
+            title = p.business.name+' - '+label
             self.summaries.append(
                 (title, get_project_totals(
                     list(group),
