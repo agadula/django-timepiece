@@ -27,10 +27,10 @@ from timepiece.reports.utils import get_project_totals, get_payroll_totals,\
 
 class ReportMixin(object):
     """Common data for the Hourly & Billable Hours reports."""
-# 
-#     @method_decorator(permission_required('entries.view_all_report'))
-#     def dispatch(self, request, *args, **kwargs):
-#         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+    @method_decorator(permission_required('entries.add_entry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Processes form data to get relevant entries & date_headers."""
@@ -372,10 +372,6 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
 
 
 class ProjectsReportMixin(OshaBaseReport):
-    @method_decorator(permission_required('entries.add_entry'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
-
     def get_report_type(self):
         return 'projects'
 
@@ -389,10 +385,6 @@ class ProjectsReportMixin(OshaBaseReport):
 
 
 class ActivitiesReportMixin(OshaBaseReport):
-    @method_decorator(permission_required('entries.add_entry'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
-
     def get_report_type(self):
         return 'activities'
 
@@ -459,7 +451,7 @@ class UsersAndProjectsReportMixin(OshaBaseReport):
     def get_report_type(self):
         return 'users_and_projects'
 
-    def run_report(self, context):        
+    def run_report(self, context):
         entries = context['entries'].filter(user__in=self.accessible_users() )
         entries = entries.order_by('project__name',
                 'project__id', 'user__last_name', 'user__id', 'date')
@@ -542,13 +534,19 @@ class AgencyActivitiesReport(ActivitiesReportMixin, AgencyReportMixin):
     pass
 
 class AgencyUsersReport(UsersReportMixin, AgencyReportMixin):
-    pass
+    @method_decorator(permission_required('entries.view_agency_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class AgencyUsersAndActivitiesReport(UsersAndActivitiesReportMixin, AgencyReportMixin):
-    pass
+    @method_decorator(permission_required('entries.view_agency_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class AgencyUsersAndProjectsReport(UsersAndProjectsReportMixin, AgencyReportMixin):
-    pass
+    @method_decorator(permission_required('entries.view_agency_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 
 
@@ -557,7 +555,7 @@ class CpuReportMixin():
         return 'cpu'
 
     def accessible_users(self):
-        return User.objects.filter(groups__name__in=['G-INF','G-ICT']).distinct().order_by('last_name')
+        return User.objects.filter(groups__name__in=['G-INF']).distinct().order_by('last_name')
 
 
 class CpuProjectsReport(ProjectsReportMixin, CpuReportMixin):
@@ -588,7 +586,7 @@ class NetReportMixin():
         return 'net'
 
     def accessible_users(self):
-        return User.objects.filter(groups__name__in=['G-NET','G-DIR']).distinct().order_by('last_name')
+        return User.objects.filter(groups__name__in=['G-NET']).distinct().order_by('last_name')
 
 
 class NetProjectsReport(ProjectsReportMixin, NetReportMixin):

@@ -147,11 +147,7 @@ def _give_permission_to_users(perm, users):
 
 
 def prepare_permissions_and_groups():
-    # set basic permissions
-    basic_perms = ['add_entry', 'change_entry', 'delete_entry']
-    basic_perms+= ['can_clock_in', 'can_clock_out', 'can_pause']
-    basic_perms+= ['can_download_report'] # can download reports
-
+    # give basic permissions to all units
     for ldap_group in ldap_units:
         group = Group.objects.get(name=ldap_group)
         for perm in basic_perms:
@@ -159,32 +155,23 @@ def prepare_permissions_and_groups():
             group.permissions.add(p)
         print 'INFO: Basic Permissions given to '+group.name
 
-    # reset (delete+set) special reports permissions, groups and users must exist
-    reports_permissions_map = [
-        # (report filter, groups, users)
-        ('all', ['G-ABB-DIRECTOR', 'G-ABB-ADMIN-HR', 'G-ABB-ADMIN-FIN'], [] ),
-        ('cpu', ['G-ABB-HOU-CPU'], [] ),
-        ('net', ['G-ABB-DIRECTOR'], [] ),
-        ('pru', ['G-ABB-HOU-PRU'], [] ),
-        ('rsc', ['G-ABB-HOU-RSC'], [] ),
-        ('ict', ['G-ABB-ICT-COORD'], [] ),
-    ]
-    see_all_reports_groups = reports_permissions_map[0][1]
-    see_all_reports_users = reports_permissions_map[0][2]
+    # reset (delete+set) special reports permissions. Groups and Users must exist
+    see_all_special_reports_groups = special_reports_perms[0][1]
+    see_all_special_reports_users = special_reports_perms[0][2]
 
-    view_some_report = _reset_permission('view_some_report') # basic special reports permission
-    for report_permission in reports_permissions_map:
+    view_some_special_reports = _reset_permission(basic_special_reports_perm)
+    for report_permission in special_reports_perms:
         report_filter, groups, users = report_permission
         perm = 'view_'+report_filter+'_report'
         p = _reset_permission(perm)
         # give basic special reports permission
-        _give_permission_to_groups(view_some_report, groups)
-        _give_permission_to_users(view_some_report, users)
+        _give_permission_to_groups(view_some_special_reports, groups)
+        _give_permission_to_users(view_some_special_reports, users)
         
         # give specific special report permissions
-        if report_permission != 'all': #  groups/user that can see all reports get all the permissions
-            groups+=see_all_reports_groups
-            users+=see_all_reports_users
+        if report_permission != 'agency': #  groups/user that can see agency reports get all the permissions
+            groups+=see_all_special_reports_groups
+            users+=see_all_special_reports_users
         _give_permission_to_groups(p, groups)
         _give_permission_to_users(p, users)
 
@@ -203,13 +190,31 @@ if __name__ == "__main__":
     from django.core.exceptions import ObjectDoesNotExist
     from django.conf import settings
 
-
+    # PERMISSIONS AND GROUPS CONFIGURATION
     ldap_server = getattr(settings, "AUTH_LDAP_SERVER_URI", None).replace('ldap://','')
     timepiece_ldap_user_dn = getattr(settings, "AUTH_LDAP_BIND_DN", None)
     timepiece_ldap_password = getattr(settings, "AUTH_LDAP_BIND_PASSWORD", None)
     base_dn = getattr(settings, "AUTH_LDAP_USER_SEARCH_BASEDN", None)
 
     ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
+    
+    # basic permissions
+    basic_perms = ['add_entry', 'change_entry', 'delete_entry']
+    basic_perms+= ['can_clock_in', 'can_clock_out', 'can_pause']
+    basic_perms+= ['can_download_report'] # can download reports
+
+    # special reports premissions
+    basic_special_reports_perm = 'view_some_report' # to show the menu item in the top menu
+    special_reports_perms = [
+        # (report filter, groups, users)
+        ('agency', ['G-ABB-DIRECTOR', 'G-ABB-ADMIN-HR', 'G-ABB-ADMIN-FIN'], [] ),
+        ('cpu', ['G-ABB-HOU-CPU'], [] ),
+        ('net', ['G-ABB-DIRECTOR'], [] ),
+        ('pru', ['G-ABB-HOU-PRU'], [] ),
+        ('rsc', ['G-ABB-HOU-RSC'], [] ),
+        ('ict', ['G-ABB-ICT-COORD'], [] ),
+    ]
+
 
     if args.do == "sync": sync_users_and_groups()
     if args.do == "preparedb": prepare_permissions_and_groups()
