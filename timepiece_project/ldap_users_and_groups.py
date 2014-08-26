@@ -37,7 +37,8 @@ def get_users_from_ldap_users():
         try: last_name = ldap_user_info["sn"][0]
         except: last_name = None
         email = ldap_user_info["mail"][0]
-        ldap_groups = ldap_user_info['memberOf'] # e.g.: ['CN=P-MYRIAD,OU=Printer Groups,OU=Agency Groups,DC=agency,DC=dom', ...
+        try: ldap_groups = ldap_user_info['memberOf'] # e.g.: ['CN=P-MYRIAD,OU=Printer Groups,OU=Agency Groups,DC=agency,DC=dom', ...
+        except: print 'WARNING: '+username+' is not member of any group'
         groups = []
         for ldap_group in ldap_groups:
             if 'Agency Groups' in ldap_group:
