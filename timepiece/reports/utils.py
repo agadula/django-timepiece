@@ -8,7 +8,7 @@ from timepiece.utils import get_hours_summary, add_timezone, get_week_start,\
         get_month_start, get_year_start
 
 
-def date_totals(entries, by):
+def date_totals(entries, by, return_working_days=False):
     """Yield a user's name and a dictionary of their hours"""
     date_dict = {}
     for date, date_entries in groupby(entries, lambda x: x['date']):
@@ -29,6 +29,7 @@ def date_totals(entries, by):
 
         pk = d_entries[0][by]
         hours = get_hours_summary(d_entries)
+        if return_working_days: hours['total'] /= 8
         date_dict[date] = hours
     return name, pk, date_dict
 
@@ -57,7 +58,7 @@ def generate_dates(start=None, end=None, by='week'):
 
 
 def get_project_totals(entries, date_headers, hour_type=None, overtime=False,
-                   total_column=False, by='user'):
+                   total_column=False, by='user', return_working_days=False):
     """
     Yield hour totals grouped by user and date. Optionally including overtime.
     """
@@ -65,7 +66,7 @@ def get_project_totals(entries, date_headers, hour_type=None, overtime=False,
     rows = []
     # thing is the actual user or the actual project. thing_entries are the entries of the same "thing"
     for thing, thing_entries in groupby(entries, lambda x: x[by]):
-        name, thing_id, date_dict = date_totals(thing_entries, by)
+        name, thing_id, date_dict = date_totals(thing_entries, by, return_working_days)
         dates = []
         for index, day in enumerate(date_headers):
             if isinstance(day, datetime.datetime):

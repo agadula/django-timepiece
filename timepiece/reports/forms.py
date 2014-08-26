@@ -96,10 +96,19 @@ class OshaReportForm(DateForm):
         ('year', 'Year'),
     )
 
+    HOUR_CHOICES = (
+        ('working_days', 'Working Days'),
+        ('hours', 'Hours'),
+    )
+
     include_non_confirmed = forms.BooleanField(required=False)
 
     trunc = forms.ChoiceField(label='Group Totals By', choices=TRUNC_CHOICES,
             widget=forms.RadioSelect())
+
+    hours_or_wds = forms.ChoiceField(label='Show Data As', choices=HOUR_CHOICES,
+            widget=forms.RadioSelect())
+
 #     projects = selectable.AutoCompleteSelectMultipleField(ProjectLookup,
 #             label='Project Name', required=False)
 

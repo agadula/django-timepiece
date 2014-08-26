@@ -43,6 +43,7 @@ class ReportMixin(object):
             start, end = form.save()
             entryQ = self.get_entry_query(start, end, data)
             trunc = data['trunc']
+            hours_or_wds = data['hours_or_wds']
             if entryQ:
                 vals = ('pk', 'activity', 'project', 'project__name',
                         'project__status', 'project__type__label')
@@ -60,6 +61,7 @@ class ReportMixin(object):
                 'entries': entries,
                 'filter_form': form,
                 'trunc': trunc,
+                'hours_or_wds': hours_or_wds,
             })
         else:
             context.update({
@@ -69,6 +71,7 @@ class ReportMixin(object):
                 'entries': Entry.objects.none(),
                 'filter_form': form,
                 'trunc': '',
+                'hours_or_wds': '',
             })
 
         return context
@@ -198,6 +201,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
             'from_date': start,
             'to_date': end,
             'trunc': 'month',
+            'hours_or_wds': 'working_days',
             'projects': [],
         }
 
@@ -243,6 +247,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
             start, end = form.save()
             entryQ = self.get_entry_query(start, end, data)
             trunc = data['trunc']
+            hours_or_wds = data['hours_or_wds']
             if entryQ:
                 vals = ('pk', 'project', 'project__name',
                         'project__status', 'project__type__label',
@@ -261,6 +266,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
                 'entries': entries,
                 'filter_form': form,
                 'trunc': trunc,
+                'hours_or_wds': hours_or_wds,
             })
         else:
             context.update({
@@ -270,6 +276,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
                 'entries': SimpleEntry.objects.none(),
                 'filter_form': form,
                 'trunc': '',
+                'hours_or_wds': '',
             })
 
 
@@ -320,8 +327,8 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
         from_date = request.get('from_date')
         to_date = request.get('to_date')
         prefix = self.get_report_name()
-        return prefix+'_{0}_to_{1}_by_{2}'.format(from_date, to_date,
-            context.get('trunc', ''))
+        return prefix+'_{0}_to_{1}_by_{2}_in_{3}'.format(from_date, to_date,
+            context.get('trunc', ''), context.get('hours_or_wds', ''))
 
     def get_report_name(self):
         return self.get_name_prefix()+'_'+self.get_report_type()
@@ -379,10 +386,11 @@ class ProjectsReportMixin(OshaBaseReport):
     def run_report(self, context):
         entries = self.filter_entries(context['entries'])
         date_headers = context['date_headers']
-
+        return_working_days = context['hours_or_wds'] == 'working_days'
         self.summaries.append(('By Project', get_project_totals(
                 entries.order_by('project__business__name', 'project__business__id', 'project__name', 'project__id', 'date'),
-                date_headers, 'total', total_column=True, by='project')))
+                date_headers, 'total', total_column=True, by='project',
+                return_working_days=return_working_days)))
 
 
 class ActivitiesReportMixin(OshaBaseReport):
@@ -392,9 +400,11 @@ class ActivitiesReportMixin(OshaBaseReport):
     def run_report(self, context):
         entries = self.filter_entries(context['entries'])
         date_headers = context['date_headers']
+        return_working_days = context['hours_or_wds'] == 'working_days'
         self.summaries.append(('By Activity', get_project_totals(
                 entries.order_by('project__business__name', 'project__business__id', 'date'),
-                date_headers, 'total', total_column=True, by='project__business__name')))
+                date_headers, 'total', total_column=True, by='project__business__name',
+                return_working_days=return_working_days)))
 
 
 class UsersReportMixin(OshaBaseReport):        
@@ -404,11 +414,13 @@ class UsersReportMixin(OshaBaseReport):
     def run_report(self, context):
         entries = self.filter_entries(context['entries'])
         date_headers = context['date_headers']
+        return_working_days = context['hours_or_wds'] == 'working_days'
         include_users_without_entries = True
 
         summary_by_user = get_project_totals(
                 entries.order_by('user__last_name', 'user__id', 'date'),
-                date_headers, 'total', total_column=True, by='user')
+                date_headers, 'total', total_column=True, by='user',
+                return_working_days=return_working_days)
 
         if include_users_without_entries:
             all_users = list( self.accessible_users() )
@@ -456,6 +468,7 @@ class UsersAndProjectsReportMixin(OshaBaseReport):
         entries = context['entries'].filter(user__in=self.accessible_users() )
         entries = entries.order_by('project__business__name', 'project__business__id', 'project__name',
                 'project__id', 'user__last_name', 'user__id', 'date')
+        return_working_days = context['hours_or_wds'] == 'working_days'
 
         func = lambda x: x['project__name']
         for label, group in groupby(entries, func):
@@ -464,7 +477,8 @@ class UsersAndProjectsReportMixin(OshaBaseReport):
             self.summaries.append(
                 (title, get_project_totals(
                     list(group),
-                    context['date_headers'], 'total', total_column=True, by='user')
+                    context['date_headers'], 'total', total_column=True, by='user',
+                    return_working_days=return_working_days)
                 )
             )
 
@@ -477,6 +491,7 @@ class UsersAndActivitiesReportMixin(OshaBaseReport):
         entries = context['entries'].filter(user__in=self.accessible_users() )
         entries = entries.order_by('project__business__name',
                 'project__business__id', 'user__last_name', 'user__id', 'date')
+        return_working_days = context['hours_or_wds'] == 'working_days'
 
         func = lambda x: x['project__business__name']
         for label, group in groupby(entries, func):
@@ -484,7 +499,8 @@ class UsersAndActivitiesReportMixin(OshaBaseReport):
             self.summaries.append(
                 (title, get_project_totals(
                     list(group),
-                    context['date_headers'], 'total', total_column=True, by='user')
+                    context['date_headers'], 'total', total_column=True, by='user',
+                    return_working_days=return_working_days)
                 )
             )
 
