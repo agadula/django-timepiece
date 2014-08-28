@@ -197,7 +197,7 @@ if __name__ == "__main__":
     timepiece_ldap_password = getattr(settings, "AUTH_LDAP_BIND_PASSWORD", None)
     base_dn = getattr(settings, "AUTH_LDAP_USER_SEARCH_BASEDN", None)
 
-    ldap_units = 'G-INF G-NET G-PRU G-ADM'.split() # CPU NET PRU RSC
+    ldap_units = 'G-ABB-U-CPU G-ABB-U-NET G-ABB-U-PRU G-ABB-U-RSC'.split()
     
     # basic permissions
     basic_perms = ['add_entry', 'change_entry', 'delete_entry']
@@ -214,6 +214,8 @@ if __name__ == "__main__":
         ('pru', ['G-ABB-HOU-PRU'], [] ),
         ('rsc', ['G-ABB-HOU-RSC'], [] ),
         ('ict', ['G-ABB-ICT-COORD'], [] ),
+        ('hr', ['G-ABB-HR-COORD'], [] ),
+        ('qt', ['G-ABB-QT-COORD'], [] ),
     ]
 
 

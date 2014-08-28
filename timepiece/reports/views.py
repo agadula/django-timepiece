@@ -723,6 +723,68 @@ class IctUsersAndProjectsReport(UsersAndProjectsReportMixin, IctReportMixin):
 
 
 
+class HrReportMixin():
+    def get_name_prefix(self):
+        return 'hr'
+
+    def accessible_users(self):
+        return User.objects.filter(groups__name__in=['G-ABB-HR']).distinct().order_by('last_name')
+
+
+class HrProjectsReport(ProjectsReportMixin, HrReportMixin):
+    pass
+
+class HrActivitiesReport(ActivitiesReportMixin, HrReportMixin):
+    pass
+
+class HrUsersReport(UsersReportMixin, HrReportMixin):
+    @method_decorator(permission_required('entries.view_hr_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+class HrUsersAndActivitiesReport(UsersAndActivitiesReportMixin, HrReportMixin):
+    @method_decorator(permission_required('entries.view_hr_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+class HrUsersAndProjectsReport(UsersAndProjectsReportMixin, HrReportMixin):
+    @method_decorator(permission_required('entries.view_hr_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+
+
+class QtReportMixin():
+    def get_name_prefix(self):
+        return 'qt'
+
+    def accessible_users(self):
+        return User.objects.filter(groups__name__in=['G-ABB-QT']).distinct().order_by('last_name')
+
+
+class QtProjectsReport(ProjectsReportMixin, QtReportMixin):
+    pass
+
+class QtActivitiesReport(ActivitiesReportMixin, QtReportMixin):
+    pass
+
+class QtUsersReport(UsersReportMixin, QtReportMixin):
+    @method_decorator(permission_required('entries.view_qt_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+class QtUsersAndActivitiesReport(UsersAndActivitiesReportMixin, QtReportMixin):
+    @method_decorator(permission_required('entries.view_qt_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+class QtUsersAndProjectsReport(UsersAndProjectsReportMixin, QtReportMixin):
+    @method_decorator(permission_required('entries.view_qt_report'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+
+
+
 
 def get_report_classes(that_contain=None):
     import sys
