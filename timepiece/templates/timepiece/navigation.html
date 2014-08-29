@@ -49,9 +49,9 @@
                                 <li><a href="{% url 'report_my_activities' %}">Activities</a></li>
                                 {% if perms.entries.view_some_report %}
                                 <li><a href="{% url 'report_my_users' %}">Users</a></li>
+                                {% endif %}
                                 <li><a href="{% url 'report_my_users_and_projects' %}">Users and Projects</a></li>
                                 <li><a href="{% url 'report_my_users_and_activities' %}">Users and Activities</a></li>
-                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}

@@ -357,9 +357,7 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
 
     def is_filter_visible_by_the_user(self, report_filter, report_type): # agency, users_and_activities
         result = False
-        if report_type in ['projects', 'activities']:
-            result = True
-        else:
+        if report_type == 'users':
             user = self.request.user
             if user.has_perm('entries.view_some_report'):
                 if user.has_perm('entries.view_all_report') or report_filter=='my':
@@ -367,6 +365,8 @@ class OshaBaseReport(ReportMixin, CSVViewMixin, TemplateView):
                 else:
                     permission = 'entries.view_'+report_filter+'_report' # view_cpu_report
                     result = user.has_perm(permission)
+        else:
+            result = True
         return result
 
     def get_form(self):
@@ -526,14 +526,10 @@ class MyUsersReport(UsersReportMixin, MyReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class MyUsersAndActivitiesReport(UsersAndActivitiesReportMixin, MyReportMixin):
-    @method_decorator(permission_required('entries.view_some_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class MyUsersAndProjectsReport(UsersAndProjectsReportMixin, MyReportMixin):
-    @method_decorator(permission_required('entries.view_some_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -557,14 +553,10 @@ class AgencyUsersReport(UsersReportMixin, AgencyReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class AgencyUsersAndActivitiesReport(UsersAndActivitiesReportMixin, AgencyReportMixin):
-    @method_decorator(permission_required('entries.view_agency_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class AgencyUsersAndProjectsReport(UsersAndProjectsReportMixin, AgencyReportMixin):
-    @method_decorator(permission_required('entries.view_agency_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -588,14 +580,10 @@ class CpuUsersReport(UsersReportMixin, CpuReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class CpuUsersAndActivitiesReport(UsersAndActivitiesReportMixin, CpuReportMixin):
-    @method_decorator(permission_required('entries.view_cpu_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class CpuUsersAndProjectsReport(UsersAndProjectsReportMixin, CpuReportMixin):
-    @method_decorator(permission_required('entries.view_cpu_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -619,14 +607,10 @@ class NetUsersReport(UsersReportMixin, NetReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class NetUsersAndActivitiesReport(UsersAndActivitiesReportMixin, NetReportMixin):
-    @method_decorator(permission_required('entries.view_net_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class NetUsersAndProjectsReport(UsersAndProjectsReportMixin, NetReportMixin):
-    @method_decorator(permission_required('entries.view_net_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -650,14 +634,10 @@ class PruUsersReport(UsersReportMixin, PruReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class PruUsersAndActivitiesReport(UsersAndActivitiesReportMixin, PruReportMixin):
-    @method_decorator(permission_required('entries.view_pru_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class PruUsersAndProjectsReport(UsersAndProjectsReportMixin, PruReportMixin):
-    @method_decorator(permission_required('entries.view_pru_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -681,14 +661,10 @@ class RscUsersReport(UsersReportMixin, RscReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class RscUsersAndActivitiesReport(UsersAndActivitiesReportMixin, RscReportMixin):
-    @method_decorator(permission_required('entries.view_rsc_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class RscUsersAndProjectsReport(UsersAndProjectsReportMixin, RscReportMixin):
-    @method_decorator(permission_required('entries.view_rsc_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -712,14 +688,10 @@ class IctUsersReport(UsersReportMixin, IctReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class IctUsersAndActivitiesReport(UsersAndActivitiesReportMixin, IctReportMixin):
-    @method_decorator(permission_required('entries.view_ict_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class IctUsersAndProjectsReport(UsersAndProjectsReportMixin, IctReportMixin):
-    @method_decorator(permission_required('entries.view_ict_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -743,14 +715,10 @@ class HrUsersReport(UsersReportMixin, HrReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class HrUsersAndActivitiesReport(UsersAndActivitiesReportMixin, HrReportMixin):
-    @method_decorator(permission_required('entries.view_hr_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class HrUsersAndProjectsReport(UsersAndProjectsReportMixin, HrReportMixin):
-    @method_decorator(permission_required('entries.view_hr_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 
@@ -774,14 +742,10 @@ class QtUsersReport(UsersReportMixin, QtReportMixin):
         return super(ReportMixin, self).dispatch(request, *args, **kwargs)
 
 class QtUsersAndActivitiesReport(UsersAndActivitiesReportMixin, QtReportMixin):
-    @method_decorator(permission_required('entries.view_qt_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 class QtUsersAndProjectsReport(UsersAndProjectsReportMixin, QtReportMixin):
-    @method_decorator(permission_required('entries.view_qt_report'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(ReportMixin, self).dispatch(request, *args, **kwargs)
+    pass
 
 
 

@@ -25,3 +25,15 @@
     </div>
 </div>
 {% endblock report_nav %}
+
+{% block download_button %}
+{% if curr_type == 'projects' or curr_type == 'activities' %}
+    {% if perms.entries.can_download_report %}
+    <button type="submit" class="btn" name="export" value="True">Download CSV <i class="icon-download-alt"></i></button>
+    {% endif %}
+
+{% elif perms.entries.view_some_report %}
+    <button type="submit" class="btn" name="export" value="True">Download CSV <i class="icon-download-alt"></i></button>
+{% endif %}
+
+{% endblock download_button %}

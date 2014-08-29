@@ -18,9 +18,7 @@
             <form class="span12 form-horizontal" method="get" action="" id="report-filters" accept-charset="utf-8">
                 {{ filter_form|as_bootstrap:"horizontal" }}
                 <button type="submit" class="btn btn-primary" name="ok" id="billable">Update Filters</button>
-                {% if perms.entries.can_download_report %}
-                    <button type="submit" class="btn" name="export" value="True">Download CSV <i class="icon-download-alt"></i></button>
-                {% endif %}
+                {% block download_button %}{% endblock download_button %}
             </form>
         </div>
     </div>
