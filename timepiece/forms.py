@@ -67,7 +67,19 @@ class YearMonthForm(forms.Form):
             first_year = this_year
         else:
             first_year = first_entry['date'].year
-        years = [(year, year) for year in xrange(first_year, this_year + 1)]
+
+        try:
+            last_entry = SimpleEntry.no_join.values('date')\
+                                       .order_by('-date')[0]
+        except IndexError:
+            last_year = this_year
+        else:
+            if last_entry['date'].year > this_year:
+                last_year = last_entry['date'].year
+            else:
+                last_year = this_year
+
+        years = [(year, year) for year in xrange(first_year, last_year + 1)]
         self.fields['year'].choices = years
         initial = kwargs.get('initial')
         if initial:
